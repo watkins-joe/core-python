@@ -1,3 +1,23 @@
+table of contents
+
+- [course overview](#course-overview)
+- [installing and starting python](#installing-and-starting-python)
+  - [intstalling python](#intstalling-python)
+  - [interactive python](#interactive-python)
+    - [typing in the command line](#typing-in-the-command-line)
+    - [how to exit REPL](#how-to-exit-repl)
+  - [significant whitespace](#significant-whitespace)
+  - [python culture](#python-culture)
+    - [moment of zen 1: readbility counts](#moment-of-zen-1-readbility-counts)
+  - [using the standard library](#using-the-standard-library)
+    - [using the `math` module](#using-the-math-module)
+      - [`from module_name import attribute_name`](#from-module_name-import-attribute_name)
+      - [`from math import factorial as fac`](#from-math-import-factorial-as-fac)
+  - [summary](#summary)
+- [scalar types, operators, and control flow](#scalar-types-operators-and-control-flow)
+  - [scalar types](#scalar-types)
+    - [integers](#integers)
+    - [float](#float)
 # course overview
 
 the course is 100% applicable to python version `3.6` released in 2016.
@@ -428,4 +448,159 @@ we learned
        - renaming imported elements
 * using python's help system
 * learned how to use python's `factorial` function from python's standard math library
+
+# scalar types, operators, and control flow
+## scalar types
+
+python comes with a number of built-in  data types
+
+these include **primitive** scalar types like `integers` as well as **collection** types like `dictionaries`
+
+| Data Type  | Description                     | Example            |
+| ---------- | ------------------------------- | ------------------ |
+| `int`      | arbitrary precision integer     | `42`               |
+| `float`    | `64-bit` floating point numbers | `4.2`              |
+| `NoneType` | the `null` object               | `None`             |
+| `bool`     | `boolean` logical values        | `true` and `false` |
+
+
+### integers
+
+python integers are **signed** and have, for all practical purposes, unlimited precision, meaning they can contain as many digits as you need.
+
+integer literals are specified in decimal:
+
+```py
+>>> 10
+10
+>>> 
+```
+
+they may also be specific in `binary` with the `0b` prefix:
+
+```py
+>>> 0b10
+2
+>>>
+```
+
+or `octal` with the `0o` prefix:
+
+```py
+>>> 0o10
+8
+>>> 
+```
+
+or in `hexadecimal` with the `Ox` prefix:
+
+```py
+>>> 0x10
+16
+>>>
+```
+
+can also create integers with the `int` constructor function
+
+```py
+>>> int(3.5)
+3
+>>> 
+```
+
+- this can convert from other numeric types (like floats) to integers
+- the rounding of integers is always rounded down towards zero
+
+can also convert `strings` to `integers`
+
+```py
+>>> int("496")
+496
+>>> 
+```
+
+you can supply an optional number base when converting from a `string`
+
+```py
+>>> int("10000", 3)
+81
+>>> 
+```
+
+### float
+
+floating point numbers are supported in python by the `float` type
+
+python floats are implemented as `IEEE-754 double-precision` with `53-bits of binary precision`
+- this is equalivalent to between 15 and 16 significant digits in decimal
+
+any literal number containing a decimal is interpreted by python as a `float`
+
+```py
+>>> 3.125
+3.125
+>>> 
+```
+
+scientific notation can also be used. an example being the speed of light in meters per second.
+
+```py
+>>> 3e8
+300000000.0
+>>> 
+```
+
+for small numbers, like Planck's constant, 1.616 times 10<sup>-35</sup>
+
+```py
+>>> 1.616e-35
+1.616e-35
+>>> 
+```
+
+notice how it switched the display representation, that is, the format it prints to the REPL, to the most readable form.
+
+as with integers, convert to floats from other numeric or string stypes  using the float constructor function
+
+we can pass int values to the float constructor:
+
+```py
+>>> float(1)
+1.0
+>>>
+```
+
+we can also pass strings:
+
+```py
+>>> float("1")
+1.0
+>>> 
+```
+
+this is also how  we create the special floating point values `nan` or `not a number`
+
+```py
+>>> float("nan")
+nan
+>>>
+```
+
+as well as positive infinity and negative infinity
+
+```py
+>>> float("inf")
+inf
+>>> float("-inf")
+-inf
+>>> 
+```
+
+**NOTE: the result of any calculation involving an `int` and a `float` is promoted to a `float`.**
+
+```py
+>>> 3.0 + 1
+4.0
+>>> 
+```
 
