@@ -372,4 +372,60 @@ this is because in most programming languages, regular signed integers can only 
 
 however, factorials growso fastthat the largest factorial that you can fit into a 32-bit signed integer is 12 factorial, since 13 factorial is too large.
 
-in most-widely used programming languages, we would need more complex code or more sophisticated mathematics merely to compute how many ways there are to 
+in most-widely used programming languages, we would need more complex code or more sophisticated mathematics merely to compute how many ways there are to draw 3 fruit from a set of 13 fruits. 
+
+python encounters no such problems and can compute with arbitrarily large integers limited only by the memory in my computer.
+
+how many different pairs of fruit can we pick from 100 fruit?
+
+to emphasize how large 100 factorial is, we calculated it in our console:
+
+```py
+>>> from math import factorial as fac
+>>> fac(100)
+93326215443944152681699238856266700490715968264381621468592963895217599993229915608941463976156518286253697920827223758251185210916864000000000000000000000000
+>>> 
+```
+
+we can convert this integer to a text string and count the number of characters in it:
+
+```py
+>>> len(str(fac(100)))
+158
+>>> 
+```
+
+158 digits! that's a lot.
+
+## summary
+
+we learned
+* how to download and install python
+* starting python REPL
+* evaluating simple expressiona and mathematic calculations in REPL
+* the role of underscore in the REPL
+  * the value of `_` in REPL is the result of the last evaluated expression
+* how to make basic use of the `print()` function
+  * that the printed output is a **side effect**  of the function, **not** a return value
+* how to exit REPL
+  * using <kbd>CTRL</kbd> + <kbd>Z</kbd> on windows or <kbd>CTRL</kbd> + <kbd>D</kbd> on Linux and macOS
+* how python uses significant whitespace
+  * code blocks are initiated  with a colon and comprise consecutive lines at the same indentation level
+  * advantages of significant whitespace
+    * clarity
+    * consistency
+  * rules for indentations
+* python culture
+  * the zen of python
+    * can be printed in REPL by typing `import this` in REPL
+  * "readability counts"
+* importing standard library modules
+    1. `import from`
+       - importing an entire module
+    2. `from module import name`
+       - importing selected/specific elements of a module
+    3. `from module import name as name2`
+       - renaming imported elements
+* using python's help system
+* learned how to use python's `factorial` function from python's standard math library
+
