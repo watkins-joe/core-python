@@ -25,6 +25,8 @@ table of contents
       - [if-statement syntax](#if-statement-syntax)
         - [else-clause](#else-clause)
       - [while-loops](#while-loops)
+        - [`break`](#break)
+  - [summary](#summary-1)
 # course overview
 
 the course is 100% applicable to python version `3.6` released in 2016.
@@ -864,9 +866,110 @@ Between 20 and 50
 
 #### while-loops
 
+while loops in python are introduced by the `while` keyword, followed by a `boolean` expression
 
+just like the condition for if-statements, the expression is implicitly converted to a boolean value as if had been passed to the `bool` constructor
 
+the while statement is terminated by a colon because it introduces a new block
 
+```py
+while expression:
+    block
+```
 
+example loop that counts down from 5 to 1
 
+```py
+>>> while c != 0:
+...     print(c)
+...     c -= 1
+... 
+5
+4
+3
+2
+1
+>>> 
+```
 
+new language feature is the **augmented assignment operator**, a minus sign followed up an equal sign to subtract one from the value of `c` on each iteration.
+
+because the expressions are implicitly converted to a bool, we can also write the loop this way:
+
+```
+>>> while c:
+...     print(c)
+...     c -= 1
+... 
+5
+4
+3
+2
+1
+>>> 
+```
+
+why? because
+* c is truthy when initialized at 5 because 5 is != 0. 0 is a falsy value and would terminate the while loop. this repeats until the value of `c` reaches 0.
+
+however, doing this may be considered "unpythonic" because referring back to the zen of python, "explicit is better than implicit"
+
+we place higher value on the readability of the first form over the consision of the second form.
+
+while-loops are often used in python where an infinite loop is required.
+
+we can create an infinite loop in REPL that will never end, but we can terminate it with CTRL+C on mac
+
+```py
+>>> while True:
+...     pass
+... 
+^C
+Traceback (most recent call last):
+  File "<stdin>", line 2, in <module>
+KeyboardInterrupt
+>>> 
+```
+
+##### `break`
+
+python requires you to use `while True`and `break` together with an early exit facilitated by the `break` statement
+
+the `break` statement jumps out of the inner-most executing loop to the line immediately after it
+
+example of break:
+
+```py
+>>> while True:
+...     response = input()
+...     if int(response) % 7 == 0:
+...             break
+... 
+8
+9
+10
+14
+>>> 
+```
+
+1. we write an infinite loop that asks the user for input using the `input()` function
+2. we assign the value that the user enters in that the input function returns to a variable called `response`
+3. we write an if-statement that first converts the input in the response variable to an integer and checks if the input is divisible by  7 using the modulo operator (`%`)
+   1. if it is, we break out of the loop
+   2. if it is not, our program asks the user for another input.
+4. the loop continues to ask for input until correct input is entered, or we terminate the program
+
+## summary
+
+we..
+* looked at data types `int`, `float`, `None`, and `bool`
+* reviewed relational operators for equivalence and ordering
+* wrote conditional code containing if-elif-else statements
+* used while-loops to ask the user for input with an infinite `while True:` loop
+* learned that while-loop expressions, like if-statements, are converted to `bools`
+* learned how interrupt/terminate infinite loops with <kbd>CTRL</kbd> + <kbd>C</kbd> on macOS and that doing this generates a `KeyboardInterrupt` exception
+* learned how to break out of loops using the `break` statement
+  * observed that `break` only exits the **inner-most executing loop**
+  * and that it takes execution to the first statement following the loop that we broke out of
+* looked at **augmented assignment operators** like `-=` and `+=` for modifying iterator/counter variables in-place
+* requesting text input from the user with the `input()` function
