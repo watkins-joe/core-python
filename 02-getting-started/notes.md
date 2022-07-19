@@ -21,6 +21,10 @@ table of contents
     - [`None`](#none)
     - [`bool`](#bool)
   - [relational operators](#relational-operators)
+    - [control flow](#control-flow)
+      - [if-statement syntax](#if-statement-syntax)
+        - [else-clause](#else-clause)
+      - [while-loops](#while-loops)
 # course overview
 
 the course is 100% applicable to python version `3.6` released in 2016.
@@ -759,6 +763,108 @@ False
 True
 >>> 
 ```
+
+### control flow
+
+conditional statements allow us to branch execution of our code based on the value of an expression
+
+#### if-statement syntax
+
+the **form** of the statement is the `if` keyword, followed by an `expression`, terminated by a colon `:` to introduce a new code block
+
+```py
+if expression:
+    block
+```
+
+at the REPL:
+
+```py
+>>> if True:
+...     print("It's true!")
+... 
+It's true!
+>>> 
+```
+
+remember to terminate the block of code with a blank line!
+
+if false, the code does not execute.
+
+```py
+>>> if False:
+...     print("It's true!")
+... 
+>>> 
+```
+
+the expression used with the if-statement will be converted to a `bool`, just if the `bool` constructor had been used
+
+so explicitly constructing a `bool` in the if-statement is exactly equivalent to using a bare string.
+
+```py
+>>> if bool("eggs"):
+...     print("Yes please!")
+... 
+Yes please!
+>>> if "eggs":
+...     print("Yes please!")
+... 
+Yes please!
+>>> 
+```
+
+thanks to this useful shorthand, explicit conversion to `bool` using the `bool` constructor is rarely used in python.
+
+##### else-clause
+
+optional block that goes in a block introduced by th else keyword followed by a colon `:` which is indented to the same level as the `if` keyword
+
+```py
+>>> h = 42
+>>> if h > 50:
+...     print("Greater than 50")
+... else:
+...     print("50 or smaller")
+... 
+50 or smaller
+>>> 
+```
+
+for the `else` keyword in this case, we just omit the indentation after the three dots.
+
+for multiple conditions, use python's `elif` keyword, which is a combined else-if. the zen of python reminds us that flat is better than nested.
+
+```py
+>>> if h > 50:
+...     print("Greater than 50")
+... elif h < 20:
+...     print("Less than 20")
+... else:
+...     print("Between 20 and 50")
+... 
+Between 20 and 50
+>>> 
+```
+
+the above is much easier to read than this:
+
+```py
+>>> if h > 50:
+...     print("Greater than 50")
+... else:
+...     if h < 20:
+...         print("Less than 20")
+...     else:
+...         print("Between 20 and 50")
+... 
+Between 20 and 50
+>>> 
+```
+
+#### while-loops
+
+
 
 
 
