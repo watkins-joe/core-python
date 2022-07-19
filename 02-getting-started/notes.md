@@ -16,8 +16,10 @@ table of contents
   - [summary](#summary)
 - [scalar types, operators, and control flow](#scalar-types-operators-and-control-flow)
   - [scalar types](#scalar-types)
-    - [integers](#integers)
-    - [float](#float)
+    - [`integers`](#integers)
+    - [`float`](#float)
+    - [`None`](#none)
+    - [`bool`](#bool)
 # course overview
 
 the course is 100% applicable to python version `3.6` released in 2016.
@@ -464,7 +466,7 @@ these include **primitive** scalar types like `integers` as well as **collection
 | `bool`     | `boolean` logical values        | `true` and `false` |
 
 
-### integers
+### `integers`
 
 python integers are **signed** and have, for all practical purposes, unlimited precision, meaning they can contain as many digits as you need.
 
@@ -527,7 +529,7 @@ you can supply an optional number base when converting from a `string`
 >>> 
 ```
 
-### float
+### `float`
 
 floating point numbers are supported in python by the `float` type
 
@@ -603,4 +605,116 @@ inf
 4.0
 >>> 
 ```
+
+### `None`
+
+python has a special `null` value called `None`, spelled with a capital `N`.
+
+`None` is frequently used to represent the absence of a value.
+
+the python REPL **never** prints `None` results, so typing `None` into the REPL has no effect
+
+```py
+>>> None
+>>>
+```
+
+`None` can be assigned to variables just like an other object
+
+we can check whether an object is `None` by using python's `is` operator
+
+```py
+>>> a = None
+>>> a is None
+True
+>>>
+```
+
+### `bool`
+
+the `bool` type represents boolean logical values (`True` and `False`) and plays an important role in several of python's control flow structures
+
+there are two `bool` values, `True` and `False`, both spelled with the first letter capitialized
+
+```py
+>>> True
+True
+>>> False
+False
+```
+
+there is also a `bool` constructor that can be used to convert from other types to `bool`
+
+for integers, `0` is considered `falsy` and all other values, including negative numbers, `truthy`
+
+```py
+>>> bool(0)
+False
+>>> bool(42)
+True
+>>> bool(-1)
+True
+>>> 
+```
+
+the same behavior applies to `float` types, again where only `0` is considered `falsy`
+
+```py
+>>> bool(0.0)
+False
+>>> bool(0.207)
+True
+>>> bool(-1.117)
+True
+>>> 
+```
+
+whenc converting from collections, such as strings or lists, only empty values are considered `falsy`
+
+for lists, the empty list is falsy
+
+```py
+>>> bool([])
+False
+>>>
+```
+
+while any non-empty list is `truthy`
+
+```py
+>>> bool([1, 5, 9])
+True
+>>> 
+```
+
+similarly, empty `strings` are `falsy`
+
+```py
+>>> bool("")
+False
+>>> 
+```
+
+while any other string is `truthy`
+
+```py
+>>> bool("Spam")
+True
+>>> 
+```
+
+the `bool` constructor may not behave how you would expect when passing in the strings `"True"` and `"False"`
+
+```py
+>>> bool("True")
+True
+>>> bool("False")
+True
+>>> 
+```
+
+since both are non-empty `strings`, both result in `True`
+
+
+
 
