@@ -33,6 +33,8 @@ table of contents
     - [newline](#newline)
     - [escape sequences](#escape-sequences)
     - [string features](#string-features)
+  - [`bytes`](#bytes)
+  - [`list`](#list)
 # course overview
 
 the course is 100% applicable to python version `3.6` released in 2016.
@@ -1220,3 +1222,73 @@ similarly, we can use thee `\x` escape sequence followed by aa two-character hex
 ```
 
 there are no such Unicode capabilities in the otherwise similar `bytes` type
+
+## `bytes`
+
+data type for sequences of bytes
+
+bytes are very similar to strings
+
+bytes are sequences of bytes
+
+they are used for raw binary data and fixed-width single-byte character encodings such as ASCII
+
+as with strings, they have a simple literal form using quotes, the first of which is prefixed by a lowercase `b`
+
+```py
+>>> b'data'
+b'data'
+>>> b"data"
+b'data'
+```
+
+there is also a bytes constructor, but it is an advanced feature which we won't cover in this course.
+
+at this point, it's our goal to recognize bytes literals and understand that they support most of the same methods as `str` such as
+
+1. indexing, which returns the integer value of the specified byte
+    ```py
+    >>> d = b'some bytes'
+    >>> d[0]
+    115
+    >>>
+    ```
+2.  splitting, which returns a list of `bytes` objects
+    ```py
+    >>> d.split()
+    [b'some', b'bytes']
+    >>> 
+    ```
+
+to convert between bytes and strings, we must know the encoding of the byte sequence used to represent the string's Unicode code points as bytes.
+
+python supports a wide variety of encodings
+
+starting with a pangram (a sentence that contains all of the letters of the alphabet of the language it was written in) in Norwegian, we can encode that using `UTF-8` into a bytes object
+
+```py
+>>> norsk = "Jeg begynte å fortære en sandwich mens jeg kjørte taxi på vei til quiz"
+>>> data = norsk.encode('utf8')
+>>> data
+b'Jeg begynte \xc3\xa5 fort\xc3\xa6re en sandwich mens jeg kj\xc3\xb8rte taxi p\xc3\xa5 vei til quiz'
+>>> 
+```
+
+notice how the norwegian characters have each been rendered as pairs of bytes?
+
+we can reverse the process using the `decode` method of the bytes object. we must supply the correct encoding
+
+we can do this and check that they are the same as our beginning pangram
+
+```py
+>>> norwegian = data.decode('utf8')
+>>> norwegian == norsk
+True
+>>> norwegian
+'Jeg begynte å fortære en sandwich mens jeg kjørte taxi på vei til quiz'
+>>> 
+```
+
+**this is crucial to understand, since files and network resources such as HTTP responses are transmitted as byte streams, whereas we often prefer to work with the convenience of Unicode strings**
+
+## `list`
