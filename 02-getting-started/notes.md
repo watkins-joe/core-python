@@ -33,6 +33,7 @@ table of contents
     - [newline](#newline)
     - [escape sequences](#escape-sequences)
     - [string features](#string-features)
+    - [difference between string and string literal](#difference-between-string-and-string-literal)
   - [`bytes`](#bytes)
   - [`list`](#list)
 # course overview
@@ -1222,6 +1223,12 @@ similarly, we can use thee `\x` escape sequence followed by aa two-character hex
 ```
 
 there are no such Unicode capabilities in the otherwise similar `bytes` type
+
+### difference between string and string literal
+
+> A string literal is what you type into your source code. The string value is what gets output when you print it.
+
+[Source]a(https://stackoverflow.com/questions/61975353/what-is-the-difference-between-string-literals-and-string-values#:~:text=A%20string%20literal%20is%20what,output%20when%20you%20print%20it)
 
 ## `bytes`
 
