@@ -27,6 +27,12 @@ table of contents
       - [while-loops](#while-loops)
         - [`break`](#break)
   - [summary](#summary-1)
+- [introducing strings, collectons, and iteration](#introducing-strings-collectons-and-iteration)
+  - [`str`](#str)
+  - [`string literals`](#string-literals)
+    - [newline](#newline)
+    - [escape sequences](#escape-sequences)
+    - [string features](#string-features)
 # course overview
 
 the course is 100% applicable to python version `3.6` released in 2016.
@@ -973,3 +979,244 @@ we..
   * and that it takes execution to the first statement following the loop that we broke out of
 * looked at **augmented assignment operators** like `-=` and `+=` for modifying iterator/counter variables in-place
 * requesting text input from the user with the `input()` function
+
+# introducing strings, collectons, and iteration
+
+## `str`
+
+strings in python have the data type `str` and we have already been using them extensively.
+
+strings are a **sequence of Unicode code points**. we can think of code points as being like characters, although they are not strictly equivalent.
+
+the sequence of characters in a python string is **immutable**, meaning that once a string has been constructed, you cannot modify its contents.
+
+`literal strings` in python are delimited by single quotes or double quotes.
+ - this differs from `C` where `char`s can only be delimited by single-quotes (`'A'`) and `string`s can only be delimited by double quotes (`"This is a string"`)
+   - and technically, `string` is not a data type in `C`, but is rather an array of `char`s terminated by the `null` character (`\0`) represented like so: 
+        ```c
+        char greetings[] = "Hello World!"
+        ```
+
+```py
+>>> 'This is a string'
+'This is a string'
+>>> "This is also a string"
+'This is also a string'
+>>> 
+```
+
+no matter which type of quotes you decide to use for strings in python, you must be consistent
+
+you can't use single quotes on one side and double quotes on the other, like below:
+
+```py
+>>> 'This is also a string"
+  File "<stdin>", line 1
+    'This is also a string"
+                           ^
+SyntaxError: EOL while scanning string literal
+>>> 
+```
+
+this allows us to use single quotes where they apply in normal english in a string and avoids from having to escape characters.
+
+```py
+>>> "It's a good thing"
+"It's a good thing"
+>>> '"Yes!", he said, "I agree!"'
+'"Yes!", he said, "I agree!"'
+>>> 
+```
+
+## `string literals`
+
+adjacent string literals are concatenated by the python compiler into a single string, which can be useful for nicely formatted code
+
+```py
+>>> "first" "second"
+'firstsecond'
+>>> 
+```
+
+### newline
+
+if you want a string literal containing new lines, we have two options
+
+1. use multi-line strings
+    - spread the string literal across multiple lines
+
+multi-line strings are delimited by three quote characters rather than one
+
+```py
+>>> """This is
+... a multiline
+... string"""
+'This is\na multiline\nstring'
+>>> 
+```
+
+when the string is echoed back to us in REPL, the new lines are represented by the `\n` escape character
+
+we can also use three single-quotes
+
+```py
+>>> '''So 
+... is
+... this.'''
+'So\nis\nthis.'
+>>> 
+```
+
+2. use escape sequences
+    - embed escape sequences in a single-line string literal
+
+as an alternative, we can just embed the `\n` characters into the string literal ourselves
+
+to get a better sense of what we are representing, we can use the print function to see the string
+
+```py
+>>> m = 'This string\nspans multiple\nlines'
+>>> m
+'This string\nspans multiple\nlines'
+>>> print(m)
+This string
+spans multiple
+lines
+>>> 
+```
+
+python 3 translates `\n` to the appropriate, native newline sequence for your platform/OS
+
+### escape sequences
+
+we can use the escape sequence for other purposes, too like:
+
+1. incorporating tabs with `\t`
+2. allowing us to quote characters within strings
+```py
+>>> "This is a \" in a string"
+'This is a " in a string'
+>>> 'This is a \' in a string'
+"This is a ' in a string"
+>>> 
+```
+
+to put a backslash in a string, we escape the backslash with itself
+
+to reassure ourselves that there really only is one backslash in that string, we can again use the print function
+
+```py
+>>> k = 'A \\ in a string'
+>>> k
+'A \\ in a string'
+>>> print(k)
+A \ in a string
+>>> 
+```
+
+### string features
+
+you can create a `raw string` in python, useful or things like regex patterns or file paths that use backslashes extensively
+
+raw strings **don't support any escape sequences** and are essentially *what you see is what you get*
+
+to create a raw string, prefix the opening quote with a lowercase `r`
+
+```py
+>>> path = r'C:\Users\Merlin\Documents\Spells'
+>>> path
+'C:\\Users\\Merlin\\Documents\\Spells'
+>>> print(path)
+C:\Users\Merlin\Documents\Spells
+>>> 
+```
+
+we can use the string constructor to create string representations of other types, such as `integers` or `floats`
+
+```py
+>>> str(6.02e23)
+'6.02e+23'
+>>> 
+```
+
+strings in python are what are called sequence types, which means they support certain common operations for querying sequences
+
+we can access individual characters using square bracket notation with an integer 0-based index
+
+```py
+>>> s = 'parrot'
+>>> s[4]
+'o'
+>>> 
+```
+
+in contract to other programming languages, there is no separate character type distinct from the `string` type. for example, `C` has the `char` data type and while it doesn't technically have a `string` type, a `string` is an array of `char`s
+
+```c
+char greetings[] = "Hello World!";
+```
+
+this means that even though we are accessing only one character of a string in our example above, it is still of the `string` type. we can test this
+
+```py
+>>> type(s[4])
+<class 'str'>
+>>> 
+```
+
+string objects also support a  wide variety of operations/methods
+
+we can list those methods using the help function on the string type
+
+we will try the `capitalize` method
+
+like other languages, we use object/dot notation to call methods on objects
+
+```py
+>>> c = "oslo"
+>>> c.capitalize()
+'Oslo'
+>>> 
+```
+
+remember that strings are **immutable**, so the `capitalize` method didn't modify `c` in-place. rather, it returned a **new** string.
+
+we can verify by this by displaying `c` again in REPL, which remains unchanged
+
+```py
+>>> c
+'oslo'
+>>> 
+```
+
+strings (`str`) are unicode-capable, meaning we can use them with international characters easily, even in string literals.
+
+this is because the default source code for python 3 is `UTF-8`.
+
+if we have access to Norwegian characters, we can store them in a string literal without issue
+
+```py
+>>> "Vi er så glad for å høre og lære om Python!"
+'Vi er så glad for å høre og lære om Python!'
+>>>
+```
+
+we can even write the hexadecimal representations of Unicode code poinst as an escape sequence prefixed by `/u`, such as:
+
+```py
+>>> "Vi er s\u00e5 glad for \u00e5 h\xf8re og l\u00e6re om Python!"
+'Vi er så glad for å høre og lære om Python!'
+>>> 
+```
+
+similarly, we can use thee `\x` escape sequence followed by aa two-character hexadecimal string or an escaped octal string to include Unicode characters in a string literal
+
+```py
+>>> '\xe5'
+'å'
+>>> '\345'
+'å'
+>>> 
+```
+
+there are no such Unicode capabilities in the otherwise similar `bytes` type
