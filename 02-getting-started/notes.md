@@ -1292,3 +1292,82 @@ True
 **this is crucial to understand, since files and network resources such as HTTP responses are transmitted as byte streams, whereas we often prefer to work with the convenience of Unicode strings**
 
 ## `list`
+
+python lists are sequences of objects
+
+unlike strings, lists are mutable, insofar as the elements inside of them can be replaced or removed, and new elements can be inserted or appended.
+
+lists are a workhorse of python data structures
+
+literal lists are delimited by square brackets `[]`, separated by commas.
+
+```py
+>>> [1, 2, 3]
+[1, 2, 3]
+>>> 
+```
+
+we can also have a list of strings, too
+
+we can access elements in lists with square bracket notation on a zero-based index, and can replaced items in lists to other values.
+```py
+>>> a = ["apple", "orange", "pear"]
+>>> a[0]
+'apple'
+>>> a[1] = 7
+>>> a
+['apple', 7, 'pear']
+>>> 
+```
+
+lists can contain multiple different data types. for example,now we have a list that contains strings and an integer
+
+it's sometimes useful to create an empty list, which we do by using empty square brackets
+
+```py
+>>> b = []
+>>> 
+```
+
+we can also modify the list in other ways
+
+we can add some floats to the end of the list using the `append()` method
+
+```py
+>>> b.append(1.618)
+>>> b
+[1.618]
+>>> b.append(1.414)
+>>> b
+[1.618, 1.414]
+>>> 
+```
+
+there is also a `list` constructor which can be used to create lists from other collections such as strings
+
+```py
+>>> list("characters")
+['c', 'h', 'a', 'r', 'a', 'c', 't', 'e', 'r', 's']
+>>> 
+```
+
+though the python whitespace rules may seem pretty rigid, there is some flexibility
+
+for example, if at the end of the line, brackets, braces, or parenthesis are unclosed, you can continue on the next line
+
+```py
+>>> c = ['bear',
+...     'giraffe',
+...     'elephant',
+...     'caterpillar',]
+>>> c
+['bear', 'giraffe', 'elephant', 'caterpillar']
+>>> 
+```
+
+this can be useful for long literal collections or to simply improve readability.
+
+see also how we're allowed to use an additional comma after the last element
+- this is an important maintainability feature 
+
+
