@@ -36,6 +36,9 @@ table of contents
     - [difference between string and string literal](#difference-between-string-and-string-literal)
   - [`bytes`](#bytes)
   - [`list`](#list)
+  - [`dict`](#dict)
+    - [dict literals](#dict-literals)
+  - [`for-loop`](#for-loop)
 # course overview
 
 the course is 100% applicable to python version `3.6` released in 2016.
@@ -1376,5 +1379,68 @@ this can be useful for long literal collections or to simply improve readability
 
 see also how we're allowed to use an additional comma after the last element
 - this is an important maintainability feature 
+
+## `dict`
+
+a `dict` or dictionary, maps keys to values, and in other languages is known as a `map` or an `associative array`
+
+### dict literals
+
+literal dictionaries are created using curly braces containing key-value pairs
+
+```py
+{k1: v1, k2: v2}
+```
+
+each pair is separated by a comma, and each pair contains a key and a value
+
+`k1` being the first key, `v1` being the value of the first key
+
+using a dict to create a simple telephone directory:
+
+```py
+>>> d = {'alice': '878-8728-922', 'bob': '256-5262-124', 'eve': '1982321-787'}
+>>> 
+```
+
+we can retrieve items from the `dict` by using the square bracket notation
+
+```py
+>>> d['alice']
+'878-8728-922'
+>>> 
+```
+
+we can update the values associated with the key by "assigning thru the square brackets"
+
+```py
+>>> d = {'alice': '878-8728-922', 'bob': '256-5262-124', 'eve': '1982321-787'}
+>>> d['alice'] = '966-4532-6272'                                    
+>>> d
+{'alice': '966-4532-6272', 'bob': '256-5262-124', 'eve': '1982321-787'}
+>>> 
+```
+
+if we assign a value to a key that has not yet been added, a new key is created.
+
+```py
+>>> d
+{'alice': '966-4532-6272', 'bob': '256-5262-124', 'eve': '1982321-787'}
+>>> d['charles'] = '334-5551-913'
+>>> d
+{'alice': '966-4532-6272', 'bob': '256-5262-124', 'eve': '1982321-787', 'charles': '334-5551-913'}
+>>> 
+```
+
+as of python 3.7, entries are required to be kept in the order in which they were inserted. prior to 3.7, the entries in the dictionary can't be relied upon to be stored in any particular order.
+
+similiarly, empty dictionaries can be created using empty curly braces
+
+```py
+>>> e = {}
+>>> 
+```
+
+## `for-loop`
 
 
