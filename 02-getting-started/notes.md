@@ -39,6 +39,14 @@ table of contents
   - [`dict`](#dict)
     - [dict literals](#dict-literals)
   - [`for-loop`](#for-loop)
+  - [putting it all together](#putting-it-all-together)
+  - [from REPL to IDE](#from-repl-to-ide)
+  - [summary](#summary-2)
+    - [strings](#strings)
+    - [bytes](#bytes-1)
+    - [lists](#lists)
+    - [dicts](#dicts)
+    - [for-loops](#for-loops)
 # course overview
 
 the course is 100% applicable to python version `3.6` released in 2016.
@@ -1484,7 +1492,101 @@ note that we used the ability of the built-in `print` function to accept multipl
 
 see also how the color codes are returned to us in decimal
 
+## putting it all together
+
+putting it all together -- we will write a program that fetches some text on the internet using a python standard library function called `urlopen`
+
+1. we have to import url open from the request module within the standard library `urllib` package
+2. we call the `urlopen` function with the url to our story
+3. we will then create an empty list which will eventually hold all of the words from the text
+4. write a for-loop which will work through and read the story
+   - this will work thru the story line by line, and assign each literal line from the `story` to the variable called `line`
+5. it so happens that the HTTP request we made returns iterative lines of texts in this way, so the for-loop will retrieve one line of text at a time
+6. for each line of text, use the split method to divide it into words on whitespace boundaries
+7. use a second for-loop inside of the first to iterate over this list of words, appending each in turn to the accumulating story words list
+8. when finished reading the url, we need to close our handle it, `story`, using `story.close`
+9. view the value of the `story_words`
+
+```py
+>>> from urllib.request import urlopen
+>>> story = urlopen('http://sixty-north.com/c/t.txt')
+
+>>> 
+>>> story_words = []
+>>> for line in story:
+...     line_words  = line.split()
+...     for word in line_words:
+...             story_words.append(word)
+... 
+>>> story.close()
+>>> story_words
+[b'It', b'was', b'the', b'best', b'of', b'times', b'it', b'was', b'the', b'worst', b'of', b'times', b'it', b'was', b'the', b'age', b'of', b'wisdom', b'it', b'was', b'the', b'age', b'of', b'foolishness', b'it', b'was', b'the', b'epoch', b'of', b'belief', b'it', b'was', b'the', b'epoch', b'of', b'incredulity', b'it', b'was', b'the', b'season', b'of', b'Light', b'it', b'was', b'the', b'season', b'of', b'Darkness', b'it', b'was', b'the', b'spring', b'of', b'hope', b'it', b'was', b'the', b'winter', b'of', b'despair', b'we', b'had', b'everything', b'before', b'us', b'we', b'had', b'nothing', b'before', b'us', b'we', b'were', b'all', b'going', b'direct', b'to', b'Heaven', b'we', b'were', b'all', b'going', b'direct', b'the', b'other', b'way', b'in', b'short', b'the', b'period', b'was', b'so', b'far', b'like', b'the', b'present', b'period', b'that', b'some', b'of', b'its', b'noisiest', b'authorities', b'insisted', b'on', b'its', b'being', b'received', b'for', b'good', b'or', b'for', b'evil', b'in', b'the', b'superlative', b'degree', b'of', b'comparison', b'only']
+>>> 
+```
+
+notice that each of the single-quoted words is prefixed by a lowercase `b`, meaning we have a list of `bytes` objects, where we would have preferred a list of strings
+
+why did we get them?
+- remember that the HTTP request transferred raw bytes (bytes literals) to us over the network. to get a list of strings, we need to decode the bytes using bytes.decode() to get Unicode strings
+
+adding the decode method on each bytes literal line of next now returns us strings as expected
+
+```py
+>>> story = urlopen('http://sixty-north.com/c/t.txt')
+>>> story_words = []
+>>> for line in story:
+...     line_words  = line.decode('utf8').split()
+...     for word in line_words:
+...             story_words.append(word)
+... 
+>>> story_words
+['It', 'was', 'the', 'best', 'of', 'times', 'it', 'was', 'the', 'worst', 'of', 'times', 'it', 'was', 'the', 'age', 'of', 'wisdom', 'it', 'was', 'the', 'age', 'of', 'foolishness', 'it', 'was', 'the', 'epoch', 'of', 'belief', 'it', 'was', 'the', 'epoch', 'of', 'incredulity', 'it', 'was', 'the', 'season', 'of', 'Light', 'it', 'was', 'the', 'season', 'of', 'Darkness', 'it', 'was', 'the', 'spring', 'of', 'hope', 'it', 'was', 'the', 'winter', 'of', 'despair', 'we', 'had', 'everything', 'before', 'us', 'we', 'had', 'nothing', 'before', 'us', 'we', 'were', 'all', 'going', 'direct', 'to', 'Heaven', 'we', 'were', 'all', 'going', 'direct', 'the', 'other', 'way', 'in', 'short', 'the', 'period', 'was', 'so', 'far', 'like', 'the', 'present', 'period', 'that', 'some', 'of', 'its', 'noisiest', 'authorities', 'insisted', 'on', 'its', 'being', 'received', 'for', 'good', 'or', 'for', 'evil', 'in', 'the', 'superlative', 'degree', 'of', 'comparison', 'only']
+>>> 
+```
+
+## from REPL to IDE
+
+the REPL is good for short-lived work and experimentation
+
+using an IDE is recommended for larger/longer-lived projects, which we will use next
+
+we will learn how to move this code into a python module so it can be more easily worked with in a text editor
+
+## summary
+
+### strings
+- single and multi-line literals
+- concatenation of adjacent literals
+- universal newlines (`\n`)
+  - appropriately translated to the native newline during IO
+- escape sequences
+- raw strings, with R prefix can be used to suppress the escaping mechanism
+- use `str` constructor to convert other types to strings
+- access individual characters with square bracket notation/indexing
+- rich API
+- string literals can contain Unicode as of python 3
+
+### bytes
+- sequence of bytes rather than codepoints
+- literals prefixed with lowercase `b`
+- use `str.encode()` and `bytes.decode()` for conversion to and from bytes, respectively, in both cases passing in the encoding as a string argument, which we must know in advance
 
 
+### lists
+- mutable, heterogeneous sequences
+- literals delimited by square brackets
+- literal items separated by commas
+- access elements with square bracket notation
+- elements can be replaced by assigning to an index. this is not possible with strings. strings are immutable in this way.
+- grow lists with append()
+- use `list` constructor to create lists from other sequences
 
 
+### dicts
+- associate keys with values
+- literals are delimited by curly braces
+- key-value pairs are separated by commas
+- keys are separated from values by colons
+
+### for-loops
+- bind each item from an iterable one at a time to a variable
