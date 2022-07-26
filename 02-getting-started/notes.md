@@ -1443,4 +1443,48 @@ similiarly, empty dictionaries can be created using empty curly braces
 
 ## `for-loop`
 
+visit each item in an iterable sequence
+
+they request items one by one from a collection, or more strictly, an **iterable series**, and assign them to a variable that we specify.
+
+```py
+for item in iterable:
+    ...body...
+```
+
+example:
+
+```py
+>>> cities  = ["London", "New York", "Paris", "Oslo", "Helsinki"]
+>>> for city in cities:
+...     print(city)
+... 
+London
+New York
+Paris
+Oslo
+Helsinki
+>>> 
+```
+
+if you iterate over `dictionaries`, you can get the keys, which you can then use within the for-loop to retrieve values from the dictionary
+
+```py
+>>> colors = {'crimson': 0xdc143c, 'coral': 0xff7f50, 'teal': 0x008080}
+>>> for color in colors:
+...     print(color, colors[color])
+... 
+crimson 14423100
+coral 16744272
+teal 32896
+>>> 
+```
+
+note that we used the ability of the built-in `print` function to accept multiple arguments. we pass the key and the value for each color separately
+
+see also how the color codes are returned to us in decimal
+
+
+
+
 
