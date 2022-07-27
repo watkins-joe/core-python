@@ -47,6 +47,9 @@ table of contents
     - [lists](#lists)
     - [dicts](#dicts)
     - [for-loops](#for-loops)
+- [modularity](#modularity)
+  - [overview](#overview)
+  - [functions](#functions)
 # course overview
 
 the course is 100% applicable to python version `3.6` released in 2016.
@@ -1590,3 +1593,43 @@ we will learn how to move this code into a python module so it can be more easil
 
 ### for-loops
 - bind each item from an iterable one at a time to a variable
+
+# modularity
+
+## overview
+
+modularity is an important concept in software engineering that allows us to reuse pieces of code and functionality across an application/environment
+
+one of the most common uses of modularity is with reusable functions
+
+we can use self-contained, reusable pieces to solve problems
+
+we will learn how modules can be used from other modules, so as long as we don't introduce circular dependencies
+
+we will also learn more about importing modules
+
+executing programs or scripts
+
+python execution module
+
+make programs executable
+
+we will be starting with the code we had from the last section that retrieved text from a URL with an HTTP request
+
+```py
+from tkinter import W
+from urllib.request import urlopen
+
+story = urlopen('http://sixty-north.com/c/t.txt')
+story_words = []
+
+for line in story:
+    line_words = line.decode('utf-8').split()
+    for word in line_words:
+        story_words.append(word)
+
+story.close()
+```
+
+## functions
+
