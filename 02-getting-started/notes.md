@@ -53,6 +53,11 @@ table of contents
   - [functions](#functions)
     - [naming special functions](#naming-special-functions)
   - [`__name__`](#__name__)
+  - [the python execution model](#the-python-execution-model)
+    - [module, script, or program?](#module-script-or-program)
+      - [module](#module)
+      - [python script](#python-script)
+      - [python program](#python-program)
 # course overview
 
 the course is 100% applicable to python version `3.6` released in 2016.
@@ -1869,3 +1874,30 @@ comparison
 only
 $
 ```
+
+## the python execution model
+
+`def` is a statement, which when executed in sequence with the other top-level model scope code, causes the code within the function to be bound to the name of the function
+
+whem modules are imported or run, **all** of the top-level statements are run, and this is by the means which the function within the module namespace are defined
+
+### module, script, or program?
+
+#### module
+- convenient import with API
+- any `.py` file constitutes a python module
+
+#### python script
+- convenient execution from the command line
+
+#### python program
+- perhaps is composed of many python modules
+
+
+strongly recommended to even making simple scripts importable because it eases development and testing so much if you can access your code from within the REPL
+
+likewise, even modules which are only evermeant to be imported in production settings benefit from having executable test code.
+
+for this reason, nearly all modules we create have this form of defining one or more importable functions with a postscript to facilitate execution
+
+
