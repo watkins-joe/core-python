@@ -10,3 +10,6 @@ for line in story:
         story_words.append(word)
 
 story.close()
+
+for word in story_words:
+    print(word)

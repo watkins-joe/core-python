@@ -49,6 +49,7 @@ table of contents
     - [for-loops](#for-loops)
 - [modularity](#modularity)
   - [overview](#overview)
+  - [modules](#modules)
   - [functions](#functions)
 # course overview
 
@@ -1630,6 +1631,14 @@ for line in story:
 
 story.close()
 ```
+
+## modules
+
+our module can also be used in the REPL by importing it.
+
+in order for us to import it, we need to have launched REPL using the `python3` command in our terminal while in the parent folder/directory of the file we want to import, or as far as I know. i tried a file path /corepy/words and it didn't work
+
+after importing our file into the REPL, our code was executed immediately. we'll need to make it more modular to stop this from happening and as a result, we'll need to put our code into a function.
 
 ## functions
 
