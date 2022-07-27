@@ -51,6 +51,7 @@ table of contents
   - [overview](#overview)
   - [modules](#modules)
   - [functions](#functions)
+    - [naming special functions](#naming-special-functions)
 # course overview
 
 the course is 100% applicable to python version `3.6` released in 2016.
@@ -1641,4 +1642,96 @@ in order for us to import it, we need to have launched REPL using the `python3` 
 after importing our file into the REPL, our code was executed immediately. we'll need to make it more modular to stop this from happening and as a result, we'll need to put our code into a function.
 
 ## functions
+
+functions are defined using the `def` keyword, followed by the function name, an argument list in parenthesis, and a colon to start a new block
+
+the code inside the function block must be indented
+
+we use the `return` keyword to return a value from a function
+
+example:
+
+```py
+>>> def square(x):
+...     return x * x
+... 
+>>> square(8)
+64
+>>> 
+```
+
+functions aren't required to explicitly return a value though. perhaps, they perform side-effects such as our `launch_missiles` function that prints text, but doesn't have a return value
+
+```py
+>>> def launch_missiles():
+...     print("Missiles launched!")
+... 
+>>> launch_missiles()
+Missiles launched!
+>>> 
+```
+
+it's good practice to prefer functions which return values rather than cause side-effects
+
+we can return early from a function by using the `return` keyword with no parameter
+
+both the return statement without a parameter, as well as the **implicit return** at the end of a function actually causes the function to return `None`
+
+but, the REPL doesn't display `None` results, so we don't see them.
+
+by capturing the returned value/object in a variable, we can test for the `None` value in REPL:
+
+```py
+>>> def even_or_odd(n):
+...     if n % 2 == 0:
+...             print("even")
+...             return
+...     print("odd")
+... 
+>>> w = even_or_odd(31)
+odd
+>>> w is None
+True
+>>> 
+```
+
+another example:
+
+```py
+>>> def nth_root(radicand, n):
+...     return radicand ** (1/n)
+... 
+>>> nth_root(16, 2)
+4.0
+>>> nth_root(27, 3)
+3.0
+>>> 
+```
+
+see how the calls of the function evaluate value of the returned expression
+
+### naming special functions
+
+in python, many language feaatures are implemented or controlled using specially named objects or functions.
+
+these special names generally have two leading and two trailing underscores
+
+`__feature__`
+
+this makes them visually distinct, making it easy to remember and unlikely to collide with other names.
+
+but it does make them hard to pronounce.
+
+as a result, we result to using the term `dunder` when pronouncing these names
+
+`dunder` is a portmanteau of the term `double underscore` and we will use it to refer to any name with leading and trailing underscores
+
+for example:
+
+* when we talk about `__name__`, or underscore underscore name underscore underscore, we'll say `dunder name`
+
+
+
+
+
 
