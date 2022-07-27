@@ -52,6 +52,7 @@ table of contents
   - [modules](#modules)
   - [functions](#functions)
     - [naming special functions](#naming-special-functions)
+  - [`__name__`](#__name__)
 # course overview
 
 the course is 100% applicable to python version `3.6` released in 2016.
@@ -1730,8 +1731,141 @@ for example:
 
 * when we talk about `__name__`, or underscore underscore name underscore underscore, we'll say `dunder name`
 
+## `__name__`
 
+we will now define a new function called `fetch_words` with our code from our previous section that fetched the words from the txt file on the internet.
 
+now, our file looks like this:
 
+```py
+from urllib.request import urlopen
 
+def fetch_words():
+    story = urlopen('http://sixty-north.com/c/t.txt')
+    story_words = []
 
+    for line in story:
+        line_words = line.decode('utf-8').split()
+        for word in line_words:
+            story_words.append(word)
+
+    story.close()
+
+    for word in story_words:
+        print(word)
+```
+
+now that we have defined this as a function and we run `import words` again, we no longer automatically execute our script. in order to run it, we now need to call it on the words module with `words.fetch_words()`
+
+```py
+>>> import words
+>>> words.fetch_words()
+It
+was
+the
+'''words omitted for spacing'''
+of
+comparison
+only
+>>> 
+```
+
+the use of the `.` is qualifying the function name with the module name. alternatively, we can import a specific function using a different form of the import statement, `from words import fetch_words`
+
+having imported ou `fetch_words` function directly into our REPL session, we are able to call `fetch_words` without the dot notation
+
+this works as expected
+
+```py
+>>> from words import fetch_words
+>>> fetch_words()
+It
+was
+the
+'''words omitted for spacing'''
+of
+comparison
+only
+>>> 
+```
+
+but what happens if we try to run the moduile directly from our OS terminal/shell prompt?
+
+```shell
+$ python words.py
+$
+```
+
+no words are printed, which is because all the module does now is define a function and then exit -- the function is never called. we would prefer if the module printed something when we executed it.
+
+to make a module from w hich we can usefully import functions into the REPL and which can be run as a script, we need to learn a new python idiom
+
+`__name__` (dunder name)
+
+a specially named variable allowing us to **detect** whether a module is run as a script or imported into another module
+
+to see how, add `print(__name__)` at the end of our `words.py` file., outside of the `fetch_words` function
+
+when we then re-import words into REPL, we get this:
+
+```py
+>>> import words
+words
+>>> 
+```
+
+when imported for the first time, dunder name does evaluate to the  module's name
+
+if we run it again, we get no output. why? because module code is only executed once when the module is first imported
+
+```py
+>>> import words
+words
+>>> import words
+>>>
+```
+
+let's try running it again as a script from the shell
+
+```shell
+$ python3 words.py
+__main__
+$
+```
+
+now, the special dunder name (`__name__`) variable is equal to the string dunder main (`__main__`)
+
+why? python sets the value of dunder name differently depending on how our module is being used. 
+
+the **key idea** being introduced here is that our module can use this behvaior **to decide how it should behave** 
+
+if we replace the print function call with an if-check that checks if the dunder name variable is == to dunder main, we will call the fetch_words function
+
+```py
+...
+if __name__ == '__main__':
+    fetch_words()
+```
+
+if dunder name is not equal to dunder main, the module knows it's being imported into another module and won't be executed, and so only **defines** the fetch_words function without executing it.
+
+now we are able to safely import our module without unintentionally executing our function:
+
+```py
+>>> import words
+>>> 
+```
+
+and we can usefully run our module as a script:
+
+```shell
+$ python words.py
+It
+was
+the
+### words omitted for spacing ###
+of
+comparison
+only
+$
+```
