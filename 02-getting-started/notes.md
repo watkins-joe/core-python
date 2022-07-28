@@ -59,6 +59,7 @@ table of contents
       - [python script](#python-script)
       - [python program](#python-program)
   - [command line arguments](#command-line-arguments)
+  - [moment of zen 2: sparse is better than dense](#moment-of-zen-2-sparse-is-better-than-dense)
 # course overview
 
 the course is 100% applicable to python version `3.6` released in 2016.
@@ -2130,3 +2131,14 @@ if __name__ == '__main__':
 
 we have ensured that our functionality will now work regardless if we use the REPL or the command line. if we use the REPL, it will work as expected with a normal URL. if we use it from the command line, the dunder name will be dunder main and will grab `argv[1]` as the argument instead!
 
+## moment of zen 2: sparse is better than dense
+
+our top-level functions have two lines between them -- this is conventional for modern python code.
+
+> Two between functions 
+> That is the number of lines
+> PEP8 recommends
+
+according to the PEP8 style guide, it is customary to use two balnk lines between module-level functions 
+
+we use single blank lines for logical breaks within functions
