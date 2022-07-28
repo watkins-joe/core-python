@@ -58,6 +58,7 @@ table of contents
       - [module](#module)
       - [python script](#python-script)
       - [python program](#python-program)
+  - [command line arguments](#command-line-arguments)
 # course overview
 
 the course is 100% applicable to python version `3.6` released in 2016.
@@ -1900,4 +1901,232 @@ likewise, even modules which are only evermeant to be imported in production set
 
 for this reason, nearly all modules we create have this form of defining one or more importable functions with a postscript to facilitate execution
 
+## command line arguments
+
+we will modify our words.py file to moduilarize more of the program
+
+we
+* added a print_words function that prints the story words now returned by the fetch words function
+* added a main function that can be called when the program is run in the terminal/shell
+* added the call of the `main` function in the if-check on the dunder name variable if it is equal to `__main__`
+
+our code now looks like this:
+
+```py
+...
+        for word in line_words:
+            story_words.append(word)
+
+    story.close()
+    return story_words
+
+def print_words(story_words):
+    for word in story_words:
+        print(word)
+
+def main():
+    words = fetch_words()
+    print_words(words)    
+
+if __name__ == '__main__':
+    main()
+```
+
+we can now test this new functionality in the REPL with a few new forms of the import statement
+
+1. `from words import (fetch_words, print_words)
+   - allowing you to import multiple objects from a module using a comma-separated list. the parenthesis are **optional**. the list is allowed to bread over multiple lines if it gets too long.
+   - is likely the most widely-used form of the import statement
+
+example:
+
+```py
+>>> from words import (fetch_words, print_words)
+>>> print_words(fetch_words())
+It
+was
+the
+... '''words omitted'''
+of
+comparison
+only
+>>> 
+```
+
+2. `from words import *`
+   - imports everything from a module using an asterisk wildcard (`*`)
+   - this form is recommended only for casual use at the REPL, as it could have unintended consequences in programs since what is now imported is potentially beyond your control. issues such as namespace clashes at a future time is just one example
+
+example:
+
+```py
+>>> from words import *
+>>> fetch_words()
+['It', 'was', 'the', 'best', 'of', 'times', 'it', 'was', 'the', 'worst', 'of', 'times', 'it', 'was', 'the', 'age', 'of', 'wisdom', 'it', 'was', 'the', 'age', 'of', 'foolishness', 'it', 'was', 'the', 'epoch', 'of', 'belief', 'it', 'was', 'the', 'epoch', 'of', 'incredulity', 'it', 'was', 'the', 'season', 'of', 'Light', 'it', 'was', 'the', 'season', 'of', 'Darkness', 'it', 'was', 'the', 'spring', 'of', 'hope', 'it', 'was', 'the', 'winter', 'of', 'despair', 'we', 'had', 'everything', 'before', 'us', 'we', 'had', 'nothing', 'before', 'us', 'we', 'were', 'all', 'going', 'direct', 'to', 'Heaven', 'we', 'were', 'all', 'going', 'direct', 'the', 'other', 'way', 'in', 'short', 'the', 'period', 'was', 'so', 'far', 'like', 'the', 'present', 'period', 'that', 'some', 'of', 'its', 'noisiest', 'authorities', 'insisted', 'on', 'its', 'being', 'received', 'for', 'good', 'or', 'for', 'evil', 'in', 'the', 'superlative', 'degree', 'of', 'comparison', 'only']
+>>> 
+```
+
+we can also print any list of words by calling print_words
+
+```py
+>>> print_words(['Any', 'list', 'of', 'words'])
+Any
+list
+of
+words
+>>> 
+```
+
+and we can run the main program, which will fetch our words and print them like we have seen before.
+
+notice that the print_words function doesn't care about the types of items in the list
+
+```py
+>>> print_words([1, 7, 3])
+1
+7
+3
+>>>
+```
+
+as a result, maybe print_words isn't the best name. it prints anything in a list, and even any iterable , as shown below, like a string
+
+```py
+>>> print_words("i am a string")
+i
+ 
+a
+m
+ 
+a
+ 
+s
+t
+r
+i
+n
+g
+>>> 
+```
+
+it's a good idea to rename it to something more generic like `print_items`, and changing the variable names in the functino to suit the change we made
+
+here is our code now:
+
+```py
+        for word in line_words:
+            story_words.append(word)
+
+    story.close()
+    return story_words
+
+def print_items(items):
+    for item in items:
+        print(item)
+
+def main():
+    words = fetch_words()
+    print_items(words)    
+
+if __name__ == '__main__':
+    main()
+```
+
+dynamic typing is what allows us this degree of flexibility.
+
+another modification we can make to our code is to replace the hard-coded URL with a URL we can pass in instead.
+
+now, our code looks like:
+
+```py
+def fetch_words(url):
+    story = urlopen(url)
+    story_words = []
+
+    for line in story:
+        line_words = line.decode('utf-8').split()
+        for word in line_words:
+            story_words.append(word)
+
+    story.close()
+    return story_words
+
+...
+```
+
+but now, we will need to accept the URL as a command-line argument
+
+access to the command-line arguments in Python is through the attribute of the `sys` module called `argv`, which is a list of strings. this shares the same name as the main function argument `argv` in `C`
+
+in order to use it, we must first import the sys module at the top of our program.
+
+```py
+import sys
+from urllib.request import urlopen
+...
+```
+
+then, we need to get the **second** argument with an index of `1` from the list, just like we would in C.
+
+the first arg at index 0, just like `C`, is the name of the program, and the second arg, index 1, is the first argument you passed to the program
+
+```
+>>> exampleProgram firstArgument
+    ^ argv[0]      ^ argv[1]
+```
+
+and now our main function looks like:
+
+```py
+def main():
+    url = sys.argv[1]
+    words = fetch_words(url)
+    print_items(words)
+```
+
+running this now works as expected as well:
+
+```shell
+$ corepy % python3 words.py http://sixty-north.com/c/t.txt
+It
+was
+the
+... # words omitted
+of
+comparison
+only
+$ corepy % 
+```
+
+this looks fine until we realize that we can't usefully test `main` any longer from the REPL since it referes to `argv[1]` which is unlikely to have any useful value in the REPL environment
+
+the solution is to allow the argument list to be passed as a formal argument to the main function using `sys.argv` as the actual parameter if the dunder name equals dunder main block.
+
+here is the change:
+
+before:
+
+```py
+...
+def main():
+    url = sys.argv[1]
+    words = fetch_words(url)
+    print_items(words)    
+
+if __name__ == '__main__':
+    main()
+```
+
+after:
+
+```py
+def main(url):
+    words = fetch_words(url)
+    print_items(words)    
+
+if __name__ == '__main__':
+    main(sys.argv[1])
+```
+
+we have ensured that our functionality will now work regardless if we use the REPL or the command line. if we use the REPL, it will work as expected with a normal URL. if we use it from the command line, the dunder name will be dunder main and will grab `argv[1]` as the argument instead!
 
