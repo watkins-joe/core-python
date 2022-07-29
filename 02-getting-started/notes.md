@@ -63,6 +63,7 @@ table of contents
   - [docstrings](#docstrings)
   - [comments](#comments)
   - [shebang](#shebang)
+  - [summary](#summary-3)
 # course overview
 
 the course is 100% applicable to python version `3.6` released in 2016.
@@ -2409,3 +2410,28 @@ PS> .\words.py http://sixty-north.com/c/t.txt
 ```
 
 you can read more about pylauncher in PEP 397.
+
+## summary
+
+we learned..
+
+* python code is generally placed in *.py files called **modules**
+* how we can execute modules by passing them as the first argument to python
+  * as well as being able to pass command line arguments to our program on the command line, and reading those in our script and doing something with that input
+    * doing so by using `sys.argv`, a list that contains the command-line arguments
+* all top-level statements are executed when a module is imported
+* how to define functions using the `def` keyword
+* return objects from functions with the return keyword
+* return without an argument returns `None`, as does the implicit return
+* how to use dunder name (`__name__`)  to determine how a module is being used, whether it was imported or executed
+  * if dunder name is equal to dunder main (`__main__`), then it has been executed directly as a program
+  * learned how to handle both cases and make our module both executable and importable with our if statement (`if __name__ == '__main__'`)
+* a module is only executed once, on first import
+* `def` is a statement which binds code to a name
+* python's dynamic typing means our functions can be very generic with respect to the type of arguments
+* functions can have `docstrings`
+* help() can retrieve docstrings
+* modules can have docstrings
+* python comments start with `#`
+* program loaders can use #! to determine which python to run
+
