@@ -62,6 +62,7 @@ table of contents
   - [moment of zen 2: sparse is better than dense](#moment-of-zen-2-sparse-is-better-than-dense)
   - [docstrings](#docstrings)
   - [comments](#comments)
+  - [shebang](#shebang)
 # course overview
 
 the course is 100% applicable to python version `3.6` released in 2016.
@@ -2326,3 +2327,85 @@ if __name__ == '__main__':
     main(sys.argv[1]) # The 0th arg is the module filename.
 ```
 
+## shebang
+
+it's common on UNIX-like system to have the first line of a script include a special comment called a `shebang`
+
+example:
+
+```
+#!/usr/bin/env python
+```
+
+it begins with a hash, like any other comment, followed by an exclamation mark.
+
+this allows the program loader to identify which interpreter should be used to run the program.
+
+from [this stack overflow post](https://stackoverflow.com/a/19305076), on which shebang you should use and not use:
+
+> The shebang line in any script determines the script's ability to be executed like a standalone executable without typing python beforehand in the terminal or when double clicking it in a file manager (when configured properly). It isn't necessary but generally put there so when someone sees the file opened in an editor, they immediately know what they're looking at. However, which shebang line you use is important.
+> 
+> Correct usage for (defaults to version 3.latest) Python 3 scripts is:
+> 
+> `#!/usr/bin/env python3`
+> 
+> Correct usage for (defaults to version 2.latest) Python 2 scripts is:
+> 
+> `#!/usr/bin/env python2`
+> 
+> The following should not be used (except for the rare case that you are writing code which is compatible with both Python 2.x and 3.x):
+> 
+> `#!/usr/bin/env python`
+> 
+> The reason for these recommendations, given in PEP 394, is that python can refer either to python2 or python3 on different systems.
+> 
+> Also, do not use:
+> 
+> `#!/usr/local/bin/python`
+> 
+> "python may be installed at /usr/bin/python or /bin/python in those cases, the above #! will fail."
+>
+> ― ["#!/usr/bin/env python" vs "#!/usr/local/bin/python"](https://mail.python.org/pipermail/tutor/2007-June/054816.html)
+
+shebangs have an additional purpose of conveniently documenting at the top of a while whether the python code therein is python 2 or python 3.
+
+the exact details of your shebang command depend on the location of python on your system.
+
+typical python 3 shebangs used the UNIX `env` program to locate python 3 on your path environment variable which is compatible with python virtual environments. 
+
+on Mac or Linux, we must mark our script as executable using the command `chmod +x words.py` before the shebang will have any effect
+
+having done that and adding `#!/usr/bin/env python3` to the top of our `words.py` file, we can now run our script directly.
+
+```bash
+$ chmod +x words.py
+$ ./words.py http://sixty-north.com/c/t.txt
+It
+was
+the
+... # words omitted
+of
+comparison
+only
+$ corepy % 
+```
+
+since python 3.3, python also supports the use of the shebang to make python scripts directly executable with the correct version of the python interpreter, even to t he extent that shebands look like they should only work on UNIX-like system will work as expected on Windows
+
+this works because Windows python distribution now uses a program called `Pylauncher`. Pylauncher, the executable  for which is simply called `py.exe` will parse the shebang and locate the appropriate version  of python
+
+on windows in CMD, writing:
+
+```cmd
+> words.py http://sixty-north.com/c/t.txt
+```
+
+would be sufficient to run your script with python 3, even if you also have python 2 installed. 
+
+in powershell, the equivalent is almost the same:
+
+```shell
+PS> .\words.py http://sixty-north.com/c/t.txt
+```
+
+you can read more about pylauncher in PEP 397.
