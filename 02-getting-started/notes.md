@@ -60,6 +60,7 @@ table of contents
       - [python program](#python-program)
   - [command line arguments](#command-line-arguments)
   - [moment of zen 2: sparse is better than dense](#moment-of-zen-2-sparse-is-better-than-dense)
+  - [docstrings](#docstrings)
 # course overview
 
 the course is 100% applicable to python version `3.6` released in 2016.
@@ -2142,3 +2143,167 @@ our top-level functions have two lines between them -- this is conventional for 
 according to the PEP8 style guide, it is customary to use two balnk lines between module-level functions 
 
 we use single blank lines for logical breaks within functions
+
+## docstrings
+
+we saw that it was possible to ask for help at the REPL for help with modules, how can we add our own documentation to our own modules?
+
+`docstrings`
+
+- literal strings which document functions, modules, and classes
+- they must be the first statement in the blocks for these constructs
+
+we use triple-quoted strings, even for single-line docstrings because they can be easily expanded to add more detail.
+
+referenced in PEP 257, official python convention for docstrings, although not widely adopted.
+
+tools such as `Sphinx` are available to create HTML documentation from Python docstrings
+
+our docstrings format is the form presented in Google's Python Style Guide since it is amenable to being machine parsed while still remaining readable at the console.
+
+our fetch_words function looks like this now, with our docstrings added:
+
+```py
+def fetch_words(url):
+    """Fetch a list of words from a URL.
+    
+    Args:
+        url: The URL of a UTF-8 text document.
+
+    Returns: A list of strings containing the words from the document.
+    """
+    story = urlopen(url)
+    story_words = []
+
+    for line in story:
+        line_words = line.decode('utf-8').split()
+        for word in line_words:
+            story_words.append(word)
+
+    story.close()
+    return story_words
+```
+
+accessing our function using help from REPL:
+
+```py
+>>> from words import *
+>>> help(fetch_words)
+Help on function fetch_words in module words:
+
+fetch_words(url)
+    Fetch a list of words from a URL.
+    
+    Args:
+        url: The URL of a UTF-8 text document.
+    
+    Returns: A list of strings containing the words from the document.
+(END)
+```
+
+our docstrings print as we saw before with other modules and their functions :)
+
+then, we add the other docstrings to the rest of our functions.
+
+additionally, we add a module docstring.
+- they should be placed at the beginning of the module before any statements
+
+now our module looks like this:
+
+```py
+"""Retrieve and print words from a URL.
+
+Usage:
+
+    python3 words.py <URL>
+"""
+
+import sys
+from urllib.request import urlopen
+
+
+def fetch_words(url):
+    """Fetch a list of words from a URL.
+    
+    Args:
+        url: The URL of a UTF-8 text document.
+
+    Returns: A list of strings containing the words from the document.
+    """
+    story = urlopen(url)
+    story_words = []
+
+    for line in story:
+        line_words = line.decode('utf-8').split()
+        for word in line_words:
+            story_words.append(word)
+
+    story.close()
+    return story_words
+
+
+def print_items(items):
+    """Prints items one per line.
+
+    Args:
+        An iterable series of printable items.
+    
+    """
+    for item in items:
+        print(item)
+
+
+def main(url):
+    """Print each word from a text document at a URL.
+
+    Args:
+        url: The URL of a UTF-8 text document.
+    
+    """
+    words = fetch_words(url)
+    print_items(words)    
+
+if __name__ == '__main__':
+    main(sys.argv[1])
+```
+
+now, when we request help on the module as a whole, we get this as our output:
+
+```py
+>>> import words
+>>> help(words)
+Help on module words:
+
+NAME
+    words - Retrieve and print words from a URL.
+
+DESCRIPTION
+    Usage:
+    
+        python3 words.py <URL>
+
+FUNCTIONS
+    fetch_words(url)
+        Fetch a list of words from a URL.
+        
+        Args:
+            url: The URL of a UTF-8 text document.
+        
+        Returns: A list of strings containing the words from the document.
+    
+    main(url)
+        Print each word from a text document at a URL.
+        
+        Args:
+            url: The URL of a UTF-8 text document.
+    
+    print_items(items)
+        Prints items one per line.
+        
+        Args:
+            An iterable series of printable items.
+
+FILE
+    /Users/$/Documents/repos/core-python/02-getting-started/corepy/words.py
+(END)
+```
