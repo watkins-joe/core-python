@@ -61,6 +61,7 @@ table of contents
   - [command line arguments](#command-line-arguments)
   - [moment of zen 2: sparse is better than dense](#moment-of-zen-2-sparse-is-better-than-dense)
   - [docstrings](#docstrings)
+  - [comments](#comments)
 # course overview
 
 the course is 100% applicable to python version `3.6` released in 2016.
@@ -2307,3 +2308,21 @@ FILE
     /Users/$/Documents/repos/core-python/02-getting-started/corepy/words.py
 (END)
 ```
+
+## comments
+
+docstrings are the right place for **most** documentation in python -- but, your code should ne clear enough without needing explanation.
+
+sometimes, it's necessary to explain why your code is written as it is
+
+this can be done with python comments. they begin with a `hash` character (`#`) and continue to the end of the line
+
+good example of this is explaining why we are using `sys.argv[1]` instead of `sys.argv[0]` for our if-check on dunder name:
+
+```py
+...
+
+if __name__ == '__main__':
+    main(sys.argv[1]) # The 0th arg is the module filename.
+```
+
