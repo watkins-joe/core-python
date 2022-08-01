@@ -75,6 +75,8 @@ table of contents
       - [replacing argument value](#replacing-argument-value)
       - [mutable arguments](#mutable-arguments)
       - [return semantics](#return-semantics)
+  - [function arguments](#function-arguments)
+    - [when are default values evaluated?](#when-are-default-values-evaluated)
 # course overview
 
 the course is 100% applicable to python version `3.6` released in 2016.
@@ -2709,3 +2711,172 @@ True
 ```
 
 we see that it returns the very same object we passed in,showing that no copies of the list were made
+
+## function arguments
+
+function arguments are a list separated by a comma in the function definition
+
+arguments can be made optional by providing default values
+
+```py
+>>> def banner(message, border='-'):
+...     # other code
+```
+
+our function takes two arguments, the second of which (`border`) is optional whose default value is a hyphen as a string literal.
+
+since we have given it this default value, people who use this function can choose whether they want to pass in their own value for `border` or use the default value.
+
+**arguments with default values must come after those without default values**
+
+```py
+>>> def banner(message, border='-'):
+...     line = border * len(message)
+...     print(line)
+...     print(message)
+...     print(line)
+... 
+>>> banner("Norwegian Blue")
+--------------
+Norwegian Blue
+--------------
+>>> 
+```
+
+this shows that we are able to multiply the integer length of our message times the border value to create a string with `border * len(message)` number of characters dynamically and easily
+
+if we do provide an optional argument, it does get used
+
+```py
+>>> banner("Sun, Moon and Stars", "*")
+*******************
+Sun, Moon and Stars
+*******************
+>>> 
+```
+
+in production, this code is not particularly self-documenting
+
+we can alleviate this by naming the border argument at the call site
+
+```py
+>>> banner("Sun, Moon and Stars", border="*")
+*******************
+Sun, Moon and Stars
+*******************
+>>> 
+```
+
+in this case, the message string (`"Sun, Moon and Stars"`) is called a **positional argument**
+
+the `border` string is called a **keyword argument**
+
+the actual positional arguments are matched up in sequence with the formal arguments, that is **by position**, where as the keywords arguments are **matched by name**.
+
+if we use keyword arguments for both of our arguments, we have the freedom to supply them in any order we want
+
+```py
+>>> banner(border=".", message="Hello from Earth")
+................
+Hello from Earth
+................
+>>> 
+```
+
+it is important to remember that all keywords arguments **must be** specified after the p
+
+### when are default values evaluated?
+
+example using a function that prints the current time
+
+```py
+>>> import time
+>>> time.ctime()
+'Mon Aug  1 15:50:51 2022'
+>>> def show_default(arg=time.ctime()):
+...     print(arg)
+... 
+>>> show_default()
+Mon Aug  1 15:51:24 2022
+>>> show_default() # called a few seconds after the first call
+Mon Aug  1 15:51:24 2022
+>>> show_default() # called a few seconds after the second call
+Mon Aug  1 15:51:24 2022
+>>> 
+```
+
+why are we getting the same time printed for each subsequent function call, even though we should be expecting different times for each call? the displayed time never progresses
+
+remember -->
+  - def is a statement that is executed at runtime that binds a function definition to a function name
+
+as a result -->
+
+**default arguments are evaluated when `def` is executed and are evaluated only ONE TIME, when the `def` statement is executed**
+
+normally, when the default is a simple, immutable constant, such as an integer or a string, this doesn't cause any issues
+
+but for dynamic, mutable default values such as the current time, this can have issues.
+
+```py
+>>> def add_spam(menu=[]):
+...     menu.append("spam")
+...     return menu
+... 
+>>> breakfast = ['bacon', 'eggs']
+>>> add_spam(breakfast)
+['bacon', 'eggs', 'spam']
+>>> lunch = ['baked beans']
+>>> add_spam(lunch)
+['baked beans', 'spam']
+>>> add_spam()
+['spam']
+# function adds one spam to empty, default list as expected
+>>> add_spam()
+['spam', 'spam']
+# function adds another 'spam' to list, even though list should be empty.
+>>> add_spam()
+['spam', 'spam', 'spam']
+# adds another
+>>> add_spam()
+['spam', 'spam', 'spam', 'spam']
+# and another
+>>> 
+```
+this behavior does not happen with javascript:
+
+![js example](media/addSpamJS.png)
+
+why is the `menu` default value persisting thru function calls in python?
+
+the empty list used for the default argument is created exactly **ONE TIME**, when the def statement is executed.
+
+the first time we fall back on the default, the `menu` list has `'spam'` added to it.
+
+when we use the default a second time, the list still contains that item, and adds another one.
+
+the solution to this is straightforward, but may not be obvious:
+
+**always** use immutable objects such as integers or strings for default values.
+
+following this advice, we can solve this particular case by using the immutable `None` object as a sentinel.
+
+now, our function needs to check if menu is None and provide a newly constructed empty list if so. the rest of the function remains unchanged.
+
+```py
+>>> def add_spam(menu=None):
+...     if menu is None:
+...             menu = []
+...     menu.append('spam')
+...     return menu
+... 
+>>> add_spam()
+['spam']
+>>> add_spam()
+['spam']
+>>> add_spam()
+['spam']
+>>> add_spam()
+['spam']
+>>> 
+```
