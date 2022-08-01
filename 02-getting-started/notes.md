@@ -69,6 +69,12 @@ table of contents
     - [assigning to a variable](#assigning-to-a-variable)
       - [built-in `id()` function](#built-in-id-function)
     - [value vs. identity equality](#value-vs-identity-equality)
+  - [passing arguments and returning values](#passing-arguments-and-returning-values)
+    - [argument passing](#argument-passing)
+      - [argument passing semantics](#argument-passing-semantics)
+      - [replacing argument value](#replacing-argument-value)
+      - [mutable arguments](#mutable-arguments)
+      - [return semantics](#return-semantics)
 # course overview
 
 the course is 100% applicable to python version `3.6` released in 2016.
@@ -2603,3 +2609,103 @@ value-equality and identity equality are very different.
 
 - comparison by **value** can be controlled **programatically**
 - comparison by **identity** is **unalterably** defined by the language and this behavior cannot be changed
+
+## passing arguments and returning values
+
+### argument passing
+
+example:
+
+```py
+>>> m = [9, 15, 24]
+>>> def modify(k):
+...     k.append(39)
+...     print("k =", k)
+... 
+>>> modify(m)
+k = [9, 15, 24, 39]
+>>> m
+[9, 15, 24, 39]
+>>> 
+```
+
+#### argument passing semantics
+
+what happens when we pass an object reference to a function?
+
+we are essentially assigning from an actual argument reference
+
+1. list `m` is created
+2. list `m` is passed into the `modify` function as argument `k`
+3. argument `k` now points to the same reference as `m`, as `m` is the list argument `k`.
+4. therefore, `k` is now equal to the `m` list, and the `m` list is therefore mutated
+5. `m` list is updated with new appended number
+
+**no copy of m is made**
+
+if you want the function to modify a **copy** of an object, it's the responsibility of the function to do the copying.
+
+#### replacing argument value
+
+```py
+>>> f = [14, 23, 37]
+>>> def replace(g):
+...     g = [17, 28, 45]
+...     print("g =", g)
+... 
+>>> replace(f)
+g = [17, 28, 45]
+>>> f
+[14, 23, 37]
+>>> 
+```
+
+`f` still refers to the original, unmodified list
+
+this time, the function **did not** modify the object that was passed in. why?
+
+1. object reference named `f` was assigned to the formal argument named `g`
+2. `g` and `f` refer to the same object
+3. on the first line of the function, we reassigned the reference `g` to point to a newly constructed list (`[17, 28, 45]`)
+4. within the function, the reference to the original list (`[14, 23, 37]`) was overwritten, although the original list was still pointed to by the `f` reference outside of the function.
+
+#### mutable arguments
+
+if you wanted to change the contents of the list and have the changes seen outside of the function, you could modify the contents of the list by writing a function that replaces each element of the list in-place.
+
+```py
+>>> def replace_contents(g):
+...     g[0] = 17
+...     g[1] = 28
+...     g[2] = 45
+...     print("g =", g)
+... 
+>>> f = [14, 23, 37]
+>>> replace_contents(f)
+g = [17, 28, 45]
+>>> f
+[17, 28, 45]
+>>> 
+```
+
+function arguments are transferred using **pass-by-object-reference**
+  - means that the value of the reference is copied into the function argument, not the value of the referred-to object.
+
+references to objects are copied, **not the objects themselves**
+
+#### return semantics 
+
+the return statement uses the same pass-by-object reference semantics as function arguments
+
+```py
+>>> def f(d):
+...     return d
+... 
+>>> c = [6,  10, 16]
+>>> e = f(c)
+>>> c is e
+True
+>>> 
+```
+
+we see that it returns the very same object we passed in,showing that no copies of the list were made
