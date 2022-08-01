@@ -64,6 +64,11 @@ table of contents
   - [comments](#comments)
   - [shebang](#shebang)
   - [summary](#summary-3)
+- [objects and types](#objects-and-types)
+  - [overview](#overview-1)
+    - [assigning to a variable](#assigning-to-a-variable)
+      - [built-in `id()` function](#built-in-id-function)
+    - [value vs. identity equality](#value-vs-identity-equality)
 # course overview
 
 the course is 100% applicable to python version `3.6` released in 2016.
@@ -2435,3 +2440,166 @@ we learned..
 * python comments start with `#`
 * program loaders can use #! to determine which python to run
 
+# objects and types
+
+## overview
+
+pyton object model
+names references to objects
+value vs identity equality
+passing arguments and returning values
+python's type system
+scopes to limit name access
+everything is an object
+
+### assigning to a variable
+
+what happens under the hood when we assign something to a variable?
+
+`x = 1000`
+
+python creates an `int` object with a value of `1000`, an object reference with the name `x`, and arranges for `x` to refer to the `int 1000` object.
+
+what if we modify the value of `x` with another assignment?
+
+`x = 500`
+
+the value of the integer object does **NOT** change. `integer` objects in python are **immutable** and **cannot be changed** 
+
+python creates a **NEW**, **immutable** integer object with the value `500` and redirects the `x` reference to the new object.
+
+we now have no way of reaching the `int 1000` object and the python garbage collector will reclaim it at some point.
+
+```py
+y = x
+```
+
+when we assign from one variable to another, we're really assigning from one object reference to another object reference, so both references now refer to the same object.
+
+if we now reassign x..
+
+```py
+x = 3000
+```
+
+...we have x referring to an `int 3000` object and y referring to a separate int 500 object. there is no work for the garbage collector to do because all objects are reachable from live references.
+
+#### built-in `id()` function
+
+`id()`
+
+returns a unique integer identifier for an object that is constant for the life of the object
+
+example in REPL:
+
+```py
+>>> a = 496
+>>> id(a)
+4456608816
+>>> b = 1729
+>>> id(b)
+4456609104
+>>> b = a
+>>> id(b)
+4456608816
+>>> id(a) == id(b)
+True
+>>> a is b
+True
+>>> a is None
+False
+>>>
+```
+
+`id()` is rarely used in production python code. instead,the `is` operator is far more commonly used, which tests for equality of identity.
+  - that is, it tests where two references refer to the same object
+
+operations that seem naturally mutating in nature are not necessarily so. example, using the augmented assignment operator:
+
+```py
+>>> t = 5
+>>> id(t)
+4455381424
+>>> t += 2
+>>> id(t)
+4455381488
+>>> 
+```
+
+we see that the id of the incremented integer is different from the original. what happened?
+
+steps:
+
+1. initialize `t` referring to an `int 5` object
+2. augmented assignment operator creates an `int 2` object **without** assigning a reference to it.
+3. it then adds the `int 2` object with the `int 5` object to create a new `int 7` object
+4. finally, it assigns `t` to the `int 7` object and the remaining `int` objects (`int 5` and `int 2`) are garbage-collected 
+
+python objects show this behavior for **all types**
+
+**core rule to remember**
+- the assignment operator only ever binds objects to names. it **never** copies an object to a value.
+
+another example, using a mutable object, lists!:
+
+```py
+>>> r = [2, 4, 6]
+>>> r
+[2, 4, 6]
+>>> s = r
+>>> s
+[2, 4, 6]
+>>> s[1] = 17
+>>> s
+[2, 17, 6]
+>>> r
+[2, 17, 6]
+>>> 
+```
+
+we created a list with `r` and assigned `s`, a new variable, to `r`
+
+we modified the element index 1 of `s` to 17, but it also modified `r` list, too.
+  - this happens since the names s and r in fact refer to the same object, which we can verify with the `is` operator
+    - ```py
+      >>> s is r
+      True
+      >>>
+      ```
+
+example with step-by-step:
+
+1. we assign `r` to a new list
+2. we assign `s` to `r`, creating a new name for the existing list
+3. if we modify `s`, we also modify `r` because we're modifying the same underlying object.
+4. `s is r` is therefore `True` because both names refer to the same object
+
+if you want to create an **actual** copy of an object such as a `list`, other techniques must be used. we will look at this later.
+
+python doesn't have variables in the sense of boxes holding a value. it only has named references to objects and these references behave more like labels, which allow us to retrieve objects.
+
+### value vs. identity equality
+
+```py
+>>> p = [4, 7, 11]
+>>> q = [4, 7, 11]
+>>> p == q
+True
+>>> p is q
+False
+>>> 
+```
+
+`p is q` returns `False` because `p` and `q` refer to **different** objects
+
+but, the objects they refer to have the same value
+
+the steps:
+
+1. we have two separate lists objects, each with a single reference to it.
+2. the values contained in the lists are the same, that is, they are equivalent, or value-equal even though they have different identities
+
+value-equality and identity equality are very different.
+
+- comparison by **value** can be controlled **programatically**
+- comparison by **identity** is **unalterably** defined by the language and this behavior cannot be changed
