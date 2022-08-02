@@ -83,6 +83,7 @@ table of contents
       - [global/module scope](#globalmodule-scope)
       - [local scope inside `fetch_words()`](#local-scope-inside-fetch_words)
     - [rebinding global names](#rebinding-global-names)
+  - [moment of zen 3: special cases aren't special enough to break the rules](#moment-of-zen-3-special-cases-arent-special-enough-to-break-the-rules)
 # course overview
 
 the course is 100% applicable to python version `3.6` released in 2016.
@@ -3096,3 +3097,12 @@ now, we can update our `set_count` function like so:
 ```
 
 this now behaves as expected and we are now properly modifying the `count` reference at the global scope
+
+## moment of zen 3: special cases aren't special enough to break the rules
+
+we follow patterns
+not to kill complexity
+but to master it
+
+all variables in python are references to objects, even basic types such as integers. practically everything in python is an object, including functions and modules
+
