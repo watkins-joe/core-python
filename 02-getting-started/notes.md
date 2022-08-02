@@ -78,6 +78,11 @@ table of contents
   - [function arguments](#function-arguments)
     - [when are default values evaluated?](#when-are-default-values-evaluated)
   - [python's type system](#pythons-type-system)
+  - [scopes](#scopes)
+    - [scopes of words.py](#scopes-of-wordspy)
+      - [global/module scope](#globalmodule-scope)
+      - [local scope inside `fetch_words()`](#local-scope-inside-fetch_words)
+    - [rebinding global names](#rebinding-global-names)
 # course overview
 
 the course is 100% applicable to python version `3.6` released in 2016.
@@ -2951,3 +2956,143 @@ add(31, Number("42"))
 js could have coerced the string number and `Number` number into a number, but chose to do a string instead.  if we explicitly type the `string` number to a `Number` using the `Number` constructor, js will then perform the math as we expect and return a number. 
 
 read more about **type coercion** vs **type conversion** in javascript [here](https://developer.mozilla.org/en-US/docs/Glossary/Type_coercion)
+
+## scopes
+
+when we bind a name to an object, where is that binding stored?
+
+name reesolution to objects is managed by **scopes** and **scoping rules**
+
+there are **four** types of scope in python arranged in an hierarchy. each scope is a context in which names are stored and can be looked-up/are accessible.
+
+the four scopes, in order of most-narrow to most-broad
+
+| Scope     | Description                                                                                |
+| --------- | ------------------------------------------------------------------------------------------ |
+| Local     | Names defined inside the current function                                                  |
+| Enclosing | Names defined inside any and all enclosing functions                                       |
+| Global    | Names defined at the top level of a module. Each module brings with it a new, global scope |
+| Built-in  | Names built into the Python language through the special `builtins` module                 |
+
+together, the scopes comprise the `LEGB` rule. names are looked-up in the **narrowest** relevant context
+
+**note:** **scopes** in Python **do not** correspond to source code blocks as demarcated by indentation.
+
+for-loops and the like **do not** introduce new, nested scopes.
+
+### scopes of words.py
+
+looking back at our words.py module and the scopes within it:
+
+```py
+import sys
+from urllib.request import urlopen
+
+
+def fetch_words(url):
+    story = urlopen(url)
+    story_words = []
+
+    for line in story:
+        line_words = line.decode('utf-8').split()
+        for word in line_words:
+            story_words.append(word)
+
+    story.close()
+    return story_words
+
+
+def print_items(items):
+    for item in items:
+        print(item)
+
+
+def main(url):
+    words = fetch_words(url)
+    print_items(words)    
+
+if __name__ == '__main__':
+    main(sys.argv[1])
+```
+
+#### global/module scope
+
+| Variable/Function | Description                                |
+| ----------------- | ------------------------------------------ |
+| `main`            | bound by `def main()`                      |
+| `sys`             | bound by `import sys`                      |
+| `__name__`        | provided by the python runtime             |
+| `urlopen`         | bound by `from urllib.request import open` |
+| `fetch_words`     | bound by `def fetch_words()`               |
+| `print_items`     | bound by `def print_items()`               |
+
+global/module-scope name bindings are typically introduced by `import` statements and function or class definitions
+
+#### local scope inside `fetch_words()`
+
+| Variable/Function | Description                           |
+| ----------------- | ------------------------------------- |
+| `word`            | bound by the inner for-loop           |
+| `line-words`      | bound by assignment                   |
+| `line`            | bound by the outer for-loop           |
+| `story_words`     | bound by assignment                   |
+| `url`             | bound by the formal function argument |
+| `story`           | bound by assignment                   |
+
+each of these variables is brought into existence at first use and continues to live within the function scope until the function completes, at which point the references will be destroyed
+
+### rebinding global names
+
+occasionally, we will need to rebind a global variable (a variable defined at the top-level module scope) from within a function
+
+example:
+
+```py
+>>> count = 0
+>>> def show_count():
+...     print(count)
+... 
+>>> def set_count(c):
+...     count = c
+... 
+>>> show_count()
+0
+>>> set_count(5)
+>>> show_count()
+0
+>>> 
+```
+
+1. `count` is initialized to `0` at the module/global scope
+2. `show_count` function is created to print the value of `count`
+3. `set_count` function is created that binds the name `count` to a new variable
+4. when `show_count` is called, python looks up the `count` name in the local namespace and doesn't find it
+5. as a result, it looks up in the next-most outer name space. in this case, this is the global module namespace
+6. python **does** find `count` in the global namespace and prints the referred-to object
+7. we call `set_count(5)` to set the `count` variable equal to `5`
+8. we call `show_count` to display the value of `count`, which prints `0`
+
+why did we get `0` printed instead of `5`?
+
+1. when we call `set_count(5)`, the assignment, `count = c` binds the object referred to by the formal argument `c` to a new name, `count`, in the **innermost** namespace context which is the scope of the current function.
+   1. no look-up is performed for the global count at the module scope.
+   2. we created a **new variable** which shadows and therefore prevents access to the global variable of the same name
+   3. to avoid this, we need to tell python to consider the use of the `count` variable in the `set_count` function to resolve the `count` in the module namespace.
+   4. this is achieved by using the `global` keyword
+
+now, we can update our `set_count` function like so:
+
+```py
+>>> def set_count(c):
+...     global count 
+...     count = c
+... 
+>>> show_count()
+0
+>>> set_count(5)
+>>> show_count()
+5
+>>> 
+```
+
+this now behaves as expected and we are now properly modifying the `count` reference at the global scope
