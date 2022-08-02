@@ -77,6 +77,7 @@ table of contents
       - [return semantics](#return-semantics)
   - [function arguments](#function-arguments)
     - [when are default values evaluated?](#when-are-default-values-evaluated)
+  - [python's type system](#pythons-type-system)
 # course overview
 
 the course is 100% applicable to python version `3.6` released in 2016.
@@ -2880,3 +2881,73 @@ now, our function needs to check if menu is None and provide a newly constructed
 ['spam']
 >>> 
 ```
+
+## python's type system
+
+python can be characterized as having a **dynamic** and a **strong** type system
+
+dynamic-typing means the type of an object reference isn't resolved until the program is running and doesn't need to be specified upfront when the program is initially written.
+
+example:
+
+a simple function that adds two objects. nowhere in this definition do we mention any types
+
+we can use our function with integers, floats, strings, or any type for which the addition operator has been defined
+
+```py
+>>> def add(a, b):
+...     return a + b
+... 
+>>> add(5, 7)
+12
+>>> add(3.1, 2.4)
+5.5
+>>> add("news", "paper")
+'newspaper'
+>>> add([1, 6], [21, 107])
+[1, 6, 21, 107]
+>>> 
+```
+
+this is an example of the dynamic typing of python. the two arguments of `add()`, `a` and `b` can reference any type of object.
+
+the strength of the type system is demonstrated by trying to add type for which addition has not been defined, such as strings and floats or strings and integers.
+
+```py
+>>> add("The answer is", 42)
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+  File "<stdin>", line 2, in add
+TypeError: can only concatenate str (not "int") to str
+>>> add("The answer is", 4.2)
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+  File "<stdin>", line 2, in add
+TypeError: can only concatenate str (not "float") to str
+>>> 
+```
+
+python will not generally perform implicit conversions between types.
+  - the exception to this rule is the conversion of if-statement and while-loop predicates to `bool`.
+
+this differs greatly from javascript, where javascript sometimes uses implicit **type coercion** to convert one type to another depending on the types being combined
+
+```js
+function add(a, b) { 
+  return a + b 
+}
+add("The answer is ", 42)
+'The answer is 42'
+add("The answer is ", 4.2)
+'The answer is 4.2'
+add("42", 31)
+'4231'
+add(31, "42")
+'3142'
+add(31, Number("42"))
+73
+```
+
+js could have coerced the string number and `Number` number into a number, but chose to do a string instead.  if we explicitly type the `string` number to a `Number` using the `Number` constructor, js will then perform the math as we expect and return a number. 
+
+read more about **type coercion** vs **type conversion** in javascript [here](https://developer.mozilla.org/en-US/docs/Glossary/Type_coercion)
