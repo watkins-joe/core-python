@@ -84,6 +84,7 @@ table of contents
       - [local scope inside `fetch_words()`](#local-scope-inside-fetch_words)
     - [rebinding global names](#rebinding-global-names)
   - [moment of zen 3: special cases aren't special enough to break the rules](#moment-of-zen-3-special-cases-arent-special-enough-to-break-the-rules)
+  - [everything is an object](#everything-is-an-object)
 # course overview
 
 the course is 100% applicable to python version `3.6` released in 2016.
@@ -3105,4 +3106,65 @@ not to kill complexity
 but to master it
 
 all variables in python are references to objects, even basic types such as integers. practically everything in python is an object, including functions and modules
+
+## everything is an object
+
+going back to our `words.py` module, we can `import words` in the REPL and it will bind a module object to the name `words` in the current namespace
+
+```py
+>>> import words
+>>> 
+```
+
+we can determine the type of any object by using the built-in `type` function
+
+```py
+>>> type(words)
+<class 'module'>
+>>> 
+```
+
+if we want to see the attributes/properties of an object, we  can use the built-in `dir` function in a python-interactive session to introspect it. 
+
+```py
+>>> dir(words)
+['__builtins__', '__cached__', '__doc__', '__file__', '__loader__', '__name__', '__package__', '__spec__', 'fetch_words', 'main', 'print_items', 'sys', 'urlopen']
+>>> 
+```
+
+`dir` returns a sorted list of the module attributes, including the ones we defined 
+
+we can use the `type` function on any of these attributes to learn more about them
+
+```py
+>>> type(words.fetch_words)
+<class 'function'>
+>>> 
+```
+
+here, we find out that fetch_words is a function object. therefore, we can in turn call the `dir` function on our `fetch_words` function to reveal its attributes, too
+
+```py
+>>> dir(words.fetch_words)
+['__annotations__', '__call__', '__class__', '__closure__', '__code__', '__defaults__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__get__', '__getattribute__', '__globals__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__kwdefaults__', '__le__', '__lt__', '__module__', '__name__', '__ne__', '__new__', '__qualname__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__str__', '__subclasshook__']
+>>> 
+```
+
+dunder name (`__name__`) as you would expect is the name of the function as a string
+
+```py
+>>> words.fetch_words.__name__
+'fetch_words'
+>>> 
+```
+
+dunder doc (`__doc__`) is the doc string we provided for the function
+
+```py
+>>> words.fetch_words.__doc__
+'Fetch a list of words from a URL.\n    \n    Args:\n        url: The URL of a UTF-8 text document.\n\n    Returns: A list of strings containing the words from the document.\n    '
+>>> 
+```
+
+
 
