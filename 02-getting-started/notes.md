@@ -85,6 +85,7 @@ table of contents
     - [rebinding global names](#rebinding-global-names)
   - [moment of zen 3: special cases aren't special enough to break the rules](#moment-of-zen-3-special-cases-arent-special-enough-to-break-the-rules)
   - [everything is an object](#everything-is-an-object)
+  - [summary](#summary-4)
 # course overview
 
 the course is 100% applicable to python version `3.6` released in 2016.
@@ -142,7 +143,7 @@ can also use the `_` variable in an expression
 ```
 this is one of the very few obscure shortcuts in python
 
-note: the `_` variable doesn't have any behavior in python scripsts or program. this functionality is only in the RE
+note: the `_` variable doesn't have any behavior in python scripsts or program. this functionality is only in the REPL
 some commands don't have return values
 
 ```py
@@ -3166,5 +3167,35 @@ dunder doc (`__doc__`) is the doc string we provided for the function
 >>> 
 ```
 
+## summary
 
+* it's better to think of python working in terms of named references to objects rather than variables and values
+* assignment **doesn't** put a value in a box, it attaches a name tag to an object
+* assigning from one reference to another puts two name tags on the same object
+* the garbage collector removes objects with no references
+* `id()` function returns a unique integer ID for an object
+  * should rarely, if ever, be used in production code
+* `is` operator determines equality of **identity**, AKA whether two **names** refer to the **same object**
+* we can test for **equivalence** using the double-equals  operator (`==`)
+* function arguments are passed by object reference
+  * functions can modify their arguments if they are mutable objects
+* if a formal argument is rebound through assignment, the reference to the passed-in object is lost
+  * to change a mutable argument, you should replace its contents rather than replacing the whole object
+* `return` statement passes back an object reference to the caller, no copies are made
+* function arguments may have a default value
+  * default argument expressions are evaluated **ONLY ONCE**, when the `def` statement is executed
+* python uses dynamic typing
+* python uses strong typing, types are **NOT** coerced to match, unlike javascript
+* python names are looked up in scopes using the LEGB rule
+  * L = local to functions, E = in enclosing functions, G = in the global/module namespace, B = built-ins
+* global references can be read from local scopes
+* use `global` to assign to global references **from** a local scope
+* everything in python is an object, including modules and functions
+* `import` and `def` keywords result in binding to named references
+* the built-in `type()` function returns the type of an object
+* `dir()` returns a sorted list of the attributes/properties of an object
+* you can access the name of a function or module with dunder name, (`__name__`)
+* doc strings can be accessed thru `__doc__`
+* we can use len() to measure the length of a string
+* if we multiply a string by an integer, we get a new string with multiple copies of the operand string. aka the repititon operation, repeats a string an integral number of times
 
