@@ -86,11 +86,17 @@ table of contents
   - [moment of zen 3: special cases aren't special enough to break the rules](#moment-of-zen-3-special-cases-arent-special-enough-to-break-the-rules)
   - [everything is an object](#everything-is-an-object)
   - [summary](#summary-4)
+- [built-in collections](#built-in-collections)
+  - [overview](#overview-2)
+    - [tuple](#tuple)
+      - [tuple unpacking](#tuple-unpacking)
+      - [checking if tuple contains value](#checking-if-tuple-contains-value)
+
 # course overview
 
 the course is 100% applicable to python version `3.6` released in 2016.
 
-it is not applicable to python version `3.7`  to `.10`
+it is not applicable to python version `3.7` to `.10`
 
 # installing and starting python
 
@@ -107,15 +113,17 @@ we can start using it immediately.
 the interactive CLI environment is a `read, eval, print` loop
 
 python will
+
 1. **read** everything we type in
-2. **evaluate** it 
+2. **evaluate** it
 3. **print** the result, and loop back to the beginning
 
 this is also known as the `REPL` >>> the read, eval, print loop.
 
 ### typing in the command line
 
-* can initialize variables in the cli and reference them
+- can initialize variables in the cli and reference them
+
 ```py
 >>> x = 5
 >>> x
@@ -124,7 +132,8 @@ this is also known as the `REPL` >>> the read, eval, print loop.
 15
 ```
 
-* can use the `_` variable to reference the most recently printed value
+- can use the `_` variable to reference the most recently printed value
+
 ```py
 >>> 3 * x
 15
@@ -133,6 +142,7 @@ this is also known as the `REPL` >>> the read, eval, print loop.
 ```
 
 can also use the `_` variable in an expression
+
 ```py
 >>> 3 * x
 15
@@ -141,6 +151,7 @@ can also use the `_` variable in an expression
 >>> _ * 2
 30
 ```
+
 this is one of the very few obscure shortcuts in python
 
 note: the `_` variable doesn't have any behavior in python scripsts or program. this functionality is only in the REPL
@@ -162,6 +173,7 @@ this command printed the string `Hello, Python`
 `print` is one of the biggest differences between Python 2 and Python 3.
 
 - in Python 3, the parenthesis are **required**
+
   - `print("Python 3")`
   - this is because `print` in Python 3 is a function call
 
@@ -172,13 +184,14 @@ this command printed the string `Hello, Python`
 
 send the end-of-file control character, `CTRL-D` on mac/linux systems
 
-`CTRL-Z`, then  `Enter` on windows systems
+`CTRL-Z`, then `Enter` on windows systems
 
 ## significant whitespace
 
 basic code structure
 
 control flow structures
+
 - for-loops
 - while-loops
 - if-statements
@@ -248,7 +261,7 @@ each level of indentation is **typically** four spaces.
 
 advantages to significant whitespace:
 
-1. forces developers to write readable code 
+1. forces developers to write readable code
 2. no clutter with unnecessary braces
 3. human and computer can't get our of sync
 
@@ -298,6 +311,7 @@ Namespaces are one honking great idea -- let's do more of those!
 ### moment of zen 1: readbility counts
 
 Readability Counts
+
 - Clarity matters
 - So readability makes
 - For valuable code
@@ -308,7 +322,7 @@ the standard library contains modules
 
 you gain access to standard library modules by uding the `import` keyword
 
-the basic method of importing a module is this syntax:  `import module_name`
+the basic method of importing a module is this syntax: `import module_name`
 
 example:
 
@@ -319,7 +333,7 @@ we can access something inside of a module with the syntax `module.attribute_nam
 ```py
 >>> math.sqrt(81)
 9.0
->>> 
+>>>
 ```
 
 how do we know which modules have certain attributes or methods?
@@ -329,7 +343,7 @@ REPL has a built-in `help` function that can retrieve any embedded documentation
 ```
 >>> help
 Type help() for interactive help, or help(object) for help about object.
->>> 
+>>>
 ```
 
 ### using the `math` module
@@ -348,7 +362,7 @@ NAME
 
 MODULE REFERENCE
     https://docs.python.org/3.8/library/math
-    
+
     The following documentation is automatically generated from the Python
     source files.  It may be incomplete, incorrect or include features that
     are considered implementation detail and may vary between Python
@@ -362,10 +376,10 @@ DESCRIPTION
 FUNCTIONS
     acos(x, /)
         Return the arc cosine (measured in radians) of x.
-    
+
     acosh(x, /)
         Return the inverse hyperbolic cosine of x.
-    
+
     asin(x, /)
         Return the arc sine (measured in radians) of x.
 ...
@@ -383,7 +397,7 @@ Help on built-in function factorial in module math:
 
 factorial(x, /)
     Find x!.
-    
+
     Raise a ValueError if x is negative or non-integral.
 (END)
 ```
@@ -418,11 +432,11 @@ example:
 10.0
 ```
 
-it's an improvement, but is still a lot of code for such a simple expression. 
+it's an improvement, but is still a lot of code for such a simple expression.
 
 #### `from math import factorial as fac`
 
-a third form of the `import`  statement allows us to rename the imported function with the syntax `from math import factorial as fac`
+a third form of the `import` statement allows us to rename the imported function with the syntax `from math import factorial as fac`
 
 example:
 
@@ -444,7 +458,7 @@ this is because we have used python's `floating point division operator`, and si
 
 we can improve our expression since we know it will only ever return integral results.
 
-we can do this by using python's `integer division operator`, which is a double forward-slash `//` 
+we can do this by using python's `integer division operator`, which is a double forward-slash `//`
 
 example:
 
@@ -460,7 +474,7 @@ this is because in most programming languages, regular signed integers can only 
 
 however, factorials growso fastthat the largest factorial that you can fit into a 32-bit signed integer is 12 factorial, since 13 factorial is too large.
 
-in most-widely used programming languages, we would need more complex code or more sophisticated mathematics merely to compute how many ways there are to draw 3 fruit from a set of 13 fruits. 
+in most-widely used programming languages, we would need more complex code or more sophisticated mathematics merely to compute how many ways there are to draw 3 fruit from a set of 13 fruits.
 
 python encounters no such problems and can compute with arbitrarily large integers limited only by the memory in my computer.
 
@@ -472,7 +486,7 @@ to emphasize how large 100 factorial is, we calculated it in our console:
 >>> from math import factorial as fac
 >>> fac(100)
 93326215443944152681699238856266700490715968264381621468592963895217599993229915608941463976156518286253697920827223758251185210916864000000000000000000000000
->>> 
+>>>
 ```
 
 we can convert this integer to a text string and count the number of characters in it:
@@ -480,7 +494,7 @@ we can convert this integer to a text string and count the number of characters 
 ```py
 >>> len(str(fac(100)))
 158
->>> 
+>>>
 ```
 
 158 digits! that's a lot.
@@ -488,39 +502,41 @@ we can convert this integer to a text string and count the number of characters 
 ## summary
 
 we learned
-* how to download and install python
-* starting python REPL
-* evaluating simple expressiona and mathematic calculations in REPL
-* the role of underscore in the REPL
-  * the value of `_` in REPL is the result of the last evaluated expression
-* how to make basic use of the `print()` function
-  * that the printed output is a **side effect**  of the function, **not** a return value
-* how to exit REPL
-  * using <kbd>CTRL</kbd> + <kbd>Z</kbd> on windows or <kbd>CTRL</kbd> + <kbd>D</kbd> on Linux and macOS
-* how python uses significant whitespace
-  * code blocks are initiated  with a colon and comprise consecutive lines at the same indentation level
-  * advantages of significant whitespace
-    * clarity
-    * consistency
-  * rules for indentations
-* python culture
-  * the zen of python
-    * can be printed in REPL by typing `import this` in REPL
-  * "readability counts"
-* importing standard library modules
-    1. `import from`
-       - importing an entire module
-    2. `from module import name`
-       - importing selected/specific elements of a module
-    3. `from module import name as name2`
-       - renaming imported elements
-* using python's help system
-* learned how to use python's `factorial` function from python's standard math library
+
+- how to download and install python
+- starting python REPL
+- evaluating simple expressiona and mathematic calculations in REPL
+- the role of underscore in the REPL
+  - the value of `_` in REPL is the result of the last evaluated expression
+- how to make basic use of the `print()` function
+  - that the printed output is a **side effect** of the function, **not** a return value
+- how to exit REPL
+  - using <kbd>CTRL</kbd> + <kbd>Z</kbd> on windows or <kbd>CTRL</kbd> + <kbd>D</kbd> on Linux and macOS
+- how python uses significant whitespace
+  - code blocks are initiated with a colon and comprise consecutive lines at the same indentation level
+  - advantages of significant whitespace
+    - clarity
+    - consistency
+  - rules for indentations
+- python culture
+  - the zen of python
+    - can be printed in REPL by typing `import this` in REPL
+  - "readability counts"
+- importing standard library modules
+  1. `import from`
+     - importing an entire module
+  2. `from module import name`
+     - importing selected/specific elements of a module
+  3. `from module import name as name2`
+     - renaming imported elements
+- using python's help system
+- learned how to use python's `factorial` function from python's standard math library
 
 # scalar types, operators, and control flow
+
 ## scalar types
 
-python comes with a number of built-in  data types
+python comes with a number of built-in data types
 
 these include **primitive** scalar types like `integers` as well as **collection** types like `dictionaries`
 
@@ -531,7 +547,6 @@ these include **primitive** scalar types like `integers` as well as **collection
 | `NoneType` | the `null` object               | `None`             |
 | `bool`     | `boolean` logical values        | `true` and `false` |
 
-
 ### `integers`
 
 python integers are **signed** and have, for all practical purposes, unlimited precision, meaning they can contain as many digits as you need.
@@ -541,7 +556,7 @@ integer literals are specified in decimal:
 ```py
 >>> 10
 10
->>> 
+>>>
 ```
 
 they may also be specific in `binary` with the `0b` prefix:
@@ -557,7 +572,7 @@ or `octal` with the `0o` prefix:
 ```py
 >>> 0o10
 8
->>> 
+>>>
 ```
 
 or in `hexadecimal` with the `Ox` prefix:
@@ -573,7 +588,7 @@ can also create integers with the `int` constructor function
 ```py
 >>> int(3.5)
 3
->>> 
+>>>
 ```
 
 - this can convert from other numeric types (like floats) to integers
@@ -584,7 +599,7 @@ can also convert `strings` to `integers`
 ```py
 >>> int("496")
 496
->>> 
+>>>
 ```
 
 you can supply an optional number base when converting from a `string`
@@ -592,7 +607,7 @@ you can supply an optional number base when converting from a `string`
 ```py
 >>> int("10000", 3)
 81
->>> 
+>>>
 ```
 
 ### `float`
@@ -600,6 +615,7 @@ you can supply an optional number base when converting from a `string`
 floating point numbers are supported in python by the `float` type
 
 python floats are implemented as `IEEE-754 double-precision` with `53-bits of binary precision`
+
 - this is equalivalent to between 15 and 16 significant digits in decimal
 
 any literal number containing a decimal is interpreted by python as a `float`
@@ -607,7 +623,7 @@ any literal number containing a decimal is interpreted by python as a `float`
 ```py
 >>> 3.125
 3.125
->>> 
+>>>
 ```
 
 scientific notation can also be used. an example being the speed of light in meters per second.
@@ -615,7 +631,7 @@ scientific notation can also be used. an example being the speed of light in met
 ```py
 >>> 3e8
 300000000.0
->>> 
+>>>
 ```
 
 for small numbers, like Planck's constant, 1.616 times 10<sup>-35</sup>
@@ -623,12 +639,12 @@ for small numbers, like Planck's constant, 1.616 times 10<sup>-35</sup>
 ```py
 >>> 1.616e-35
 1.616e-35
->>> 
+>>>
 ```
 
 notice how it switched the display representation, that is, the format it prints to the REPL, to the most readable form.
 
-as with integers, convert to floats from other numeric or string stypes  using the float constructor function
+as with integers, convert to floats from other numeric or string stypes using the float constructor function
 
 we can pass int values to the float constructor:
 
@@ -643,10 +659,10 @@ we can also pass strings:
 ```py
 >>> float("1")
 1.0
->>> 
+>>>
 ```
 
-this is also how  we create the special floating point values `nan` or `not a number`
+this is also how we create the special floating point values `nan` or `not a number`
 
 ```py
 >>> float("nan")
@@ -661,7 +677,7 @@ as well as positive infinity and negative infinity
 inf
 >>> float("-inf")
 -inf
->>> 
+>>>
 ```
 
 **NOTE: the result of any calculation involving an `int` and a `float` is promoted to a `float`.**
@@ -669,7 +685,7 @@ inf
 ```py
 >>> 3.0 + 1
 4.0
->>> 
+>>>
 ```
 
 ### `None`
@@ -720,7 +736,7 @@ False
 True
 >>> bool(-1)
 True
->>> 
+>>>
 ```
 
 the same behavior applies to `float` types, again where only `0` is considered `falsy`
@@ -732,7 +748,7 @@ False
 True
 >>> bool(-1.117)
 True
->>> 
+>>>
 ```
 
 whenc converting from collections, such as strings or lists, only empty values are considered `falsy`
@@ -750,7 +766,7 @@ while any non-empty list is `truthy`
 ```py
 >>> bool([1, 5, 9])
 True
->>> 
+>>>
 ```
 
 similarly, empty `strings` are `falsy`
@@ -758,7 +774,7 @@ similarly, empty `strings` are `falsy`
 ```py
 >>> bool("")
 False
->>> 
+>>>
 ```
 
 while any other string is `truthy`
@@ -766,7 +782,7 @@ while any other string is `truthy`
 ```py
 >>> bool("Spam")
 True
->>> 
+>>>
 ```
 
 the `bool` constructor may not behave how you would expect when passing in the strings `"True"` and `"False"`
@@ -776,7 +792,7 @@ the `bool` constructor may not behave how you would expect when passing in the s
 True
 >>> bool("False")
 True
->>> 
+>>>
 ```
 
 since both are non-empty `strings`, both result in `True`
@@ -808,7 +824,7 @@ False
 False
 >>> g != 13
 True
->>> 
+>>>
 ```
 
 we can also compare the order of quantities using the rich comparison operators
@@ -822,7 +838,7 @@ True
 False
 >>> g >= 20
 True
->>> 
+>>>
 ```
 
 ### control flow
@@ -843,9 +859,9 @@ at the REPL:
 ```py
 >>> if True:
 ...     print("It's true!")
-... 
+...
 It's true!
->>> 
+>>>
 ```
 
 remember to terminate the block of code with a blank line!
@@ -855,8 +871,8 @@ if false, the code does not execute.
 ```py
 >>> if False:
 ...     print("It's true!")
-... 
->>> 
+...
+>>>
 ```
 
 the expression used with the if-statement will be converted to a `bool`, just if the `bool` constructor had been used
@@ -866,13 +882,13 @@ so explicitly constructing a `bool` in the if-statement is exactly equivalent to
 ```py
 >>> if bool("eggs"):
 ...     print("Yes please!")
-... 
+...
 Yes please!
 >>> if "eggs":
 ...     print("Yes please!")
-... 
+...
 Yes please!
->>> 
+>>>
 ```
 
 thanks to this useful shorthand, explicit conversion to `bool` using the `bool` constructor is rarely used in python.
@@ -887,9 +903,9 @@ optional block that goes in a block introduced by th else keyword followed by a 
 ...     print("Greater than 50")
 ... else:
 ...     print("50 or smaller")
-... 
+...
 50 or smaller
->>> 
+>>>
 ```
 
 for the `else` keyword in this case, we just omit the indentation after the three dots.
@@ -903,9 +919,9 @@ for multiple conditions, use python's `elif` keyword, which is a combined else-i
 ...     print("Less than 20")
 ... else:
 ...     print("Between 20 and 50")
-... 
+...
 Between 20 and 50
->>> 
+>>>
 ```
 
 the above is much easier to read than this:
@@ -918,9 +934,9 @@ the above is much easier to read than this:
 ...         print("Less than 20")
 ...     else:
 ...         print("Between 20 and 50")
-... 
+...
 Between 20 and 50
->>> 
+>>>
 ```
 
 #### while-loops
@@ -942,13 +958,13 @@ example loop that counts down from 5 to 1
 >>> while c != 0:
 ...     print(c)
 ...     c -= 1
-... 
+...
 5
 4
 3
 2
 1
->>> 
+>>>
 ```
 
 new language feature is the **augmented assignment operator**, a minus sign followed up an equal sign to subtract one from the value of `c` on each iteration.
@@ -959,17 +975,18 @@ because the expressions are implicitly converted to a bool, we can also write th
 >>> while c:
 ...     print(c)
 ...     c -= 1
-... 
+...
 5
 4
 3
 2
 1
->>> 
+>>>
 ```
 
 why? because
-* c is truthy when initialized at 5 because 5 is != 0. 0 is a falsy value and would terminate the while loop. this repeats until the value of `c` reaches 0.
+
+- c is truthy when initialized at 5 because 5 is != 0. 0 is a falsy value and would terminate the while loop. this repeats until the value of `c` reaches 0.
 
 however, doing this may be considered "unpythonic" because referring back to the zen of python, "explicit is better than implicit"
 
@@ -982,12 +999,12 @@ we can create an infinite loop in REPL that will never end, but we can terminate
 ```py
 >>> while True:
 ...     pass
-... 
+...
 ^C
 Traceback (most recent call last):
   File "<stdin>", line 2, in <module>
 KeyboardInterrupt
->>> 
+>>>
 ```
 
 ##### `break`
@@ -1003,17 +1020,17 @@ example of break:
 ...     response = input()
 ...     if int(response) % 7 == 0:
 ...             break
-... 
+...
 8
 9
 10
 14
->>> 
+>>>
 ```
 
 1. we write an infinite loop that asks the user for input using the `input()` function
 2. we assign the value that the user enters in that the input function returns to a variable called `response`
-3. we write an if-statement that first converts the input in the response variable to an integer and checks if the input is divisible by  7 using the modulo operator (`%`)
+3. we write an if-statement that first converts the input in the response variable to an integer and checks if the input is divisible by 7 using the modulo operator (`%`)
    1. if it is, we break out of the loop
    2. if it is not, our program asks the user for another input.
 4. the loop continues to ask for input until correct input is entered, or we terminate the program
@@ -1021,17 +1038,18 @@ example of break:
 ## summary
 
 we..
-* looked at data types `int`, `float`, `None`, and `bool`
-* reviewed relational operators for equivalence and ordering
-* wrote conditional code containing if-elif-else statements
-* used while-loops to ask the user for input with an infinite `while True:` loop
-* learned that while-loop expressions, like if-statements, are converted to `bools`
-* learned how interrupt/terminate infinite loops with <kbd>CTRL</kbd> + <kbd>C</kbd> on macOS and that doing this generates a `KeyboardInterrupt` exception
-* learned how to break out of loops using the `break` statement
-  * observed that `break` only exits the **inner-most executing loop**
-  * and that it takes execution to the first statement following the loop that we broke out of
-* looked at **augmented assignment operators** like `-=` and `+=` for modifying iterator/counter variables in-place
-* requesting text input from the user with the `input()` function
+
+- looked at data types `int`, `float`, `None`, and `bool`
+- reviewed relational operators for equivalence and ordering
+- wrote conditional code containing if-elif-else statements
+- used while-loops to ask the user for input with an infinite `while True:` loop
+- learned that while-loop expressions, like if-statements, are converted to `bools`
+- learned how interrupt/terminate infinite loops with <kbd>CTRL</kbd> + <kbd>C</kbd> on macOS and that doing this generates a `KeyboardInterrupt` exception
+- learned how to break out of loops using the `break` statement
+  - observed that `break` only exits the **inner-most executing loop**
+  - and that it takes execution to the first statement following the loop that we broke out of
+- looked at **augmented assignment operators** like `-=` and `+=` for modifying iterator/counter variables in-place
+- requesting text input from the user with the `input()` function
 
 # introducing strings, collectons, and iteration
 
@@ -1044,18 +1062,19 @@ strings are a **sequence of Unicode code points**. we can think of code points a
 the sequence of characters in a python string is **immutable**, meaning that once a string has been constructed, you cannot modify its contents.
 
 `literal strings` in python are delimited by single quotes or double quotes.
- - this differs from `C` where `char`s can only be delimited by single-quotes (`'A'`) and `string`s can only be delimited by double quotes (`"This is a string"`)
-   - and technically, `string` is not a data type in `C`, but is rather an array of `char`s terminated by the `null` character (`\0`) represented like so: 
-        ```c
-        char greetings[] = "Hello World!"
-        ```
+
+- this differs from `C` where `char`s can only be delimited by single-quotes (`'A'`) and `string`s can only be delimited by double quotes (`"This is a string"`)
+  - and technically, `string` is not a data type in `C`, but is rather an array of `char`s terminated by the `null` character (`\0`) represented like so:
+    ```c
+    char greetings[] = "Hello World!"
+    ```
 
 ```py
 >>> 'This is a string'
 'This is a string'
 >>> "This is also a string"
 'This is also a string'
->>> 
+>>>
 ```
 
 no matter which type of quotes you decide to use for strings in python, you must be consistent
@@ -1068,7 +1087,7 @@ you can't use single quotes on one side and double quotes on the other, like bel
     'This is also a string"
                            ^
 SyntaxError: EOL while scanning string literal
->>> 
+>>>
 ```
 
 this allows us to use single quotes where they apply in normal english in a string and avoids from having to escape characters.
@@ -1078,7 +1097,7 @@ this allows us to use single quotes where they apply in normal english in a stri
 "It's a good thing"
 >>> '"Yes!", he said, "I agree!"'
 '"Yes!", he said, "I agree!"'
->>> 
+>>>
 ```
 
 ## `string literals`
@@ -1088,7 +1107,7 @@ adjacent string literals are concatenated by the python compiler into a single s
 ```py
 >>> "first" "second"
 'firstsecond'
->>> 
+>>>
 ```
 
 ### newline
@@ -1096,7 +1115,7 @@ adjacent string literals are concatenated by the python compiler into a single s
 if you want a string literal containing new lines, we have two options
 
 1. use multi-line strings
-    - spread the string literal across multiple lines
+   - spread the string literal across multiple lines
 
 multi-line strings are delimited by three quote characters rather than one
 
@@ -1105,7 +1124,7 @@ multi-line strings are delimited by three quote characters rather than one
 ... a multiline
 ... string"""
 'This is\na multiline\nstring'
->>> 
+>>>
 ```
 
 when the string is echoed back to us in REPL, the new lines are represented by the `\n` escape character
@@ -1113,15 +1132,15 @@ when the string is echoed back to us in REPL, the new lines are represented by t
 we can also use three single-quotes
 
 ```py
->>> '''So 
+>>> '''So
 ... is
 ... this.'''
 'So\nis\nthis.'
->>> 
+>>>
 ```
 
 2. use escape sequences
-    - embed escape sequences in a single-line string literal
+   - embed escape sequences in a single-line string literal
 
 as an alternative, we can just embed the `\n` characters into the string literal ourselves
 
@@ -1135,7 +1154,7 @@ to get a better sense of what we are representing, we can use the print function
 This string
 spans multiple
 lines
->>> 
+>>>
 ```
 
 python 3 translates `\n` to the appropriate, native newline sequence for your platform/OS
@@ -1146,12 +1165,13 @@ we can use the escape sequence for other purposes, too like:
 
 1. incorporating tabs with `\t`
 2. allowing us to quote characters within strings
+
 ```py
 >>> "This is a \" in a string"
 'This is a " in a string'
 >>> 'This is a \' in a string'
 "This is a ' in a string"
->>> 
+>>>
 ```
 
 to put a backslash in a string, we escape the backslash with itself
@@ -1164,14 +1184,14 @@ to reassure ourselves that there really only is one backslash in that string, we
 'A \\ in a string'
 >>> print(k)
 A \ in a string
->>> 
+>>>
 ```
 
 ### string features
 
 you can create a `raw string` in python, useful or things like regex patterns or file paths that use backslashes extensively
 
-raw strings **don't support any escape sequences** and are essentially *what you see is what you get*
+raw strings **don't support any escape sequences** and are essentially _what you see is what you get_
 
 to create a raw string, prefix the opening quote with a lowercase `r`
 
@@ -1181,7 +1201,7 @@ to create a raw string, prefix the opening quote with a lowercase `r`
 'C:\\Users\\Merlin\\Documents\\Spells'
 >>> print(path)
 C:\Users\Merlin\Documents\Spells
->>> 
+>>>
 ```
 
 we can use the string constructor to create string representations of other types, such as `integers` or `floats`
@@ -1189,7 +1209,7 @@ we can use the string constructor to create string representations of other type
 ```py
 >>> str(6.02e23)
 '6.02e+23'
->>> 
+>>>
 ```
 
 strings in python are what are called sequence types, which means they support certain common operations for querying sequences
@@ -1200,7 +1220,7 @@ we can access individual characters using square bracket notation with an intege
 >>> s = 'parrot'
 >>> s[4]
 'o'
->>> 
+>>>
 ```
 
 in contract to other programming languages, there is no separate character type distinct from the `string` type. for example, `C` has the `char` data type and while it doesn't technically have a `string` type, a `string` is an array of `char`s
@@ -1214,10 +1234,10 @@ this means that even though we are accessing only one character of a string in o
 ```py
 >>> type(s[4])
 <class 'str'>
->>> 
+>>>
 ```
 
-string objects also support a  wide variety of operations/methods
+string objects also support a wide variety of operations/methods
 
 we can list those methods using the help function on the string type
 
@@ -1229,7 +1249,7 @@ like other languages, we use object/dot notation to call methods on objects
 >>> c = "oslo"
 >>> c.capitalize()
 'Oslo'
->>> 
+>>>
 ```
 
 remember that strings are **immutable**, so the `capitalize` method didn't modify `c` in-place. rather, it returned a **new** string.
@@ -1239,7 +1259,7 @@ we can verify by this by displaying `c` again in REPL, which remains unchanged
 ```py
 >>> c
 'oslo'
->>> 
+>>>
 ```
 
 strings (`str`) are unicode-capable, meaning we can use them with international characters easily, even in string literals.
@@ -1259,7 +1279,7 @@ we can even write the hexadecimal representations of Unicode code poinst as an e
 ```py
 >>> "Vi er s\u00e5 glad for \u00e5 h\xf8re og l\u00e6re om Python!"
 'Vi er så glad for å høre og lære om Python!'
->>> 
+>>>
 ```
 
 similarly, we can use thee `\x` escape sequence followed by aa two-character hexadecimal string or an escaped octal string to include Unicode characters in a string literal
@@ -1269,7 +1289,7 @@ similarly, we can use thee `\x` escape sequence followed by aa two-character hex
 'å'
 >>> '\345'
 'å'
->>> 
+>>>
 ```
 
 there are no such Unicode capabilities in the otherwise similar `bytes` type
@@ -1304,18 +1324,18 @@ there is also a bytes constructor, but it is an advanced feature which we won't 
 at this point, it's our goal to recognize bytes literals and understand that they support most of the same methods as `str` such as
 
 1. indexing, which returns the integer value of the specified byte
-    ```py
-    >>> d = b'some bytes'
-    >>> d[0]
-    115
-    >>>
-    ```
-2.  splitting, which returns a list of `bytes` objects
-    ```py
-    >>> d.split()
-    [b'some', b'bytes']
-    >>> 
-    ```
+   ```py
+   >>> d = b'some bytes'
+   >>> d[0]
+   115
+   >>>
+   ```
+2. splitting, which returns a list of `bytes` objects
+   ```py
+   >>> d.split()
+   [b'some', b'bytes']
+   >>>
+   ```
 
 to convert between bytes and strings, we must know the encoding of the byte sequence used to represent the string's Unicode code points as bytes.
 
@@ -1328,7 +1348,7 @@ starting with a pangram (a sentence that contains all of the letters of the alph
 >>> data = norsk.encode('utf8')
 >>> data
 b'Jeg begynte \xc3\xa5 fort\xc3\xa6re en sandwich mens jeg kj\xc3\xb8rte taxi p\xc3\xa5 vei til quiz'
->>> 
+>>>
 ```
 
 notice how the norwegian characters have each been rendered as pairs of bytes?
@@ -1343,7 +1363,7 @@ we can do this and check that they are the same as our beginning pangram
 True
 >>> norwegian
 'Jeg begynte å fortære en sandwich mens jeg kjørte taxi på vei til quiz'
->>> 
+>>>
 ```
 
 **this is crucial to understand, since files and network resources such as HTTP responses are transmitted as byte streams, whereas we often prefer to work with the convenience of Unicode strings**
@@ -1361,12 +1381,13 @@ literal lists are delimited by square brackets `[]`, separated by commas.
 ```py
 >>> [1, 2, 3]
 [1, 2, 3]
->>> 
+>>>
 ```
 
 we can also have a list of strings, too
 
 we can access elements in lists with square bracket notation on a zero-based index, and can replaced items in lists to other values.
+
 ```py
 >>> a = ["apple", "orange", "pear"]
 >>> a[0]
@@ -1374,7 +1395,7 @@ we can access elements in lists with square bracket notation on a zero-based ind
 >>> a[1] = 7
 >>> a
 ['apple', 7, 'pear']
->>> 
+>>>
 ```
 
 lists can contain multiple different data types. for example,now we have a list that contains strings and an integer
@@ -1383,7 +1404,7 @@ it's sometimes useful to create an empty list, which we do by using empty square
 
 ```py
 >>> b = []
->>> 
+>>>
 ```
 
 we can also modify the list in other ways
@@ -1397,7 +1418,7 @@ we can add some floats to the end of the list using the `append()` method
 >>> b.append(1.414)
 >>> b
 [1.618, 1.414]
->>> 
+>>>
 ```
 
 there is also a `list` constructor which can be used to create lists from other collections such as strings
@@ -1405,7 +1426,7 @@ there is also a `list` constructor which can be used to create lists from other 
 ```py
 >>> list("characters")
 ['c', 'h', 'a', 'r', 'a', 'c', 't', 'e', 'r', 's']
->>> 
+>>>
 ```
 
 though the python whitespace rules may seem pretty rigid, there is some flexibility
@@ -1419,13 +1440,14 @@ for example, if at the end of the line, brackets, braces, or parenthesis are unc
 ...     'caterpillar',]
 >>> c
 ['bear', 'giraffe', 'elephant', 'caterpillar']
->>> 
+>>>
 ```
 
 this can be useful for long literal collections or to simply improve readability.
 
 see also how we're allowed to use an additional comma after the last element
-- this is an important maintainability feature 
+
+- this is an important maintainability feature
 
 ## `dict`
 
@@ -1447,7 +1469,7 @@ using a dict to create a simple telephone directory:
 
 ```py
 >>> d = {'alice': '878-8728-922', 'bob': '256-5262-124', 'eve': '1982321-787'}
->>> 
+>>>
 ```
 
 we can retrieve items from the `dict` by using the square bracket notation
@@ -1455,17 +1477,17 @@ we can retrieve items from the `dict` by using the square bracket notation
 ```py
 >>> d['alice']
 '878-8728-922'
->>> 
+>>>
 ```
 
 we can update the values associated with the key by "assigning thru the square brackets"
 
 ```py
 >>> d = {'alice': '878-8728-922', 'bob': '256-5262-124', 'eve': '1982321-787'}
->>> d['alice'] = '966-4532-6272'                                    
+>>> d['alice'] = '966-4532-6272'
 >>> d
 {'alice': '966-4532-6272', 'bob': '256-5262-124', 'eve': '1982321-787'}
->>> 
+>>>
 ```
 
 if we assign a value to a key that has not yet been added, a new key is created.
@@ -1476,7 +1498,7 @@ if we assign a value to a key that has not yet been added, a new key is created.
 >>> d['charles'] = '334-5551-913'
 >>> d
 {'alice': '966-4532-6272', 'bob': '256-5262-124', 'eve': '1982321-787', 'charles': '334-5551-913'}
->>> 
+>>>
 ```
 
 as of python 3.7, entries are required to be kept in the order in which they were inserted. prior to 3.7, the entries in the dictionary can't be relied upon to be stored in any particular order.
@@ -1485,7 +1507,7 @@ similiarly, empty dictionaries can be created using empty curly braces
 
 ```py
 >>> e = {}
->>> 
+>>>
 ```
 
 ## `for-loop`
@@ -1505,13 +1527,13 @@ example:
 >>> cities  = ["London", "New York", "Paris", "Oslo", "Helsinki"]
 >>> for city in cities:
 ...     print(city)
-... 
+...
 London
 New York
 Paris
 Oslo
 Helsinki
->>> 
+>>>
 ```
 
 if you iterate over `dictionaries`, you can get the keys, which you can then use within the for-loop to retrieve values from the dictionary
@@ -1520,11 +1542,11 @@ if you iterate over `dictionaries`, you can get the keys, which you can then use
 >>> colors = {'crimson': 0xdc143c, 'coral': 0xff7f50, 'teal': 0x008080}
 >>> for color in colors:
 ...     print(color, colors[color])
-... 
+...
 crimson 14423100
 coral 16744272
 teal 32896
->>> 
+>>>
 ```
 
 note that we used the ability of the built-in `print` function to accept multiple arguments. we pass the key and the value for each color separately
@@ -1550,22 +1572,23 @@ putting it all together -- we will write a program that fetches some text on the
 >>> from urllib.request import urlopen
 >>> story = urlopen('http://sixty-north.com/c/t.txt')
 
->>> 
+>>>
 >>> story_words = []
 >>> for line in story:
 ...     line_words  = line.split()
 ...     for word in line_words:
 ...             story_words.append(word)
-... 
+...
 >>> story.close()
 >>> story_words
 [b'It', b'was', b'the', b'best', b'of', b'times', b'it', b'was', b'the', b'worst', b'of', b'times', b'it', b'was', b'the', b'age', b'of', b'wisdom', b'it', b'was', b'the', b'age', b'of', b'foolishness', b'it', b'was', b'the', b'epoch', b'of', b'belief', b'it', b'was', b'the', b'epoch', b'of', b'incredulity', b'it', b'was', b'the', b'season', b'of', b'Light', b'it', b'was', b'the', b'season', b'of', b'Darkness', b'it', b'was', b'the', b'spring', b'of', b'hope', b'it', b'was', b'the', b'winter', b'of', b'despair', b'we', b'had', b'everything', b'before', b'us', b'we', b'had', b'nothing', b'before', b'us', b'we', b'were', b'all', b'going', b'direct', b'to', b'Heaven', b'we', b'were', b'all', b'going', b'direct', b'the', b'other', b'way', b'in', b'short', b'the', b'period', b'was', b'so', b'far', b'like', b'the', b'present', b'period', b'that', b'some', b'of', b'its', b'noisiest', b'authorities', b'insisted', b'on', b'its', b'being', b'received', b'for', b'good', b'or', b'for', b'evil', b'in', b'the', b'superlative', b'degree', b'of', b'comparison', b'only']
->>> 
+>>>
 ```
 
 notice that each of the single-quoted words is prefixed by a lowercase `b`, meaning we have a list of `bytes` objects, where we would have preferred a list of strings
 
 why did we get them?
+
 - remember that the HTTP request transferred raw bytes (bytes literals) to us over the network. to get a list of strings, we need to decode the bytes using bytes.decode() to get Unicode strings
 
 adding the decode method on each bytes literal line of next now returns us strings as expected
@@ -1577,10 +1600,10 @@ adding the decode method on each bytes literal line of next now returns us strin
 ...     line_words  = line.decode('utf8').split()
 ...     for word in line_words:
 ...             story_words.append(word)
-... 
+...
 >>> story_words
 ['It', 'was', 'the', 'best', 'of', 'times', 'it', 'was', 'the', 'worst', 'of', 'times', 'it', 'was', 'the', 'age', 'of', 'wisdom', 'it', 'was', 'the', 'age', 'of', 'foolishness', 'it', 'was', 'the', 'epoch', 'of', 'belief', 'it', 'was', 'the', 'epoch', 'of', 'incredulity', 'it', 'was', 'the', 'season', 'of', 'Light', 'it', 'was', 'the', 'season', 'of', 'Darkness', 'it', 'was', 'the', 'spring', 'of', 'hope', 'it', 'was', 'the', 'winter', 'of', 'despair', 'we', 'had', 'everything', 'before', 'us', 'we', 'had', 'nothing', 'before', 'us', 'we', 'were', 'all', 'going', 'direct', 'to', 'Heaven', 'we', 'were', 'all', 'going', 'direct', 'the', 'other', 'way', 'in', 'short', 'the', 'period', 'was', 'so', 'far', 'like', 'the', 'present', 'period', 'that', 'some', 'of', 'its', 'noisiest', 'authorities', 'insisted', 'on', 'its', 'being', 'received', 'for', 'good', 'or', 'for', 'evil', 'in', 'the', 'superlative', 'degree', 'of', 'comparison', 'only']
->>> 
+>>>
 ```
 
 ## from REPL to IDE
@@ -1594,6 +1617,7 @@ we will learn how to move this code into a python module so it can be more easil
 ## summary
 
 ### strings
+
 - single and multi-line literals
 - concatenation of adjacent literals
 - universal newlines (`\n`)
@@ -1606,12 +1630,13 @@ we will learn how to move this code into a python module so it can be more easil
 - string literals can contain Unicode as of python 3
 
 ### bytes
+
 - sequence of bytes rather than codepoints
 - literals prefixed with lowercase `b`
 - use `str.encode()` and `bytes.decode()` for conversion to and from bytes, respectively, in both cases passing in the encoding as a string argument, which we must know in advance
 
-
 ### lists
+
 - mutable, heterogeneous sequences
 - literals delimited by square brackets
 - literal items separated by commas
@@ -1620,14 +1645,15 @@ we will learn how to move this code into a python module so it can be more easil
 - grow lists with append()
 - use `list` constructor to create lists from other sequences
 
-
 ### dicts
+
 - associate keys with values
 - literals are delimited by curly braces
 - key-value pairs are separated by commas
 - keys are separated from values by colons
 
 ### for-loops
+
 - bind each item from an iterable one at a time to a variable
 
 # modularity
@@ -1688,10 +1714,10 @@ example:
 ```py
 >>> def square(x):
 ...     return x * x
-... 
+...
 >>> square(8)
 64
->>> 
+>>>
 ```
 
 functions aren't required to explicitly return a value though. perhaps, they perform side-effects such as our `launch_missiles` function that prints text, but doesn't have a return value
@@ -1699,10 +1725,10 @@ functions aren't required to explicitly return a value though. perhaps, they per
 ```py
 >>> def launch_missiles():
 ...     print("Missiles launched!")
-... 
+...
 >>> launch_missiles()
 Missiles launched!
->>> 
+>>>
 ```
 
 it's good practice to prefer functions which return values rather than cause side-effects
@@ -1721,12 +1747,12 @@ by capturing the returned value/object in a variable, we can test for the `None`
 ...             print("even")
 ...             return
 ...     print("odd")
-... 
+...
 >>> w = even_or_odd(31)
 odd
 >>> w is None
 True
->>> 
+>>>
 ```
 
 another example:
@@ -1734,12 +1760,12 @@ another example:
 ```py
 >>> def nth_root(radicand, n):
 ...     return radicand ** (1/n)
-... 
+...
 >>> nth_root(16, 2)
 4.0
 >>> nth_root(27, 3)
 3.0
->>> 
+>>>
 ```
 
 see how the calls of the function evaluate value of the returned expression
@@ -1762,7 +1788,7 @@ as a result, we result to using the term `dunder` when pronouncing these names
 
 for example:
 
-* when we talk about `__name__`, or underscore underscore name underscore underscore, we'll say `dunder name`
+- when we talk about `__name__`, or underscore underscore name underscore underscore, we'll say `dunder name`
 
 ## `__name__`
 
@@ -1800,7 +1826,7 @@ the
 of
 comparison
 only
->>> 
+>>>
 ```
 
 the use of the `.` is qualifying the function name with the module name. alternatively, we can import a specific function using a different form of the import statement, `from words import fetch_words`
@@ -1819,7 +1845,7 @@ the
 of
 comparison
 only
->>> 
+>>>
 ```
 
 but what happens if we try to run the moduile directly from our OS terminal/shell prompt?
@@ -1844,10 +1870,10 @@ when we then re-import words into REPL, we get this:
 ```py
 >>> import words
 words
->>> 
+>>>
 ```
 
-when imported for the first time, dunder name does evaluate to the  module's name
+when imported for the first time, dunder name does evaluate to the module's name
 
 if we run it again, we get no output. why? because module code is only executed once when the module is first imported
 
@@ -1868,9 +1894,9 @@ $
 
 now, the special dunder name (`__name__`) variable is equal to the string dunder main (`__main__`)
 
-why? python sets the value of dunder name differently depending on how our module is being used. 
+why? python sets the value of dunder name differently depending on how our module is being used.
 
-the **key idea** being introduced here is that our module can use this behvaior **to decide how it should behave** 
+the **key idea** being introduced here is that our module can use this behvaior **to decide how it should behave**
 
 if we replace the print function call with an if-check that checks if the dunder name variable is == to dunder main, we will call the fetch_words function
 
@@ -1886,7 +1912,7 @@ now we are able to safely import our module without unintentionally executing ou
 
 ```py
 >>> import words
->>> 
+>>>
 ```
 
 and we can usefully run our module as a script:
@@ -1912,15 +1938,17 @@ whem modules are imported or run, **all** of the top-level statements are run, a
 ### module, script, or program?
 
 #### module
+
 - convenient import with API
 - any `.py` file constitutes a python module
 
 #### python script
+
 - convenient execution from the command line
 
 #### python program
-- perhaps is composed of many python modules
 
+- perhaps is composed of many python modules
 
 strongly recommended to even making simple scripts importable because it eases development and testing so much if you can access your code from within the REPL
 
@@ -1933,9 +1961,10 @@ for this reason, nearly all modules we create have this form of defining one or 
 we will modify our words.py file to moduilarize more of the program
 
 we
-* added a print_words function that prints the story words now returned by the fetch words function
-* added a main function that can be called when the program is run in the terminal/shell
-* added the call of the `main` function in the if-check on the dunder name variable if it is equal to `__main__`
+
+- added a print_words function that prints the story words now returned by the fetch words function
+- added a main function that can be called when the program is run in the terminal/shell
+- added the call of the `main` function in the if-check on the dunder name variable if it is equal to `__main__`
 
 our code now looks like this:
 
@@ -1953,7 +1982,7 @@ def print_words(story_words):
 
 def main():
     words = fetch_words()
-    print_words(words)    
+    print_words(words)
 
 if __name__ == '__main__':
     main()
@@ -1977,7 +2006,7 @@ the
 of
 comparison
 only
->>> 
+>>>
 ```
 
 2. `from words import *`
@@ -1990,7 +2019,7 @@ example:
 >>> from words import *
 >>> fetch_words()
 ['It', 'was', 'the', 'best', 'of', 'times', 'it', 'was', 'the', 'worst', 'of', 'times', 'it', 'was', 'the', 'age', 'of', 'wisdom', 'it', 'was', 'the', 'age', 'of', 'foolishness', 'it', 'was', 'the', 'epoch', 'of', 'belief', 'it', 'was', 'the', 'epoch', 'of', 'incredulity', 'it', 'was', 'the', 'season', 'of', 'Light', 'it', 'was', 'the', 'season', 'of', 'Darkness', 'it', 'was', 'the', 'spring', 'of', 'hope', 'it', 'was', 'the', 'winter', 'of', 'despair', 'we', 'had', 'everything', 'before', 'us', 'we', 'had', 'nothing', 'before', 'us', 'we', 'were', 'all', 'going', 'direct', 'to', 'Heaven', 'we', 'were', 'all', 'going', 'direct', 'the', 'other', 'way', 'in', 'short', 'the', 'period', 'was', 'so', 'far', 'like', 'the', 'present', 'period', 'that', 'some', 'of', 'its', 'noisiest', 'authorities', 'insisted', 'on', 'its', 'being', 'received', 'for', 'good', 'or', 'for', 'evil', 'in', 'the', 'superlative', 'degree', 'of', 'comparison', 'only']
->>> 
+>>>
 ```
 
 we can also print any list of words by calling print_words
@@ -2001,7 +2030,7 @@ Any
 list
 of
 words
->>> 
+>>>
 ```
 
 and we can run the main program, which will fetch our words and print them like we have seen before.
@@ -2021,19 +2050,19 @@ as a result, maybe print_words isn't the best name. it prints anything in a list
 ```py
 >>> print_words("i am a string")
 i
- 
+
 a
 m
- 
+
 a
- 
+
 s
 t
 r
 i
 n
 g
->>> 
+>>>
 ```
 
 it's a good idea to rename it to something more generic like `print_items`, and changing the variable names in the functino to suit the change we made
@@ -2053,7 +2082,7 @@ def print_items(items):
 
 def main():
     words = fetch_words()
-    print_items(words)    
+    print_items(words)
 
 if __name__ == '__main__':
     main()
@@ -2122,7 +2151,7 @@ the
 of
 comparison
 only
-$ corepy % 
+$ corepy %
 ```
 
 this looks fine until we realize that we can't usefully test `main` any longer from the REPL since it referes to `argv[1]` which is unlikely to have any useful value in the REPL environment
@@ -2138,7 +2167,7 @@ before:
 def main():
     url = sys.argv[1]
     words = fetch_words(url)
-    print_items(words)    
+    print_items(words)
 
 if __name__ == '__main__':
     main()
@@ -2149,7 +2178,7 @@ after:
 ```py
 def main(url):
     words = fetch_words(url)
-    print_items(words)    
+    print_items(words)
 
 if __name__ == '__main__':
     main(sys.argv[1])
@@ -2161,11 +2190,11 @@ we have ensured that our functionality will now work regardless if we use the RE
 
 our top-level functions have two lines between them -- this is conventional for modern python code.
 
-> Two between functions 
+> Two between functions
 > That is the number of lines
 > PEP8 recommends
 
-according to the PEP8 style guide, it is customary to use two balnk lines between module-level functions 
+according to the PEP8 style guide, it is customary to use two balnk lines between module-level functions
 
 we use single blank lines for logical breaks within functions
 
@@ -2191,7 +2220,7 @@ our fetch_words function looks like this now, with our docstrings added:
 ```py
 def fetch_words(url):
     """Fetch a list of words from a URL.
-    
+
     Args:
         url: The URL of a UTF-8 text document.
 
@@ -2218,10 +2247,10 @@ Help on function fetch_words in module words:
 
 fetch_words(url)
     Fetch a list of words from a URL.
-    
+
     Args:
         url: The URL of a UTF-8 text document.
-    
+
     Returns: A list of strings containing the words from the document.
 (END)
 ```
@@ -2231,6 +2260,7 @@ our docstrings print as we saw before with other modules and their functions :)
 then, we add the other docstrings to the rest of our functions.
 
 additionally, we add a module docstring.
+
 - they should be placed at the beginning of the module before any statements
 
 now our module looks like this:
@@ -2249,7 +2279,7 @@ from urllib.request import urlopen
 
 def fetch_words(url):
     """Fetch a list of words from a URL.
-    
+
     Args:
         url: The URL of a UTF-8 text document.
 
@@ -2272,7 +2302,7 @@ def print_items(items):
 
     Args:
         An iterable series of printable items.
-    
+
     """
     for item in items:
         print(item)
@@ -2283,10 +2313,10 @@ def main(url):
 
     Args:
         url: The URL of a UTF-8 text document.
-    
+
     """
     words = fetch_words(url)
-    print_items(words)    
+    print_items(words)
 
 if __name__ == '__main__':
     main(sys.argv[1])
@@ -2304,27 +2334,27 @@ NAME
 
 DESCRIPTION
     Usage:
-    
+
         python3 words.py <URL>
 
 FUNCTIONS
     fetch_words(url)
         Fetch a list of words from a URL.
-        
+
         Args:
             url: The URL of a UTF-8 text document.
-        
+
         Returns: A list of strings containing the words from the document.
-    
+
     main(url)
         Print each word from a text document at a URL.
-        
+
         Args:
             url: The URL of a UTF-8 text document.
-    
+
     print_items(items)
         Prints items one per line.
-        
+
         Args:
             An iterable series of printable items.
 
@@ -2367,25 +2397,25 @@ this allows the program loader to identify which interpreter should be used to r
 from [this stack overflow post](https://stackoverflow.com/a/19305076), on which shebang you should use and not use:
 
 > The shebang line in any script determines the script's ability to be executed like a standalone executable without typing python beforehand in the terminal or when double clicking it in a file manager (when configured properly). It isn't necessary but generally put there so when someone sees the file opened in an editor, they immediately know what they're looking at. However, which shebang line you use is important.
-> 
+>
 > Correct usage for (defaults to version 3.latest) Python 3 scripts is:
-> 
+>
 > `#!/usr/bin/env python3`
-> 
+>
 > Correct usage for (defaults to version 2.latest) Python 2 scripts is:
-> 
+>
 > `#!/usr/bin/env python2`
-> 
+>
 > The following should not be used (except for the rare case that you are writing code which is compatible with both Python 2.x and 3.x):
-> 
+>
 > `#!/usr/bin/env python`
-> 
+>
 > The reason for these recommendations, given in PEP 394, is that python can refer either to python2 or python3 on different systems.
-> 
+>
 > Also, do not use:
-> 
+>
 > `#!/usr/local/bin/python`
-> 
+>
 > "python may be installed at /usr/bin/python or /bin/python in those cases, the above #! will fail."
 >
 > ― ["#!/usr/bin/env python" vs "#!/usr/local/bin/python"](https://mail.python.org/pipermail/tutor/2007-June/054816.html)
@@ -2394,7 +2424,7 @@ shebangs have an additional purpose of conveniently documenting at the top of a 
 
 the exact details of your shebang command depend on the location of python on your system.
 
-typical python 3 shebangs used the UNIX `env` program to locate python 3 on your path environment variable which is compatible with python virtual environments. 
+typical python 3 shebangs used the UNIX `env` program to locate python 3 on your path environment variable which is compatible with python virtual environments.
 
 on Mac or Linux, we must mark our script as executable using the command `chmod +x words.py` before the shebang will have any effect
 
@@ -2410,12 +2440,12 @@ the
 of
 comparison
 only
-$ corepy % 
+$ corepy %
 ```
 
 since python 3.3, python also supports the use of the shebang to make python scripts directly executable with the correct version of the python interpreter, even to t he extent that shebands look like they should only work on UNIX-like system will work as expected on Windows
 
-this works because Windows python distribution now uses a program called `Pylauncher`. Pylauncher, the executable  for which is simply called `py.exe` will parse the shebang and locate the appropriate version  of python
+this works because Windows python distribution now uses a program called `Pylauncher`. Pylauncher, the executable for which is simply called `py.exe` will parse the shebang and locate the appropriate version of python
 
 on windows in CMD, writing:
 
@@ -2423,7 +2453,7 @@ on windows in CMD, writing:
 > words.py http://sixty-north.com/c/t.txt
 ```
 
-would be sufficient to run your script with python 3, even if you also have python 2 installed. 
+would be sufficient to run your script with python 3, even if you also have python 2 installed.
 
 in powershell, the equivalent is almost the same:
 
@@ -2437,25 +2467,25 @@ you can read more about pylauncher in PEP 397.
 
 we learned..
 
-* python code is generally placed in *.py files called **modules**
-* how we can execute modules by passing them as the first argument to python
-  * as well as being able to pass command line arguments to our program on the command line, and reading those in our script and doing something with that input
-    * doing so by using `sys.argv`, a list that contains the command-line arguments
-* all top-level statements are executed when a module is imported
-* how to define functions using the `def` keyword
-* return objects from functions with the return keyword
-* return without an argument returns `None`, as does the implicit return
-* how to use dunder name (`__name__`)  to determine how a module is being used, whether it was imported or executed
-  * if dunder name is equal to dunder main (`__main__`), then it has been executed directly as a program
-  * learned how to handle both cases and make our module both executable and importable with our if statement (`if __name__ == '__main__'`)
-* a module is only executed once, on first import
-* `def` is a statement which binds code to a name
-* python's dynamic typing means our functions can be very generic with respect to the type of arguments
-* functions can have `docstrings`
-* help() can retrieve docstrings
-* modules can have docstrings
-* python comments start with `#`
-* program loaders can use #! to determine which python to run
+- python code is generally placed in \*.py files called **modules**
+- how we can execute modules by passing them as the first argument to python
+  - as well as being able to pass command line arguments to our program on the command line, and reading those in our script and doing something with that input
+    - doing so by using `sys.argv`, a list that contains the command-line arguments
+- all top-level statements are executed when a module is imported
+- how to define functions using the `def` keyword
+- return objects from functions with the return keyword
+- return without an argument returns `None`, as does the implicit return
+- how to use dunder name (`__name__`) to determine how a module is being used, whether it was imported or executed
+  - if dunder name is equal to dunder main (`__main__`), then it has been executed directly as a program
+  - learned how to handle both cases and make our module both executable and importable with our if statement (`if __name__ == '__main__'`)
+- a module is only executed once, on first import
+- `def` is a statement which binds code to a name
+- python's dynamic typing means our functions can be very generic with respect to the type of arguments
+- functions can have `docstrings`
+- help() can retrieve docstrings
+- modules can have docstrings
+- python comments start with `#`
+- program loaders can use #! to determine which python to run
 
 # objects and types
 
@@ -2481,7 +2511,7 @@ what if we modify the value of `x` with another assignment?
 
 `x = 500`
 
-the value of the integer object does **NOT** change. `integer` objects in python are **immutable** and **cannot be changed** 
+the value of the integer object does **NOT** change. `integer` objects in python are **immutable** and **cannot be changed**
 
 python creates a **NEW**, **immutable** integer object with the value `500` and redirects the `x` reference to the new object.
 
@@ -2529,7 +2559,8 @@ False
 ```
 
 `id()` is rarely used in production python code. instead,the `is` operator is far more commonly used, which tests for equality of identity.
-  - that is, it tests where two references refer to the same object
+
+- that is, it tests where two references refer to the same object
 
 operations that seem naturally mutating in nature are not necessarily so. example, using the augmented assignment operator:
 
@@ -2540,7 +2571,7 @@ operations that seem naturally mutating in nature are not necessarily so. exampl
 >>> t += 2
 >>> id(t)
 4455381488
->>> 
+>>>
 ```
 
 we see that the id of the incremented integer is different from the original. what happened?
@@ -2550,11 +2581,12 @@ steps:
 1. initialize `t` referring to an `int 5` object
 2. augmented assignment operator creates an `int 2` object **without** assigning a reference to it.
 3. it then adds the `int 2` object with the `int 5` object to create a new `int 7` object
-4. finally, it assigns `t` to the `int 7` object and the remaining `int` objects (`int 5` and `int 2`) are garbage-collected 
+4. finally, it assigns `t` to the `int 7` object and the remaining `int` objects (`int 5` and `int 2`) are garbage-collected
 
 python objects show this behavior for **all types**
 
 **core rule to remember**
+
 - the assignment operator only ever binds objects to names. it **never** copies an object to a value.
 
 another example, using a mutable object, lists!:
@@ -2571,18 +2603,19 @@ another example, using a mutable object, lists!:
 [2, 17, 6]
 >>> r
 [2, 17, 6]
->>> 
+>>>
 ```
 
 we created a list with `r` and assigned `s`, a new variable, to `r`
 
 we modified the element index 1 of `s` to 17, but it also modified `r` list, too.
-  - this happens since the names s and r in fact refer to the same object, which we can verify with the `is` operator
-    - ```py
-      >>> s is r
-      True
-      >>>
-      ```
+
+- this happens since the names s and r in fact refer to the same object, which we can verify with the `is` operator
+  - ```py
+    >>> s is r
+    True
+    >>>
+    ```
 
 example with step-by-step:
 
@@ -2604,7 +2637,7 @@ python doesn't have variables in the sense of boxes holding a value. it only has
 True
 >>> p is q
 False
->>> 
+>>>
 ```
 
 `p is q` returns `False` because `p` and `q` refer to **different** objects
@@ -2632,12 +2665,12 @@ example:
 >>> def modify(k):
 ...     k.append(39)
 ...     print("k =", k)
-... 
+...
 >>> modify(m)
 k = [9, 15, 24, 39]
 >>> m
 [9, 15, 24, 39]
->>> 
+>>>
 ```
 
 #### argument passing semantics
@@ -2663,12 +2696,12 @@ if you want the function to modify a **copy** of an object, it's the responsibil
 >>> def replace(g):
 ...     g = [17, 28, 45]
 ...     print("g =", g)
-... 
+...
 >>> replace(f)
 g = [17, 28, 45]
 >>> f
 [14, 23, 37]
->>> 
+>>>
 ```
 
 `f` still refers to the original, unmodified list
@@ -2690,33 +2723,34 @@ if you wanted to change the contents of the list and have the changes seen outsi
 ...     g[1] = 28
 ...     g[2] = 45
 ...     print("g =", g)
-... 
+...
 >>> f = [14, 23, 37]
 >>> replace_contents(f)
 g = [17, 28, 45]
 >>> f
 [17, 28, 45]
->>> 
+>>>
 ```
 
 function arguments are transferred using **pass-by-object-reference**
-  - means that the value of the reference is copied into the function argument, not the value of the referred-to object.
+
+- means that the value of the reference is copied into the function argument, not the value of the referred-to object.
 
 references to objects are copied, **not the objects themselves**
 
-#### return semantics 
+#### return semantics
 
 the return statement uses the same pass-by-object reference semantics as function arguments
 
 ```py
 >>> def f(d):
 ...     return d
-... 
+...
 >>> c = [6,  10, 16]
 >>> e = f(c)
 >>> c is e
 True
->>> 
+>>>
 ```
 
 we see that it returns the very same object we passed in,showing that no copies of the list were made
@@ -2744,12 +2778,12 @@ since we have given it this default value, people who use this function can choo
 ...     print(line)
 ...     print(message)
 ...     print(line)
-... 
+...
 >>> banner("Norwegian Blue")
 --------------
 Norwegian Blue
 --------------
->>> 
+>>>
 ```
 
 this shows that we are able to multiply the integer length of our message times the border value to create a string with `border * len(message)` number of characters dynamically and easily
@@ -2761,7 +2795,7 @@ if we do provide an optional argument, it does get used
 *******************
 Sun, Moon and Stars
 *******************
->>> 
+>>>
 ```
 
 in production, this code is not particularly self-documenting
@@ -2773,7 +2807,7 @@ we can alleviate this by naming the border argument at the call site
 *******************
 Sun, Moon and Stars
 *******************
->>> 
+>>>
 ```
 
 in this case, the message string (`"Sun, Moon and Stars"`) is called a **positional argument**
@@ -2789,7 +2823,7 @@ if we use keyword arguments for both of our arguments, we have the freedom to su
 ................
 Hello from Earth
 ................
->>> 
+>>>
 ```
 
 it is important to remember that all keywords arguments **must be** specified after the p
@@ -2804,20 +2838,21 @@ example using a function that prints the current time
 'Mon Aug  1 15:50:51 2022'
 >>> def show_default(arg=time.ctime()):
 ...     print(arg)
-... 
+...
 >>> show_default()
 Mon Aug  1 15:51:24 2022
 >>> show_default() # called a few seconds after the first call
 Mon Aug  1 15:51:24 2022
 >>> show_default() # called a few seconds after the second call
 Mon Aug  1 15:51:24 2022
->>> 
+>>>
 ```
 
 why are we getting the same time printed for each subsequent function call, even though we should be expecting different times for each call? the displayed time never progresses
 
 remember -->
-  - def is a statement that is executed at runtime that binds a function definition to a function name
+
+- def is a statement that is executed at runtime that binds a function definition to a function name
 
 as a result -->
 
@@ -2831,7 +2866,7 @@ but for dynamic, mutable default values such as the current time, this can have 
 >>> def add_spam(menu=[]):
 ...     menu.append("spam")
 ...     return menu
-... 
+...
 >>> breakfast = ['bacon', 'eggs']
 >>> add_spam(breakfast)
 ['bacon', 'eggs', 'spam']
@@ -2850,8 +2885,9 @@ but for dynamic, mutable default values such as the current time, this can have 
 >>> add_spam()
 ['spam', 'spam', 'spam', 'spam']
 # and another
->>> 
+>>>
 ```
+
 this behavior does not happen with javascript:
 
 ![js example](media/addSpamJS.png)
@@ -2878,7 +2914,7 @@ now, our function needs to check if menu is None and provide a newly constructed
 ...             menu = []
 ...     menu.append('spam')
 ...     return menu
-... 
+...
 >>> add_spam()
 ['spam']
 >>> add_spam()
@@ -2887,7 +2923,7 @@ now, our function needs to check if menu is None and provide a newly constructed
 ['spam']
 >>> add_spam()
 ['spam']
->>> 
+>>>
 ```
 
 ## python's type system
@@ -2905,7 +2941,7 @@ we can use our function with integers, floats, strings, or any type for which th
 ```py
 >>> def add(a, b):
 ...     return a + b
-... 
+...
 >>> add(5, 7)
 12
 >>> add(3.1, 2.4)
@@ -2914,7 +2950,7 @@ we can use our function with integers, floats, strings, or any type for which th
 'newspaper'
 >>> add([1, 6], [21, 107])
 [1, 6, 21, 107]
->>> 
+>>>
 ```
 
 this is an example of the dynamic typing of python. the two arguments of `add()`, `a` and `b` can reference any type of object.
@@ -2932,31 +2968,32 @@ Traceback (most recent call last):
   File "<stdin>", line 1, in <module>
   File "<stdin>", line 2, in add
 TypeError: can only concatenate str (not "float") to str
->>> 
+>>>
 ```
 
 python will not generally perform implicit conversions between types.
-  - the exception to this rule is the conversion of if-statement and while-loop predicates to `bool`.
+
+- the exception to this rule is the conversion of if-statement and while-loop predicates to `bool`.
 
 this differs greatly from javascript, where javascript sometimes uses implicit **type coercion** to convert one type to another depending on the types being combined
 
 ```js
-function add(a, b) { 
-  return a + b 
+function add(a, b) {
+  return a + b;
 }
-add("The answer is ", 42)
-'The answer is 42'
-add("The answer is ", 4.2)
-'The answer is 4.2'
-add("42", 31)
-'4231'
-add(31, "42")
-'3142'
-add(31, Number("42"))
-73
+add("The answer is ", 42);
+("The answer is 42");
+add("The answer is ", 4.2);
+("The answer is 4.2");
+add("42", 31);
+("4231");
+add(31, "42");
+("3142");
+add(31, Number("42"));
+73;
 ```
 
-js could have coerced the string number and `Number` number into a number, but chose to do a string instead.  if we explicitly type the `string` number to a `Number` using the `Number` constructor, js will then perform the math as we expect and return a number. 
+js could have coerced the string number and `Number` number into a number, but chose to do a string instead. if we explicitly type the `string` number to a `Number` using the `Number` constructor, js will then perform the math as we expect and return a number.
 
 read more about **type coercion** vs **type conversion** in javascript [here](https://developer.mozilla.org/en-US/docs/Glossary/Type_coercion)
 
@@ -3012,7 +3049,7 @@ def print_items(items):
 
 def main(url):
     words = fetch_words(url)
-    print_items(words)    
+    print_items(words)
 
 if __name__ == '__main__':
     main(sys.argv[1])
@@ -3054,16 +3091,16 @@ example:
 >>> count = 0
 >>> def show_count():
 ...     print(count)
-... 
+...
 >>> def set_count(c):
 ...     count = c
-... 
+...
 >>> show_count()
 0
 >>> set_count(5)
 >>> show_count()
 0
->>> 
+>>>
 ```
 
 1. `count` is initialized to `0` at the module/global scope
@@ -3087,15 +3124,15 @@ now, we can update our `set_count` function like so:
 
 ```py
 >>> def set_count(c):
-...     global count 
+...     global count
 ...     count = c
-... 
+...
 >>> show_count()
 0
 >>> set_count(5)
 >>> show_count()
 5
->>> 
+>>>
 ```
 
 this now behaves as expected and we are now properly modifying the `count` reference at the global scope
@@ -3114,7 +3151,7 @@ going back to our `words.py` module, we can `import words` in the REPL and it wi
 
 ```py
 >>> import words
->>> 
+>>>
 ```
 
 we can determine the type of any object by using the built-in `type` function
@@ -3122,25 +3159,25 @@ we can determine the type of any object by using the built-in `type` function
 ```py
 >>> type(words)
 <class 'module'>
->>> 
+>>>
 ```
 
-if we want to see the attributes/properties of an object, we  can use the built-in `dir` function in a python-interactive session to introspect it. 
+if we want to see the attributes/properties of an object, we can use the built-in `dir` function in a python-interactive session to introspect it.
 
 ```py
 >>> dir(words)
 ['__builtins__', '__cached__', '__doc__', '__file__', '__loader__', '__name__', '__package__', '__spec__', 'fetch_words', 'main', 'print_items', 'sys', 'urlopen']
->>> 
+>>>
 ```
 
-`dir` returns a sorted list of the module attributes, including the ones we defined 
+`dir` returns a sorted list of the module attributes, including the ones we defined
 
 we can use the `type` function on any of these attributes to learn more about them
 
 ```py
 >>> type(words.fetch_words)
 <class 'function'>
->>> 
+>>>
 ```
 
 here, we find out that fetch_words is a function object. therefore, we can in turn call the `dir` function on our `fetch_words` function to reveal its attributes, too
@@ -3148,7 +3185,7 @@ here, we find out that fetch_words is a function object. therefore, we can in tu
 ```py
 >>> dir(words.fetch_words)
 ['__annotations__', '__call__', '__class__', '__closure__', '__code__', '__defaults__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__get__', '__getattribute__', '__globals__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__kwdefaults__', '__le__', '__lt__', '__module__', '__name__', '__ne__', '__new__', '__qualname__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__str__', '__subclasshook__']
->>> 
+>>>
 ```
 
 dunder name (`__name__`) as you would expect is the name of the function as a string
@@ -3156,7 +3193,7 @@ dunder name (`__name__`) as you would expect is the name of the function as a st
 ```py
 >>> words.fetch_words.__name__
 'fetch_words'
->>> 
+>>>
 ```
 
 dunder doc (`__doc__`) is the doc string we provided for the function
@@ -3164,38 +3201,263 @@ dunder doc (`__doc__`) is the doc string we provided for the function
 ```py
 >>> words.fetch_words.__doc__
 'Fetch a list of words from a URL.\n    \n    Args:\n        url: The URL of a UTF-8 text document.\n\n    Returns: A list of strings containing the words from the document.\n    '
->>> 
+>>>
 ```
 
 ## summary
 
-* it's better to think of python working in terms of named references to objects rather than variables and values
-* assignment **doesn't** put a value in a box, it attaches a name tag to an object
-* assigning from one reference to another puts two name tags on the same object
-* the garbage collector removes objects with no references
-* `id()` function returns a unique integer ID for an object
-  * should rarely, if ever, be used in production code
-* `is` operator determines equality of **identity**, AKA whether two **names** refer to the **same object**
-* we can test for **equivalence** using the double-equals  operator (`==`)
-* function arguments are passed by object reference
-  * functions can modify their arguments if they are mutable objects
-* if a formal argument is rebound through assignment, the reference to the passed-in object is lost
-  * to change a mutable argument, you should replace its contents rather than replacing the whole object
-* `return` statement passes back an object reference to the caller, no copies are made
-* function arguments may have a default value
-  * default argument expressions are evaluated **ONLY ONCE**, when the `def` statement is executed
-* python uses dynamic typing
-* python uses strong typing, types are **NOT** coerced to match, unlike javascript
-* python names are looked up in scopes using the LEGB rule
-  * L = local to functions, E = in enclosing functions, G = in the global/module namespace, B = built-ins
-* global references can be read from local scopes
-* use `global` to assign to global references **from** a local scope
-* everything in python is an object, including modules and functions
-* `import` and `def` keywords result in binding to named references
-* the built-in `type()` function returns the type of an object
-* `dir()` returns a sorted list of the attributes/properties of an object
-* you can access the name of a function or module with dunder name, (`__name__`)
-* doc strings can be accessed thru `__doc__`
-* we can use len() to measure the length of a string
-* if we multiply a string by an integer, we get a new string with multiple copies of the operand string. aka the repititon operation, repeats a string an integral number of times
+- it's better to think of python working in terms of named references to objects rather than variables and values
+- assignment **doesn't** put a value in a box, it attaches a name tag to an object
+- assigning from one reference to another puts two name tags on the same object
+- the garbage collector removes objects with no references
+- `id()` function returns a unique integer ID for an object
+  - should rarely, if ever, be used in production code
+- `is` operator determines equality of **identity**, AKA whether two **names** refer to the **same object**
+- we can test for **equivalence** using the double-equals operator (`==`)
+- function arguments are passed by object reference
+  - functions can modify their arguments if they are mutable objects
+- if a formal argument is rebound through assignment, the reference to the passed-in object is lost
+  - to change a mutable argument, you should replace its contents rather than replacing the whole object
+- `return` statement passes back an object reference to the caller, no copies are made
+- function arguments may have a default value
+  - default argument expressions are evaluated **ONLY ONCE**, when the `def` statement is executed
+- python uses dynamic typing
+- python uses strong typing, types are **NOT** coerced to match, unlike javascript
+- python names are looked up in scopes using the LEGB rule
+  - L = local to functions, E = in enclosing functions, G = in the global/module namespace, B = built-ins
+- global references can be read from local scopes
+- use `global` to assign to global references **from** a local scope
+- everything in python is an object, including modules and functions
+- `import` and `def` keywords result in binding to named references
+- the built-in `type()` function returns the type of an object
+- `dir()` returns a sorted list of the attributes/properties of an object
+- you can access the name of a function or module with dunder name, (`__name__`)
+- doc strings can be accessed thru `__doc__`
+- we can use len() to measure the length of a string
+- if we multiply a string by an integer, we get a new string with multiple copies of the operand string. aka the repititon operation, repeats a string an integral number of times
 
+# built-in collections
+
+## overview
+
+- will take a deeper look at `str`, `list`, and `dict`
+- new collection types:
+  - tuple, an **immutable** sequence of objects
+  - range, represents arithmatic progressions of integers
+  - set, a **mutable** collection of unique, **immutable** objects.
+- protocols that unit collections
+
+### tuple
+
+tuple
+
+- immutable sequences of arbitrary objects
+
+once created, the objects within them cannot be replaced or removed and new elements cannot be added
+
+they have a similar syntax to lists, except that they are delimited by parenthesis instead of square brackets
+
+their contents can be accessed using the familiar zero-based index bracket syntax
+
+example of literal tuple:
+
+```py
+>>> t = ("Norway", 4.953, 3)
+>>> t[0]
+'Norway'
+>>> t[2]
+3
+>>>
+```
+
+we can determine the number of elements in the tuple with the built-in `len()` function
+
+```py
+>>> len(t)
+3
+>>>
+```
+
+we can also iterate over them with a for loop
+
+```py
+>>> for item in t:
+...     print(item)
+...
+Norway
+4.953
+3
+>>>
+```
+
+we can concatentate tuples using the plus operator and repeat using the multiplication operator
+
+```py
+>>> t + (338186.0, 265e9)
+('Norway', 4.953, 3, 338186.0, 265000000000.0)
+>>> t * 3
+('Norway', 4.953, 3, 'Norway', 4.953, 3, 'Norway', 4.953, 3)
+>>>
+```
+
+since tuples can contain any object, it's perfectly possible to have nested tuples, and can access nested tuple values with the bracket syntax again
+
+```py
+>>> a = ((220, 284), (1184, 1210), (2620, 2924), (5020, 5564), (6232, 6368))
+>>> a[2][1]
+2924
+>>>
+```
+
+sometimes, a single element tuple is required
+
+to write this, we can't just use a simple number and parenthesis. this is because python parses that as an `int` enclosed in the precedence controlling parenthesis of a math expression.
+
+```py
+>>> h = (391)
+>>> h
+391
+>>> type(h)
+<class 'int'>
+>>>
+```
+
+to create a single-element tuple, we make use of the trailing-comma separator that we are allowed to use when specifying literal tuples, lists, and dicts.
+
+```py
+>>> k = (391,)
+>>> k
+(391,)
+>>> type(k)
+<class 'tuple'>
+>>>
+```
+
+a single element with a trailing comma is parsed as a single element tuple.
+
+how do we specify an empty tuple?
+
+simple -- we just use empty parenthesis.
+
+```py
+>>> e = ()
+>>> e
+()
+>>> type(e)
+<class 'tuple'>
+>>>
+```
+
+in many cases, the parenthesis of literal tuples may be omitted.
+
+this feature is often used when returning multiple values from a function.
+
+```py
+>>> p = 1, 1, 1, 4, 6, 19
+>>> p
+(1, 1, 1, 4, 6, 19)
+>>> type(p)
+<class 'tuple'>
+>>>
+```
+
+here we make a function that returns the largest and smallest values of our dataset as a tuple!
+
+```py
+>>> def minmax(items):
+...     return min(items), max(items)
+...
+>>> minmax([83, 33, 84, 32, 85, 31, 86])
+(31, 86)
+>>>
+```
+
+#### tuple unpacking
+
+- destructuring operations that unpacks data structures into named references
+
+for example, we can assign the result of our `minmax` function into two new references like this:
+
+```py
+>>> lower, upper = minmax([83, 33, 84, 32, 85, 31, 86])
+>>> lower
+31
+>>> upper
+86
+>>>
+```
+
+unpacking also works with nested tuples
+
+```py
+>>> (a, (b, (c, d))) = (4, (3, (2, 1)))
+>>> a
+4
+>>>
+>>> b
+3
+>>> c
+2
+>>> d
+1
+>>>
+```
+
+this support for unpacking leads to the python idiom for swapping two or more variables
+
+first, we created two new variables, `a` and `b`
+
+and then we use the form `a, b = b, a`
+
+this first packs `a` and `b` into a tuple on the right side of the assignment operator.
+
+it then unpacks the tuple on the left, reusing the names `a` and `b`
+
+if we examine them we find that they have been swapped
+
+```py
+>>> a = 'jelly'
+>>> b = 'bean'
+>>> a, b = b, a
+>>> a
+'bean'
+>>> b
+'jelly'
+>>>
+```
+
+creating a tuple from an existing collection object such as a list, you can use the tuple constructor function
+
+```py
+>>> tuple([561, 1105, 1729, 2465])
+(561, 1105, 1729, 2465)
+>>>
+```
+
+this can also be done with a string:
+
+```py
+tuple("Carmichael")
+('C', 'a', 'r', 'm', 'i', 'c', 'h', 'a', 'e', 'l')
+>>>
+```
+
+and can be done with any iterable type.
+
+#### checking if tuple contains value
+
+we can test for containment using the `in` operator
+
+```py
+>>> 5 in (3, 5, 17, 257, 65537)
+True
+>>>
+```
+
+and we can also test non-membership as well
+
+```py
+5 not in (3, 5, 17, 257, 65537)
+False
+>>>
+```
