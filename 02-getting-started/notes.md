@@ -3457,7 +3457,7 @@ True
 and we can also test non-membership as well
 
 ```py
-5 not in (3, 5, 17, 257, 65537)
+>>> 5 not in (3, 5, 17, 257, 65537)
 False
 >>>
 ```
