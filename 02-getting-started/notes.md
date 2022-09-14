@@ -91,6 +91,9 @@ table of contents
     - [tuple](#tuple)
       - [tuple unpacking](#tuple-unpacking)
       - [checking if tuple contains value](#checking-if-tuple-contains-value)
+    - [strings](#strings-1)
+      - [use `str.join()` to join strings](#use-strjoin-to-join-strings)
+        - [why?](#why)
 
 # course overview
 
@@ -3459,5 +3462,61 @@ and we can also test non-membership as well
 ```py
 >>> 5 not in (3, 5, 17, 257, 65537)
 False
+>>>
+```
+
+### strings
+
+exploring the capabilities of strings in further depth:
+
+like any python sequence, we can determine the length of a string with the `len()` function
+
+```py
+>>> len("hello")
+5
+>>>
+```
+
+can concatenate strings with the plus `+` operator
+
+```py
+>>> "New" + "found" + "land"
+'Newfoundland'
+>>>
+```
+
+can also use the augmented assignment operator
+
+```py
+>>> s = "New"
+>>> s += "found"
+>>> s += "land"
+>>> s
+'Newfoundland'
+>>>
+```
+
+**NOTE: Strings are IMMUTABLE. You CANNOT modify them in place.**
+
+concatenating our strings together creating the illusion of mutability is because `s` is a **reference** to an object, not an object itself.
+
+#### use `str.join()` to join strings
+
+we should use the `join()` method instead of the plus operator for joining large numbers of strings because it is substantially more efficient.
+
+##### why?
+
+1. concatenation with + results in temporaries with consequent costs in memory allocations for the copies
+2. str.join() inserts a separator between a collection of strings
+3. call join() on the _separator string_
+
+example:
+
+```py
+>>> colors = ';'.join(['#45ff23', '#2321fa', '#1298a3', '#a32312'])
+>>> colors
+'#45ff23;#2321fa;#1298a3;#a32312'
+>>> colors.split(';')
+['#45ff23', '#2321fa', '#1298a3', '#a32312']
 >>>
 ```
