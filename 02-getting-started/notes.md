@@ -99,9 +99,27 @@ table of contents
       - [string formatting/format strings](#string-formattingformat-strings)
       - [pep498: literal string interpolation](#pep498-literal-string-interpolation)
     - [f-strings](#f-strings)
-  - [range](#range)
+  - [ranges](#ranges)
     - [`range()` signature](#range-signature)
     - [enumerate](#enumerate)
+  - [lists](#lists-1)
+    - [negative indices](#negative-indices)
+    - [slicing](#slicing)
+      - [shallow copies](#shallow-copies)
+      - [deep copies](#deep-copies)
+    - [multiplication operator](#multiplication-operator)
+    - [`list.index()`](#listindex)
+    - [`del`, delete items from list by index](#del-delete-items-from-list-by-index)
+    - [`remove()` method](#remove-method)
+    - [`list.insert()`](#listinsert)
+    - [concatenating lists](#concatenating-lists)
+    - [`list.reverse()` and `list.sort()`](#listreverse-and-listsort)
+    - [`list.reverse()`](#listreverse)
+    - [`list.sort()`](#listsort)
+      - [key parameter to `list.sort()`](#key-parameter-to-listsort)
+      - [reversing and sorting into copies](#reversing-and-sorting-into-copies)
+        - [`reversed()`](#reversed)
+        - [`sorted()`](#sorted)
 
 # course overview
 
@@ -3740,7 +3758,7 @@ in order to do this, we put a colon after the expression in the f-string followe
 >>>
 ```
 
-## range
+## ranges
 
 a sequence representing an arithmetic progression of integers
 
@@ -3847,7 +3865,7 @@ instead, **always** prefer to use iteration over objects themselves.
 >>>
 ```
 
-if for some reason we need a counter, we should use the built-in `enumerate()` function
+8if for some reason we need a counter, we should use the built-in `enumerate()` function
 
 ### enumerate
 
@@ -3877,5 +3895,511 @@ i = 1, v = 372
 i = 2, v = 8862
 i = 3, v = 148800
 i = 4, v = 2096886
+>>>
+```
+
+## lists
+
+### negative indices
+
+index from the end of the sequences using negative numbers
+
+the last element is at index `-1`
+
+this applies to other python sequences as well, such as tuples and strings
+
+```py
+>>> r = [1, -4, 10, -16, 15]
+>>> r[-1]
+15
+>>> r[-2]
+-16
+>>>
+```
+
+this is much more elegant than the clunky approach of subtracting one from the length of the container -- the approach you would otherwise need to use to retrieve the last element
+
+```py
+>>> r[len(r) - 1]
+15
+>>>
+```
+
+indexing with negative 0 is the same as indexing with 0, returning the first element in the list
+
+```py
+>>> r[0]
+1
+>>> r[-0]
+1
+>>>
+```
+
+because there is no distinction between `0` and `-0`, negative indexing is essentially `one based` rather than `zero based`. this is good to keep in mind if you're calculating indices even with moderately complex logic
+
+### slicing
+
+extended form of indexing for referring to a portion of a list or other sequence
+
+syntax: `a_list[start:stop]`
+
+```py
+>>> s = [3, 186, 4431, 74400, 1048443]
+>>> s[1:3]
+[186, 4431]
+>>>
+```
+
+the second index, `3` in this case, is 1 beyond the end of the returned range.
+
+this can also be combined with negative indices
+
+```py
+>>> s[1:-1]
+[186, 4431, 74400]
+>>>
+```
+
+both `start` and `stop` indices are optional
+
+```py
+>>> s[2:]
+[4431, 74400, 1048443]
+>>> s[:2]
+[3, 186]
+>>>
+```
+
+since they are both optional, it's possible to omit both and retrieve all of the elements
+
+```py
+>>> s[:]
+[3, 186, 4431, 74400, 1048443]
+>>>
+```
+
+this last example is an important idiom for copying a list
+
+recall that assigning references **NEVER** copies an object, but merely copies a **REFERENCE** to an object
+
+```py
+>>> t = s
+>>> t is s
+True
+>>>
+```
+
+we deploy the full slice to perform a copy into a new list. this gives us a new object with a distinct identity
+
+```py
+>>> r = s[:]
+>>> r is s
+False
+>>>
+```
+
+but since it's a copy, the new object has an equivalent value
+
+```py
+>>> r == s
+True
+>>>
+```
+
+![only references are copied](media/onlyRefsAreCopied.png)
+
+**NOTE**: it's important to understand that even though we have a new list object that can be independently modified, the elements within it are references to the same objects referred to by the original list
+
+**in the event that these objects are both mutable and modified, as opposed to replaced, the change WILL be seen in BOTH lists!**
+
+there are other, more readable ways to copy a list, like the copy method
+
+```py
+>>> u = s.copy()
+>>> u is s
+False
+>>> u == s
+True
+>>>
+```
+
+or, you could simply call the list constructor, passing in the list you want to copy
+
+```py
+>>> v = list(s)
+>>> v is s
+False
+>>> v == s
+True
+>>>
+```
+
+it's a matter of preference, but is a good idea to use the third form (constructor), since it has the advantage that it works with any iterable series as the source, not JUST lists
+
+#### shallow copies
+
+all of these techniques perform **SHALLOW COPIES**, a new list containing the same object references as the source list, but they don't copy the referred-to objects
+
+to demonstrate this, we will use nested lists, with the inner lists serving as mutable objects
+
+```py
+>>> a = [ [1, 2], [3, 4] ]
+>>> b = a[:]
+>>> a is b
+False
+>>> a == b
+True
+>>> a[0]
+[1, 2]
+>>> b[0]
+[1, 2]
+>>> a[0] is b[0]
+True
+>>>
+```
+
+first elements of lists `a` and `b` are the same object, until we reassign the first element of `a` to a newly constructed list
+
+```py
+>>> a[0] = [8, 9]
+>>> a[0]
+[8, 9]
+>>> b[0]
+[1, 2]
+>>>
+```
+
+now, the first elements of `a` and `b` refer to different lists with different values
+
+the second elements of `a` and `b` still refer to the same object
+
+we can demonstrate this by mutating that object thru the `a` list
+
+```py
+>>> a[1].append(5)
+>>> a[1]
+[3, 4, 5]
+>>> b[1]
+[3, 4, 5]
+>>>
+```
+
+we can see this change reflected nowin the `b` list
+
+and the final state of both lists, `a` and `b`
+
+```py
+>>> a
+[[8, 9], [3, 4, 5]]
+>>> b
+[[1, 2], [3, 4, 5]]
+>>>
+```
+
+#### deep copies
+
+in the rare occasion that you need a deep copy, take a look at the copy module in the python standard library
+
+### multiplication operator
+
+as with strings and tuples, lists support repetition with the multiplication operator
+
+```py
+>>> c = [21, 37]
+>>> d = c * 4
+>>> d
+[21, 37, 21, 37, 21, 37, 21, 37]
+>>>
+```
+
+it's most often used for initializing a list of a certain size known in advance with a constant value, like a list to keep track of numbers of each letter of alphabet in each word in [Leetcode: Group Anagrams](https://leetcode.com/problems/group-anagrams/)
+
+```py
+>>> [0] * 9
+[0, 0, 0, 0, 0, 0, 0, 0, 0]
+>>>
+```
+
+**WARNING:** whenusing mutable objectsa selements, the same principle applies: repetition in this case will repeat the **REFERENCE** without copying the value
+
+this is demonstrated using nested lists:
+
+```py
+>>> s = [ [-1, +1] ] * 5
+>>> s
+[[-1, 1], [-1, 1], [-1, 1], [-1, 1], [-1, 1]]
+>>>
+```
+
+if we now modify the third element of our outer list, the change is reflected thru all five references which comprise the outer list elements
+
+```py
+
+>>> s[2].append(7)
+>>> s
+[[-1, 1, 7], [-1, 1, 7], [-1, 1, 7], [-1, 1, 7], [-1, 1, 7]]
+>>>
+```
+
+this is because each element of the outer list is a reference to the same nested list
+
+### `list.index()`
+
+find the location of an object in a list
+
+returns the index of the first list element which is equal to the argument.
+
+```py
+>>> w = "the quick brown fox jumps over the lazy dog".split()
+>>> w
+['the', 'quick', 'brown', 'fox', 'jumps', 'over', 'the', 'lazy', 'dog']
+>>> i = w.index('fox')
+>>> i
+3
+>>> w[i]
+'fox'
+>>>
+```
+
+if you search for a value that isn't present, you receive a `ValueError`
+
+```py
+>>> w.index('unicorn')
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+ValueError: 'unicorn' is not in list
+>>>
+```
+
+another means of searching is to count matching elements
+
+here, we count how many times the word 'the' appears in our list
+
+```py
+>>> w.count('the')
+2
+>>>
+```
+
+if you just want to test for membership, you can use the `in` operator
+
+```py
+>>> 37 in [1, 78, 9, 37, 34, 53]
+True
+>>>
+```
+
+and you can test for non-membership with the `not in` operator
+
+```py
+>>> 78 not in [1, 78, 9, 37, 34, 53]
+False
+>>>
+```
+
+### `del`, delete items from list by index
+
+remove an element from a list by index
+
+syntax: `del a_list[index]`
+
+the `del` keyword takes a single parameter, a reference to the list element and removes it from the list, shortening the list in the process
+
+```py
+>>> u = "jackdaws love my big sphinx of quartz".split()
+>>> u
+['jackdaws', 'love', 'my', 'big', 'sphinx', 'of', 'quartz']
+>>> del u[3]
+>>> u
+['jackdaws', 'love', 'my', 'sphinx', 'of', 'quartz']
+>>>
+```
+
+### `remove()` method
+
+it's also possible to remove items in a list with the remove method
+
+```py
+>>> u.remove('jackdaws')
+>>> u
+['love', 'my', 'sphinx', 'of', 'quartz']
+>>>
+```
+
+this is equivalent to passing the index of the element we want to delete to `del`
+
+```py
+>>> del u[u.index('quartz')]
+>>> u
+['love', 'my', 'sphinx', 'of']
+>>>
+```
+
+remove also raises a `ValueError` if an element is not present
+
+```py
+>>> u.remove('pyramid')
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+ValueError: list.remove(x): x not in list
+>>>
+```
+
+### `list.insert()`
+
+insert an item into a list
+
+accepts an item and the index of the new item
+
+```py
+>>> a = 'I accidentally the whole universe'.split()
+>>> a
+['I', 'accidentally', 'the', 'whole', 'universe']
+>>> a.insert(2, "destroyed")
+>>> a
+['I', 'accidentally', 'destroyed', 'the', 'whole', 'universe']
+>>> " ".join(a)
+'I accidentally destroyed the whole universe'
+>>>
+```
+
+### concatenating lists
+
+concatenating lists using the addition operator results in a new list without modification of the operands
+
+```py
+>>> m = [2, 1, 3]
+>>> n = [4, 7, 11]
+>>> k = m + n
+>>> k
+[2, 1, 3, 4, 7, 11]
+>>>
+```
+
+whereas the augmented assignment operator (`+=`) modifies the assignee **in-place**
+
+```py
+>>> k += [18, 29, 47]
+>>> k
+[2, 1, 3, 4, 7, 11, 18, 29, 47]
+>>>
+```
+
+this can also be achieved using the `extend` method
+
+```py
+>>> k.extend([76, 129, 199])
+>>> k
+[2, 1, 3, 4, 7, 11, 18, 29, 47, 76, 129, 199]
+>>>
+```
+
+all of these techniques work with any iterable series on the right-hand side
+
+### `list.reverse()` and `list.sort()`
+
+common operations that modify a list **in-place**
+
+### `list.reverse()`
+
+a list can be reversed **in-place** by calling the `reverse()` method on it
+
+```py
+>>> g = [1, 11, 21]
+>>> g.reverse()
+>>> g
+[21, 11, 1]
+>>>
+```
+
+### `list.sort()`
+
+a list can be sorted **in-place** by calling the `sort()` method on it
+
+```py
+>>> d = [17, 41, 29]
+>>> d.sort()
+>>> d
+[17, 29, 41]
+>>>
+```
+
+`sort()` accepts two optional arguments
+
+1. key
+   1. can be any callable object that accepts a single parameter
+   2. items passed to callable and sorted on its return value
+   3. see [this section](#key-parameter-to-listsort)
+2. reverse
+   1. when set to true, it sorts **DESCENDING**. otherwise defaults to **ASCENDING** when not provide
+
+#### key parameter to `list.sort()`
+
+can be any callable object that accepts a single parameter
+
+items passed to callable and sorted on its return value
+
+for example, the len() function is a callable object which is used to determine the length of a collection.
+
+we can sort this list by the length of their strings by passing `(key=len)` to the sort method
+
+it will then sort the words by their individual lengths
+
+```py
+>>> h = 'not perplexing do handwriting family
+where I illegibly know doctors'.split()
+>>> h
+['not', 'perplexing', 'do', 'handwriting', 'family', 'where', 'I', 'illegibly', 'know', 'doctors']
+>>> h.sort(key=len)
+>>> h
+['I', 'do', 'not', 'know', 'where', 'family', 'doctors', 'illegibly', 'perplexing', 'handwriting']
+>>> ' '.join(h)
+'I do not know where family doctors illegibly perplexing handwriting'
+>>>
+```
+
+#### reversing and sorting into copies
+
+sometimes, an in-place sortor reversal is not required. for example, it might cause a function argument to be modified
+
+`reversed()` and `sorted()` are out-of-place equivalents to `list.reverse()` and `list.sort()`
+
+`reversed()` returns a reverse iterator and `sorted()` returns a new list
+
+these functions have the advantage that they will work on any finite, iterable source object
+
+##### `reversed()`
+
+returns an object of the type `list_reverseiterator`
+
+```py
+>>> p = [9, 3, 1, 0]
+>>> q = reversed(p)
+>>> q
+<list_reverseiterator object at 0x107b8b4f0>
+>>>
+```
+
+we can pass this to the list constructor to create an actual list
+
+```py
+>>> p = [9, 3, 1, 0]
+>>> q = reversed(p)
+>>> q
+<list_reverseiterator object at 0x107b8b4f0>
+>>> list(q)
+[0, 1, 3, 9]
+>>>
+```
+
+##### `sorted()`
+
+```py
+>>> x = [4, 9, 2, 1]
+>>> y = sorted(x)
+>>> y
+[1, 2, 4, 9]
+>>> x
+[4, 9, 2, 1]
 >>>
 ```
