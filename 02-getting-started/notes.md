@@ -88,17 +88,20 @@ table of contents
   - [summary](#summary-4)
 - [built-in collections](#built-in-collections)
   - [overview](#overview-2)
-    - [tuple](#tuple)
-      - [tuple unpacking](#tuple-unpacking)
+  - [tuple](#tuple)
+    - [tuple unpacking](#tuple-unpacking)
       - [checking if tuple contains value](#checking-if-tuple-contains-value)
-    - [strings](#strings-1)
-      - [use `str.join()` to join strings](#use-strjoin-to-join-strings)
-        - [why?](#why)
+  - [strings](#strings-1)
+    - [use `str.join()` to join strings](#use-strjoin-to-join-strings)
+      - [why?](#why)
       - [moment of zen 4: the way may not be obvious at first](#moment-of-zen-4-the-way-may-not-be-obvious-at-first)
-      - [string partition() method](#string-partition-method)
+    - [string partition() method](#string-partition-method)
       - [string formatting/format strings](#string-formattingformat-strings)
-        - [pep498: literal string interpolation](#pep498-literal-string-interpolation)
-      - [f-strings](#f-strings)
+      - [pep498: literal string interpolation](#pep498-literal-string-interpolation)
+    - [f-strings](#f-strings)
+  - [range](#range)
+    - [`range()` signature](#range-signature)
+    - [enumerate](#enumerate)
 
 # course overview
 
@@ -3255,7 +3258,7 @@ dunder doc (`__doc__`) is the doc string we provided for the function
   - set, a **mutable** collection of unique, **immutable** objects.
 - protocols that unit collections
 
-### tuple
+## tuple
 
 tuple
 
@@ -3380,7 +3383,7 @@ here we make a function that returns the largest and smallest values of our data
 >>>
 ```
 
-#### tuple unpacking
+### tuple unpacking
 
 - destructuring operations that unpacks data structures into named references
 
@@ -3470,7 +3473,7 @@ False
 >>>
 ```
 
-### strings
+## strings
 
 exploring the capabilities of strings in further depth:
 
@@ -3505,11 +3508,11 @@ can also use the augmented assignment operator
 
 concatenating our strings together creating the illusion of mutability is because `s` is a **reference** to an object, not an object itself.
 
-#### use `str.join()` to join strings
+### use `str.join()` to join strings
 
 we should use the `join()` method instead of the plus operator for joining large numbers of strings because it is substantially more efficient.
 
-##### why?
+#### why?
 
 1. concatenation with + results in temporaries with consequent costs in memory allocations for the copies
 2. str.join() inserts a separator between a collection of strings
@@ -3540,7 +3543,7 @@ to concatenate
 invoke join on empty text
 something from nothing
 
-#### string partition() method
+### string partition() method
 
 partition divides a string into three sections
 
@@ -3682,13 +3685,13 @@ here, we had to mention the name `value` three times. the example could be made 
 
 but in larger and more complex interpolations, we would want to keep those elements for maintainability and readability
 
-##### pep498: literal string interpolation
+#### pep498: literal string interpolation
 
 commonly called f-strings, available in python 3.6 and later
 
 "embed expressions inside literal strings, using a minimal syntax"
 
-#### f-strings
+### f-strings
 
 just like a normal string literal, but is prefixed with the letter `f`
 
@@ -3734,5 +3737,145 @@ in order to do this, we put a colon after the expression in the f-string followe
 ```py
 >>> f'Math constants: pi={math.pi:.3f}, e={math.e:.3f}'
 'Math constants: pi=3.142, e=2.718'
+>>>
+```
+
+## range
+
+a sequence representing an arithmetic progression of integers
+
+ranges are created with calls to the `range()` constructor and there is no literal form
+
+most typically, we supply only the stop value and python defaults to a starting value of `0`
+
+```py
+>>> range(5)
+range(0, 5)
+>>>
+```
+
+ranges are sometimes used to create consecutive integers for use as loop counters/iterators
+
+```py
+>>> for i in range(5):
+...     print(i)
+...
+0
+1
+2
+3
+4
+>>>
+```
+
+note that the stop value provided to range is `1` past the end of the sequence, which is why our loop didn't print `5`
+
+we can also supply a starting value by providing two arguments to range, the first being the starting value, the second being the ending value
+
+```py
+>>> range(5,10)
+range(5, 10)
+>>>
+```
+
+wrapping our range in a call to the `list()` constructor is a very handy way to force production of each item
+
+```py
+>>> list(range(5,10))
+[5, 6, 7, 8, 9]
+>>>
+```
+
+this so-called 'half-open range convention', with the stop value NOT being included in the sequence is odd but makes sense:
+
+the end specified by one range is the start of the next one
+
+```py
+>>> list(range(5,10))
+[5, 6, 7, 8, 9]
+>>> list(range(10,15))
+[10, 11, 12, 13, 14]
+>>>
+```
+
+range() also supports a step argument, the third argument in the function, which tells range to increment by within the range. in order to use it, you must supply all three arguments.
+
+```py
+>>> list(range(0, 10, 2))
+[0, 2, 4, 6, 8]
+>>>
+```
+
+### `range()` signature
+
+1. providing only one argument: `range(stop)`
+   1. means the argument is a stop value
+2. two arguments: `range(start, stop)`
+3. three arguments: `range(start, stop, step)`
+
+range does NOT support keyword arguments
+
+**bad** example of iterating thru a list:
+
+```py
+>>> s = [0, 1, 4, 6, 13]
+>>> for i in range(len(s)):
+...     print(s[i])
+...
+0
+1
+4
+6
+13
+>>>
+```
+
+although this works, it's unpythonic.
+
+instead, **always** prefer to use iteration over objects themselves.
+
+```py
+>>> s = [0, 1, 4, 6, 13]
+>>> for v in s:
+...     print(v)
+...
+0
+1
+4
+6
+13
+>>>
+```
+
+if for some reason we need a counter, we should use the built-in `enumerate()` function
+
+### enumerate
+
+constructs an iterable of `(index, value)` tuples around another iterable object
+
+```py
+>>> t = [6, 372, 8862, 148800, 2096886]
+>>> for p in enumerate(t):
+...     print(p)
+...
+(0, 6)
+(1, 372)
+(2, 8862)
+(3, 148800)
+(4, 2096886)
+>>>
+```
+
+better yet, we can use tuple unpacking to avoid having to directly deal with the tuple:
+
+```py
+>>> for i, v in enumerate(t):
+...     print(f"i = {i}, v = {v}")
+...
+i = 0, v = 6
+i = 1, v = 372
+i = 2, v = 8862
+i = 3, v = 148800
+i = 4, v = 2096886
 >>>
 ```
