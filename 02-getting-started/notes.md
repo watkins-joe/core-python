@@ -94,6 +94,11 @@ table of contents
     - [strings](#strings-1)
       - [use `str.join()` to join strings](#use-strjoin-to-join-strings)
         - [why?](#why)
+      - [moment of zen 4: the way may not be obvious at first](#moment-of-zen-4-the-way-may-not-be-obvious-at-first)
+      - [string partition() method](#string-partition-method)
+      - [string formatting/format strings](#string-formattingformat-strings)
+        - [pep498: literal string interpolation](#pep498-literal-string-interpolation)
+      - [f-strings](#f-strings)
 
 # course overview
 
@@ -3518,5 +3523,216 @@ example:
 '#45ff23;#2321fa;#1298a3;#a32312'
 >>> colors.split(';')
 ['#45ff23', '#2321fa', '#1298a3', '#a32312']
+>>>
+```
+
+a widespread and conventional way of concatenating strings together as one string is using `join()` on an empty string
+
+```py
+>>> ''.join(['high', 'way', 'man'])
+'highwayman'
+>>>
+```
+
+#### moment of zen 4: the way may not be obvious at first
+
+to concatenate
+invoke join on empty text
+something from nothing
+
+#### string partition() method
+
+partition divides a string into three sections
+
+1. the part before the separator
+2. the separator itseelf
+3. the part after the separator
+
+```py
+>>> 'unforgetable'.partition('forget')
+('un', 'forget', 'able')
+>>>
+```
+
+partition returns a tuple, so this is commonly used in conjunction with tuple unpacking.
+
+example:
+
+```py
+>>> departure, separator, arrival = "London:Edinburgh".partition(':')
+>>> departure
+'London'
+>>> separator
+':'
+>>> arrival
+'Edinburgh'
+>>>
+```
+
+often we are not interested in capturing the separator variable, so you may see the underscore used. it is not treated in a special way by the python language
+
+but, there is an unwritten convention that the underscore `_` is for unused or dummy values
+
+example:
+
+```py
+>>> origin, _, destination = "Seattle-Boston".partition('-')
+>>> origin
+'Seattle'
+>>> _
+'-'
+>>> destination
+'Boston'
+>>>
+```
+
+#### string formatting/format strings
+
+one of the most frequently used string methods
+
+format() can be called on any string containing so-called **replacement fields**, which are surrounded by curly braces
+
+example:
+
+```py
+"{0}° north {1}° east".format(59.7, 10.4)
+# ^          ^                 ^      ^
+# replacement fields        format arguments
+```
+
+the objects provided as arguments to the format method are converted into strings and used to populate these fields
+
+example:
+
+```py
+>>> "The age of {0} is {1}".format("Jim", 32)
+'The age of Jim is 32'
+>>>
+```
+
+the field names, in this case `0` and `1`, are matched up with the positional arguments to format and each argument is converted to a string
+
+the field name may be used more than once too
+
+example:
+
+```py
+>>> "The age of {0} is {1}. {0}'s birthday is on {2}".format("Fred", 24, "October 31")
+"The age of Fred is 24. Fred's birthday is on October 31"
+>>>
+```
+
+however, if the field names are used **EXACTLY ONCE** and are in the **SAME ORDER AS THE ARGUMENTS**, the field number can be omitted.
+
+```py
+>>> "Reticulating spline {} of {}.".format(4, 23)
+'Reticulating spline 4 of 23.'
+>>>
+```
+
+if keyword arguments are supplied to `format()`, named fields can be used instead of ordinals.
+
+```py
+>>> "Current position {latitude} {longitude}".format(latitude="60N", longitude="5E")
+'Current position 60N 5E'
+>>>
+```
+
+it's also possible to index into sequences using square bracket notation inside the replacement field
+
+here, we index into a tuple in the replacement fields
+
+```py
+>>> "Galactic position x={pos[0]}, y={pos[1]}, z={pos[2]}".format(pos=(65.2,23.1,82.2))
+'Galactic position x=65.2, y=23.1, z=82.2'
+>>>
+```
+
+you can even access object attributes
+
+```py
+>>> import math
+>>> "Math constants: pi={m.pi}, e={m.e}".format(m=math)
+'Math constants: pi=3.141592653589793, e=2.718281828459045'
+>>>
+```
+
+here, we pass the whole `Math` module to `format()` using a keyword argument (remember, modules are objects), and then access two of its attributes within the replacement fields
+
+format strings also give us a lot of control over field alignment and floating-point formatting
+
+same values as above, but displayed using only three decimal places.
+
+```py
+>>> "Math constants: pi={m.pi:.3f}, e={m.e:.3f}".format(m=math)
+'Math constants: pi=3.142, e=2.718'
+>>>
+```
+
+format() is powerful and is generally preferred to its predecessor, it can be quite verbose for relatively simple cases
+
+```py
+>>> value = 4 * 20
+>>> "The value is {value}".format(value=value)
+'The value is 80'
+>>>
+```
+
+here, we had to mention the name `value` three times. the example could be made shorter by removing the name `value` from the brackets in the string and not using keyword arguments to format
+
+but in larger and more complex interpolations, we would want to keep those elements for maintainability and readability
+
+##### pep498: literal string interpolation
+
+commonly called f-strings, available in python 3.6 and later
+
+"embed expressions inside literal strings, using a minimal syntax"
+
+#### f-strings
+
+just like a normal string literal, but is prefixed with the letter `f`
+
+```py
+f"one plus one is {1 + 1}"
+#                    ↑
+#     evaluated and inserted at runtime
+```
+
+rework our previous `value` example using f-strings
+
+```py
+>>> value = 4 * 20
+>>> f"The value is {value}"
+'The value is 80'
+>>>
+```
+
+here, instead of needing to pass value into a method, the f-string simply evaluates it as a normal python expression (very similar to how template literals work in JavaScript), inserting the result into the resulting string
+
+because f-strings allow you to use any python expression, you are not limited to using simple named references. you can also call functions
+
+```py
+>>> import datetime
+>>> f"The current time is {datetime.datetime.now().isoformat()}"
+'The current time is 2022-09-15T09:52:26.475071'
+>>>
+```
+
+can also redo the previous math example too
+
+```py
+>>> import math
+>>> f"Math constants: pi={math.pi}, e={math.e}"
+'Math constants: pi=3.141592653589793, e=2.718281828459045'
+>>>
+```
+
+this also demonstrates that f-strings also support floating point formatting
+
+in order to do this, we put a colon after the expression in the f-string followed by the format specifier
+
+```py
+>>> f'Math constants: pi={math.pi:.3f}, e={math.e:.3f}'
+'Math constants: pi=3.142, e=2.718'
 >>>
 ```
