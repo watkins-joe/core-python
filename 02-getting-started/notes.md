@@ -120,6 +120,19 @@ table of contents
       - [reversing and sorting into copies](#reversing-and-sorting-into-copies)
         - [`reversed()`](#reversed)
         - [`sorted()`](#sorted)
+  - [dictionaries](#dictionaries)
+    - [shallow copying](#shallow-copying)
+    - [copying a dictionary](#copying-a-dictionary)
+      - [`copy()` method](#copy-method)
+      - [`dict()` constructor](#dict-constructor)
+    - [`dict.update()`](#dictupdate)
+    - [dictionary iteration](#dictionary-iteration)
+      - [`dict.values()`](#dictvalues)
+      - [`dict.keys()`](#dictkeys)
+      - [`dict.items()`](#dictitems)
+    - [membership tests](#membership-tests)
+    - [deleting from dicts with `del`](#deleting-from-dicts-with-del)
+    - [pretty printing dicts](#pretty-printing-dicts)
 
 # course overview
 
@@ -4403,3 +4416,309 @@ we can pass this to the list constructor to create an actual list
 [4, 9, 2, 1]
 >>>
 ```
+
+## dictionaries
+
+as we learned before, dictionaries are a collection of key-value pairs
+
+```py
+>>> urls = { 'Google': 'http://google.com/',
+...     'Pluralsight': 'http://pluralsight.com',
+...     'Sixty North': 'http://sixty-north.com',
+...     'Microsoft': 'http://microsoft.com/' }
+>>>
+```
+
+values are accessible via the keys. since each key is associated with exactly one value and lookup is through keys, the keys must be unique within any single dictionary
+
+```py
+>>> urls['Pluralsight']
+'http://pluralsight.com'
+>>>
+```
+
+having duplicate values is OK, however
+
+internally, dictionaries maintains pairs of references to the key objects and the value objects
+
+![dictionary internals](media/dictionaryInternals.png)
+
+the key objects **MUST BE IMMUTABLE**, therefore strings, numbers, and tupes are fine to use as keys, but lists are not
+
+the value objects can be mutable and in practice, often are
+
+you should never rely on the order of the items in the dictionary -- it is essentially random
+
+there is also a dictionary constructor, `dict()`, which can convert other types to dictionaries
+
+we can use the dict() constructor to convert from an iterable series of key-value pairs stored in tuples
+
+```py
+>>> names_and_ages = [('Alice', 32), ('Bob', 48), ('Charlie', 28), ('Daniel', 33)]
+>>> d = dict(names_and_ages)
+>>> d
+{'Alice': 32, 'Bob': 48, 'Charlie': 28, 'Daniel': 33}
+>>>
+```
+
+recall that the items in the dictionary are not stored in any particular order
+
+so long as the keys are legitimate python identifiers, it's even possible to create a dictionary directly from keyword arguments passed to the dict.
+
+```py
+>>> phonetic = dict(a='alfa', b='bravo', c='charlie', d='delta', e='echo', f='foxtrot')
+>>> phonetic
+{'a': 'alfa', 'b': 'bravo', 'c': 'charlie', 'd': 'delta', 'e': 'echo', 'f': 'foxtrot'}
+>>>
+```
+
+### shallow copying
+
+as with lists, dictionary copying is shallow by default, copying only the **references** to the key and value objects, **not the objects themselves**
+
+### copying a dictionary
+
+two main ways
+
+1. copy() method
+2. dict() constructor
+
+#### `copy()` method
+
+```py
+>>> d = dict(goldenrod=0xDAA520, indigo=0x4B0082, seashell=0xFFF5EE)
+>>> e = d.copy()
+>>> e
+{'goldenrod': 14329120, 'indigo': 4915330, 'seashell': 16774638}
+>>>
+```
+
+#### `dict()` constructor
+
+pass an existing dictionary to the dict constructor
+
+```py
+>>> f = dict(e)
+>>> f
+{'goldenrod': 14329120, 'indigo': 4915330, 'seashell': 16774638}
+>>>
+```
+
+this is the most common way of copying a dict
+
+### `dict.update()`
+
+adds entries from one dictionary to another
+
+call this on the dictionary that is to be updated
+
+pass the contents of the dictionary that is to be merged in
+
+```py
+>>> g = dict(test=12345,meme=67890,orange=246810)
+>>> f.update(g)
+>>> f
+{'goldenrod': 14329120, 'indigo': 4915330, 'seashell': 16774638, 'test': 12345, 'meme': 67890, 'orange': 246810}
+>>>
+```
+
+we can see the elements of the new dict `g` in the original dict `f`
+
+if the argument update includes keys which are already present in the target dictionary, **the values associated with these keys are replaced in the target by the corresponding values from the source**
+
+example:
+
+```py
+>>> stocks = {'GOOG': 891, 'AAPL': 416, 'IBM': 194}
+>>> stocks.update({'GOOG': 894, 'YHOO': 25})
+>>> stocks
+{'GOOG': 894, 'AAPL': 416, 'IBM': 194, 'YHOO': 25}
+>>>
+```
+
+we started with a stocks dict, then updated it with a new 'GOOG' value and added the 'YHOO' stock.
+
+### dictionary iteration
+
+dictionaries yield the next key on each iteration
+
+values can be retrieved using the square-bracket syntax operator
+
+```py
+>>> cars = dict(ford='focus', toyota='corolla', honda='civic', nissan='altima', jeep='wrangler')
+>>> cars
+{'ford': 'focus', 'toyota': 'corolla', 'honda': 'civic', 'nissan': 'altima', 'jeep': 'wrangler'}
+>>> for key in cars:
+...     print(f"{key} => {cars[key]}")
+...
+ford => focus
+toyota => corolla
+honda => civic
+nissan => altima
+jeep => wrangler
+>>> cars.update(dict(lamborghini = 'hurracan', ferrari = '488', dodge = 'ram', bmw = '350', vw = 'golf', kia = 'soul'))
+>>> cars
+{'ford': 'focus', 'toyota': 'corolla', 'honda': 'civic', 'nissan': 'altima', 'jeep': 'wrangler', 'lamborghini': 'hurracan', 'ferrari': '488', 'dodge': 'ram', 'bmw': '350', 'vw': 'golf', 'kia': 'soul'}
+>>> for key in cars:
+...     print(f"{key} => {cars[key]}")
+...
+ford => focus
+toyota => corolla
+honda => civic
+nissan => altima
+jeep => wrangler
+lamborghini => hurracan
+ferrari => 488
+dodge => ram
+bmw => 350
+vw => golf
+kia => soul
+>>>
+```
+
+notice the keys are returned in the same order in which they are written -- but you cannot rely nor expect this. instead expect an arbitrary (random) order, neither the order in which they were specified nor any meaningful order
+
+#### `dict.values()`
+
+if we want to iterate over only the values, we can use the `values()` dict method
+
+this returns an object which provides an iterable view onto the dictionary values without causing the values to be copied
+
+```py
+>>> for value in cars.values():
+...     print(value)
+...
+focus
+corolla
+civic
+altima
+wrangler
+hurracan
+488
+ram
+350
+golf
+soul
+>>>
+```
+
+there is no efficient or convenient way to retrieve the corresponding key from a value, so we only print the values
+
+#### `dict.keys()`
+
+there is also a keys() method. unlike `values()`, this method retrieves the keys from the dict
+
+```py
+>>> for key in cars.keys():
+...     print(key)
+...
+ford
+toyota
+honda
+nissan
+jeep
+lamborghini
+ferrari
+dodge
+bmw
+vw
+kia
+>>>
+```
+
+#### `dict.items()`
+
+iterates over keys **and** values in tandem
+
+yields a `(key, value)` tuple on each iteration
+
+each key-value pair is called an **item** and we can get hold of an iterable view of items using the items() dict method
+
+```py
+>>> for key, value in cars.items():
+...     print(f"{key} => {value}")
+...
+ford => focus
+toyota => corolla
+honda => civic
+nissan => altima
+jeep => wrangler
+lamborghini => hurracan
+ferrari => 488
+dodge => ram
+bmw => 350
+vw => golf
+kia => soul
+>>>
+```
+
+### membership tests
+
+membership tests for dictionaries using the `in` and `not in` operators work on the keys
+
+```py
+>>> 'ferrari' in cars
+True
+>>> 'mitsubishi' in cars
+False
+>>> 'bentley' not in cars
+True
+>>>
+```
+
+### deleting from dicts with `del`
+
+just like with lists, we use the `del` keyword to remove an entry from a dictionary
+
+```py
+>>> del cars['dodge']
+>>> cars
+{'ford': 'focus', 'toyota': 'corolla', 'honda': 'civic', 'nissan': 'altima', 'jeep': 'wrangler', 'lamborghini': 'hurracan', 'ferrari': '488', 'bmw': '350', 'vw': 'golf', 'kia': 'soul'}
+>>>
+```
+
+the keys in a dictionary should be immutable, although the values can be modified
+
+```py
+>>> choices = {'a': [1,2], 'b': [3,4,5], 'c': [6,7], 'd': [8,9,10]}
+>>>
+```
+
+our string keys are immutable, which is a good thing for correct functioning of the dict
+
+but there is no issue with updating the values of a key when we need to
+
+```py
+>>> choices['b'] += [11,12,13,14]
+>>> choices
+{'a': [1, 2], 'b': [3, 4, 5, 11, 12, 13, 14], 'c': [6, 7], 'd': [8, 9, 10]}
+>>>
+```
+
+here, the augmented assignment operator is applied to the list object accessed thru the key `'b'`
+
+of course, the dictionary itself is mutable and we can add new items
+
+### pretty printing dicts
+
+with compound data structures such as our list of choices dict, it can be useful to print them in a more readable format
+
+we can do this with the python standard library `pprint`, which contains a function called `pprint()`
+
+```py
+>>> from pprint import pprint as pp
+>>>
+```
+
+**NOTE:** without the `'as pp'`, the print function reference would overwrite the module reference, preventing further access to the contents of the module. this kind of duplicate naming should be avoided in your own APIs and modules.
+
+```py
+>>> pp(choices)
+{'a': [1, 2],
+'b': [3, 4, 5, 11, 12, 13, 14],
+'c': [6, 7],
+'d': [8, 9, 10]}
+>>>
+```
+
+`pp` function gives us a more comprehensible display
