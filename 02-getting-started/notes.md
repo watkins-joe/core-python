@@ -133,6 +133,25 @@ table of contents
     - [membership tests](#membership-tests)
     - [deleting from dicts with `del`](#deleting-from-dicts-with-del)
     - [pretty printing dicts](#pretty-printing-dicts)
+  - [sets](#sets)
+    - [literal form of set](#literal-form-of-set)
+      - [creating empty set](#creating-empty-set)
+    - [sets are iterable](#sets-are-iterable)
+    - [set membership](#set-membership)
+    - [adding to set](#adding-to-set)
+    - [removing from set](#removing-from-set)
+      - [`remove()`](#remove)
+      - [`discard()`](#discard)
+    - [copying a set](#copying-a-set)
+    - [set algebra](#set-algebra)
+      - [example:](#example)
+        - [`union()` method](#union-method)
+      - [`difference()` method](#difference-method)
+        - [`symmetric_difference()` method](#symmetric_difference-method)
+      - [`intersection()` method](#intersection-method)
+      - [`issubset()` method](#issubset-method)
+      - [`issuperset()` method](#issuperset-method)
+      - [`isdisjoint()` method](#isdisjoint-method)
 
 # course overview
 
@@ -4722,3 +4741,351 @@ we can do this with the python standard library `pprint`, which contains a funct
 ```
 
 `pp` function gives us a more comprehensible display
+
+## sets
+
+**unordered** collection of unique elements
+
+sets are mutable -- elements can be added and removed from the set
+
+each element itself must be immutable, very much like the keys of a dictionary
+
+### literal form of set
+
+very similar to dictionaries, delimited by curly braces
+
+but each item is a single object, rather than a pair joined by a colon.
+
+```py
+>>> p = {6, 28, 496, 8128, 33550336}
+>>> p
+{33550336, 8128, 496, 6, 28}
+>>> type(p)
+<class 'set'>
+>>>
+```
+
+#### creating empty set
+
+recall that curly braces create an empty dictionary
+
+```py
+>>> d = {}
+>>> type(d)
+<class 'dict'>
+>>>
+```
+
+to makean empty set, we can't use the `{}` syntax. we must use the `set()` constructor
+
+```py
+>>> e = set()
+>>> e
+set()
+>>>
+```
+
+the set constructor can create a set from any iterable series, such as a list, and duplicates are discarded.
+
+```py
+>>> s = set([2, 4, 16, 64, 4096, 65536, 262114])
+>>> s
+{4096, 64, 2, 65536, 4, 262114, 16}
+```
+
+a common use of sets is to efficiently remove duplicate items from a series of objects
+
+```py
+>>> t = [1, 4, 2, 1, 7, 9, 9]
+>>> set(t)
+{1, 2, 4, 7, 9}
+>>>
+```
+
+### sets are iterable
+
+sets are iterable -- but the order is arbitrary
+
+```py
+>>> for x in {1, 2, 4, 5, 16, 32}:
+...     print(x)
+...
+32
+1
+2
+4
+5
+16
+>>>
+```
+
+### set membership
+
+like other collection types, membership of a set is checked using the `in` and `not in` operators
+
+```py
+>>> q = {2, 9, 6, 4}
+>>> 3 in q
+False
+>>> 3 not in q
+True
+>>>
+```
+
+### adding to set
+
+adding to set uses the `add()` method
+
+```py
+>>> k = {81, 108}
+>>> k.add(54)
+>>> k
+{81, 108, 54}
+>>> k.add(12)
+>>> k
+{81, 108, 12, 54}
+>>>
+```
+
+adding an element that already exists in the set has no effect and also does **not** produce an error
+
+```py
+>>> k
+{81, 108, 12, 54}
+>>> k.add(108)
+>>> k
+{81, 108, 12, 54}
+>>>
+```
+
+multiple elements can be added in one go from any iterable series using the `update()` method
+
+```py
+>>> k.update([37, 128, 97])
+>>> k
+{128, 97, 37, 108, 12, 81, 54}
+>>>
+```
+
+### removing from set
+
+two methods are provided for removing elements from a set
+
+1. `remove()`
+2. `discard()`
+
+#### `remove()`
+
+`remove()` requires that element to be removed is present in the set
+
+```py
+>>> k
+{128, 97, 37, 108, 12, 81, 54}
+>>> k.remove(97)
+>>> k
+{128, 37, 108, 12, 81, 54}
+>>>
+```
+
+otherwise, a `KeyError` is produced
+
+```py
+>>> k
+{128, 37, 108, 12, 81, 54}
+>>> k.remove(98)
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+KeyError: 98
+>>>
+```
+
+#### `discard()`
+
+less fussy
+
+has no effect if the element to be removed is not present in the set
+
+```py
+>>> k
+{128, 37, 108, 12, 81, 54}
+>>> k.discard(98)
+>>> k
+{128, 37, 108, 12, 81, 54}
+>>>
+```
+
+### copying a set
+
+set supports the `copy()` method, which creates a shallow copy of the set, copying **references**, but **not objects**
+
+```py
+>>> k
+{128, 37, 108, 12, 81, 54}
+>>> j = k.copy()
+>>> j
+{128, 81, 37, 54, 108, 12}
+>>>
+```
+
+the set constructor may also be used
+
+```py
+>>> j
+{128, 81, 37, 54, 108, 12}
+>>> m = set(j)
+>>> m
+{128, 81, 37, 54, 108, 12}
+>>>
+```
+
+### set algebra
+
+![set algebra](media/setAlgebra.png)
+
+most useful aspect of set types is the group of powerful set algebra operations
+
+these allow us to easily compute:
+
+1. set unions
+2. set differences
+3. set intersections
+
+and to evaluate whether two sets have:
+
+1. subset relations
+2. superset relations
+3. disjoint relations
+
+#### example:
+
+first, we define a number of sets
+
+```py
+>>> blue_eyes = {'Olivia', 'Harry', 'Lily', 'Jack', 'Amelia'}
+>>> blond_hair = {'Harry', 'Jack', 'Amelia', 'Mia', 'Joshua'}
+>>> smell_hcn = {'Harry', 'Amelia'}
+>>> taste_ptc = {'Harry', 'Lily', 'Amelia', 'Lola'}
+>>> o_blood = {'Mia', 'Joshua', 'Lily', 'Olivia'}
+>>> b_blood = {'Amelia', 'Jack'}
+>>> a_blood = {'Harry'}
+>>> ab_blood = {'Joshua', 'Lola'}
+>>>
+```
+
+##### `union()` method
+
+to find all of the people with blond hair, blue eyes, or both, we use the `union()` method
+
+this collects together all of the elements which are in either or both sets.
+
+```py
+>>> blue_eyes.union(blond_hair)
+{'Jack', 'Harry', 'Joshua', 'Mia', 'Olivia', 'Amelia', 'Lily'}
+>>>
+```
+
+union is a commutative operation, meaning we can swap the order of the operands using the value equality operator to check for equivalents of the resulting sets
+
+```py
+>>> blue_eyes.union(blond_hair) == blond_hair.union(blue_eyes)
+True
+>>>
+```
+
+#### `difference()` method
+
+to find all of the people who have blond hair but don't have blue eyes, we can use the `difference()` method
+
+this collects all of the elements which are in the first set, which are **NOT** in the second set
+
+```py
+>>> blond_hair.difference(blue_eyes)
+{'Joshua', 'Mia'}
+>>>
+```
+
+this is **non-commutative** because the people with blond hair who don't have blue eyes are not the same as the people who have blue eyes but don't have blond hair
+
+```py
+>>> blond_hair.difference(blue_eyes) == blue_eyes.difference(blond_hair)
+False
+>>>
+```
+
+##### `symmetric_difference()` method
+
+however, if we wanted to find which people have exclusively blond hair or blue eyes, but not both, we can use the `symmetric_difference()` method
+
+this collects all of the elements which are in the first set or the second set, but not both.
+
+```py
+>>> blond_hair.symmetric_difference(blue_eyes)
+{'Lily', 'Mia', 'Olivia', 'Joshua'}
+>>>
+```
+
+this is commutative
+
+```py
+>>> blond_hair.symmetric_difference(blue_eyes) == blue_eyes.symmetric_difference(blond_hair)
+True
+>>>
+```
+
+#### `intersection()` method
+
+to find all of the people with blond hair **and** blue eyes, we can use the `intersection()` method
+
+this collects together only the elements which are present in both sets
+
+```py
+>>> blue_eyes.intersection(blond_hair)
+{'Jack', 'Harry', 'Amelia'}
+>>>
+```
+
+this is also commutative
+
+```py
+>>> blue_eyes.intersection(blond_hair) == blond_hair.intersection(blue_eyes)
+True
+>>>
+```
+
+#### `issubset()` method
+
+used to check whether one set is a subset of another
+
+this checks that all of the elements of the first set are also present in the second set
+
+to check whether all of the people who can smell hydrogen cyanide also have blond hair, we can use the `issubset()`method on `smell_hcn`, passing `blond_hair` as a parameter
+
+```py
+>>> smell_hcn.issubset(blond_hair)
+True
+>>>
+```
+
+#### `issuperset()` method
+
+this checks that all of the elements of the second set are present in the first set
+
+to check whether all of the people who can taste phenylthiocarbamide and calso taste hydrogen cyanide, we can use the `issuperset()` method
+
+```py
+>>> taste_ptc.issuperset(smell_hcn)
+True
+>>>
+```
+
+#### `isdisjoint()` method
+
+to test that two sets have no members in common, we can use the `isdisjoint()` method
+
+one's blood type is either `A` or `O`, never both
+
+```py
+>>> a_blood.isdisjoint(o_blood)
+True
+>>>
+```
