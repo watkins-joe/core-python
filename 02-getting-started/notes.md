@@ -146,12 +146,12 @@ table of contents
     - [set algebra](#set-algebra)
       - [example:](#example)
         - [`union()` method](#union-method)
-      - [`difference()` method](#difference-method)
-        - [`symmetric_difference()` method](#symmetric_difference-method)
-      - [`intersection()` method](#intersection-method)
-      - [`issubset()` method](#issubset-method)
-      - [`issuperset()` method](#issuperset-method)
-      - [`isdisjoint()` method](#isdisjoint-method)
+        - [`difference()` method](#difference-method)
+          - [`symmetric_difference()` method](#symmetric_difference-method)
+        - [`intersection()` method](#intersection-method)
+        - [`issubset()` method](#issubset-method)
+        - [`issuperset()` method](#issuperset-method)
+        - [`isdisjoint()` method](#isdisjoint-method)
 
 # course overview
 
@@ -310,13 +310,13 @@ after doing do, our code is evaluated and executed and our prompt `>>>` returns 
 
 looking at more significant examples of code clearly demonstrate how indentation matters in differentiating different blocks of code.
 
-![example](content/sigWhitespace.png)
+![example](media/sigWhitespace.png)
 
 the whitespace **must** match the structure of your program.
 
 even with code removed, we can see different colored bars with different levels of indentation that visually help us see the levels of code.
 
-![example2](content/sigWhitespaceNoCode.png)
+![example2](media/sigWhitespaceNoCode.png)
 
 each level of indentation is **typically** four spaces.
 
@@ -4992,7 +4992,7 @@ True
 >>>
 ```
 
-#### `difference()` method
+##### `difference()` method
 
 to find all of the people who have blond hair but don't have blue eyes, we can use the `difference()` method
 
@@ -5012,7 +5012,7 @@ False
 >>>
 ```
 
-##### `symmetric_difference()` method
+###### `symmetric_difference()` method
 
 however, if we wanted to find which people have exclusively blond hair or blue eyes, but not both, we can use the `symmetric_difference()` method
 
@@ -5032,7 +5032,7 @@ True
 >>>
 ```
 
-#### `intersection()` method
+##### `intersection()` method
 
 to find all of the people with blond hair **and** blue eyes, we can use the `intersection()` method
 
@@ -5052,7 +5052,7 @@ True
 >>>
 ```
 
-#### `issubset()` method
+##### `issubset()` method
 
 used to check whether one set is a subset of another
 
@@ -5066,7 +5066,7 @@ True
 >>>
 ```
 
-#### `issuperset()` method
+##### `issuperset()` method
 
 this checks that all of the elements of the second set are present in the first set
 
@@ -5078,7 +5078,7 @@ True
 >>>
 ```
 
-#### `isdisjoint()` method
+##### `isdisjoint()` method
 
 to test that two sets have no members in common, we can use the `isdisjoint()` method
 
