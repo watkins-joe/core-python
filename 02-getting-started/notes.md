@@ -152,6 +152,14 @@ table of contents
         - [`issubset()` method](#issubset-method)
         - [`issuperset()` method](#issuperset-method)
         - [`isdisjoint()` method](#isdisjoint-method)
+  - [protocols](#protocols)
+  - [summary](#summary-5)
+    - [tuples](#tuples)
+    - [string](#string)
+    - [range](#range)
+    - [lists](#lists-2)
+    - [dictionaries](#dictionaries-1)
+    - [sets](#sets-1)
 
 # course overview
 
@@ -5089,3 +5097,92 @@ one's blood type is either `A` or `O`, never both
 True
 >>>
 ```
+
+## protocols
+
+a set of operations that a type must support to implement the protocol
+
+protocols do not need to be defined as interfaces or base classes
+
+types only need to provide functioning implementations
+
+we can organize the different collections we have encountered in python according to which protocols they support
+
+| Protocol         | Implementing collections                    |
+| ---------------- | ------------------------------------------- |
+| Container        | `str, list, dict, range, tuple, set, bytes` |
+| Sized            | `str, list, dict, range, tuple, set, bytes` |
+| Iterable         | `str, list, dict, range, tuple, set, bytes` |
+| Sequence         | `str, list, range, tuple, bytes`            |
+| Mutable Sequence | `list`                                      |
+| Mutable Set      | `set`                                       |
+| Mutable Mapping  | `dict`                                      |
+
+support from a protocol demands specific behavior from a type
+
+- the `container` protocol requires that membership testing using `in` and `not in` operators be supported
+
+- the `sized` protocol requires that the number of elements in a collection can be determined by calling `len()` on the collection
+
+- the `iterable` protocol requires that the collections yield items one by one as they are requested
+
+- the `sequence` protocol requires that
+
+  1. the items can be retrieved using square brackets with an integer index `item = sequence[index]`
+  2. the items can be searched for with `index()`
+  3. the items can be counted with `count()`
+  4. a reversed copy of the sequence can be produced with `reversed()`
+
+  - in addition, objects that support sequence must also support iterable, sized, and container.
+
+- `mutable sequence`, `mutable set`, and `mutable mapping` won't be covered here at this time
+
+## summary
+
+### tuples
+
+- tuples are immutable sequences
+- tuple literals are optional parenthesis around comma-separated items
+- use a trailing comma for single-element tuples
+- tuple unpacking is useful for multiple return values and swapping
+
+### string
+
+- use `str.join()` for efficient string concatentation
+- use `str.partition()` for certain simple string parsing operations
+- `str.format()` is a powerful string interpolation technique
+- `f-strings`, new from python 3.6, are a kind of string literal for performing interpolation
+
+### range
+
+- `range` objects represent arithmetic progressions of integers
+- `range()` can be called with one, two or three arguments: start, stop, and step
+- `enumerate` is often better than range for making loop counters
+
+### lists
+
+- lists support indexing from the end with negative slices
+- slicing copies all or part of a list
+- the full slice is a common idiom for copying lists
+- use `list.index()` and `list.count()` to look for elements in a list
+- use the `del` keyword to remove elements from a list
+- sort and reverse lists **in-place** with `list.sort()` and `list.reverse()`
+- `sorted()` and `reverse()` sortand reverse any iterable
+- list copies are shallow, **only copying the references**
+
+### dictionaries
+
+- dictionaries map keys to values
+- iteration and membership in dictionaries are done with respect to their keys
+- do not assume any order when iterating dictionary keys
+- `dict.keys()`, `dict.values()`, and `dict.items()` are iterable views into dictionaries
+- copy dictionariesw with `dict.copy() or the `dict` constructor
+- use `dict.update()` to extend one dictionary with another
+
+### sets
+
+- sets are unordered collections of unique elements
+- sets support powerful set-algebra operations and predicates
+- built-in collections can be organized by protocols
+- underscore often represents unused values used for dummy or superfluous variables
+- the `pprint` module supports pretty printing of compound data structures
