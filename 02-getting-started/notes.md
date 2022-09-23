@@ -165,6 +165,8 @@ table of contents
     - [exception handling](#exception-handling)
   - [exceptions and control flow](#exceptions-and-control-flow)
     - [exception propagation](#exception-propagation)
+  - [handling exceptions](#handling-exceptions)
+    - [try, except statements/blocks](#try-except-statementsblocks)
 
 # course overview
 
@@ -5261,3 +5263,180 @@ the `KeyError` in the stack trace is the type of the exception object, the strin
 ![exception propagation](media/exceptionPropagation.png)
 
 notice that the exception propagates thru several levels in the call stack
+
+## handling exceptions
+
+making our `convert` function more robust by adding a `try, except` construct to handle a potential `KeyError` like we had before
+
+`exceptional.py`
+
+```py
+# DIGIT_MAP above in file..
+
+def convert(s):
+  try:
+    number = ''
+    for token in s:
+      number += DIGIT_MAP[token]
+    x = int(number)
+  except KeyError:
+    x = -1
+  return x
+```
+
+### try, except statements/blocks
+
+`try` and `except` introduce new blocks
+
+- the `try` block contains doe that could raise an exception
+- the `except` block contains the code, which performs error handling in the event an exception is raised
+
+we decided that if an unconvertible string is supplied, we will set the value of `x` to `-1`
+
+we will add a couple of print statements to reinforce control flow
+
+`exceptional.py`
+
+```py
+# DIGIT_MAP above in file..
+
+def convert(s):
+  try:
+    number = ''
+    for token in s:
+      number += DIGIT_MAP[token]
+    x = int(number)
+    print(f"Conversion succeeded! x = {x}")
+  except KeyError:
+    print("Conversion failed!")
+    x = -1
+  return x
+```
+
+test this new functionality after restarting the REPL and reimporting our function `convert` from our module `exceptional`
+
+```py
+>>> from exceptional import convert
+>>> convert("three four".split())
+Conversion succeeded! x = 34
+34
+>>> convert("eleventeen".split())
+Conversion failed!
+-1
+>>>
+```
+
+our print statements are now showing up, and our KeyError is no longer being caught by the REPL, but rather by our try except in `convert`
+
+our function expects its argument `s` to be iterable -- what happens when we pass an object that isn't?
+
+```py
+>>> convert(512)
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+  File "/Users/jw02583/Documents/repos/core-python/02-getting-started/exceptions/exceptional.py", line 17, in convert
+    for token in s:
+TypeError: 'int' object is not iterable
+>>>
+```
+
+this time, our handler didn't intercept the exception and we get a TypeError in the REPL
+
+each try block can have multiple corresponding except blocks which intercept exceptions of different types
+
+now, if we add a handler for a TypeError, too, our code looks like this:
+
+`exceptional.py`
+
+```py
+# DIGIT_MAP above in file..
+
+def convert(s):
+  try:
+    number = ''
+    for token in s:
+      number += DIGIT_MAP[token]
+    x = int(number)
+    print(f"Conversion succeeded! x = {x}")
+  except KeyError:
+    print("Conversion failed!")
+    x = -1
+  except TypeError:
+    print("Conversion failed!")
+    x = -1
+  return x
+```
+
+now, if we rerun the same test on the number `512` as before, the TypeError is handled as well
+
+```py
+>>> from exceptional import convert
+>>> convert(512)
+Conversion failed!
+-1
+>>>
+```
+
+we have some code duplication in our except blocks. instead, we can move the assignment of x to -1 in the beginning of our program.
+
+if our program fails to properly convert our input `s`, the value of `x` won't change from `-1` and it will print `-1` with our error message.
+
+otherwise, our program will reassign `x` as needed to the proper number and will return the proper value of `x`.
+
+`exceptional.py`
+
+```py
+# DIGIT_MAP above in file..
+
+def convert(s):
+  """Convert a string to an integer."""
+  x = -1
+  try:
+    number = ''
+    for token in s:
+      number += DIGIT_MAP[token]
+    x = int(number)
+    print(f"Conversion succeeded! x = {x}")
+  except KeyError:
+    print("Conversion failed!")
+  except TypeError:
+    print("Conversion failed!")
+  return x
+```
+
+we can also exploit the fact that both handlers do the same thing by collapsing them into one, using the ability of the `except` statement to accept a tuple of exception types, allowing us to merge the except blocks together:
+
+`exceptional.py`
+
+```py
+# DIGIT_MAP above in file..
+
+def convert(s):
+  """Convert a string to an integer."""
+  x = -1
+  try:
+    number = ''
+    for token in s:
+      number += DIGIT_MAP[token]
+    x = int(number)
+    print(f"Conversion succeeded! x = {x}")
+  except (KeyError, TypeError):
+    print("Conversion failed!")
+  return x
+```
+
+everything still works as designed:
+
+```py
+>>> from exceptional import convert
+>>> convert("two nine".split())
+Conversion succeeded! x = 29
+29
+>>> convert("elephant".split())
+Conversion failed!
+-1
+>>> convert(451)
+Conversion failed!
+-1
+>>>
+```
