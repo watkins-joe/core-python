@@ -2,13 +2,13 @@ table of contents
 
 - [course overview](#course-overview)
 - [installing and starting python](#installing-and-starting-python)
-  - [intstalling python](#intstalling-python)
+  - [installing python](#installing-python)
   - [interactive python](#interactive-python)
     - [typing in the command line](#typing-in-the-command-line)
     - [how to exit REPL](#how-to-exit-repl)
   - [significant whitespace](#significant-whitespace)
   - [python culture](#python-culture)
-    - [moment of zen 1: readbility counts](#moment-of-zen-1-readbility-counts)
+    - [moment of zen 1: readability counts](#moment-of-zen-1-readability-counts)
   - [using the standard library](#using-the-standard-library)
     - [using the `math` module](#using-the-math-module)
       - [`from module_name import attribute_name`](#from-module_name-import-attribute_name)
@@ -27,7 +27,7 @@ table of contents
       - [while-loops](#while-loops)
         - [`break`](#break)
   - [summary](#summary-1)
-- [introducing strings, collectons, and iteration](#introducing-strings-collectons-and-iteration)
+- [introducing strings, collections, and iteration](#introducing-strings-collections-and-iteration)
   - [`str`](#str)
   - [`string literals`](#string-literals)
     - [newline](#newline)
@@ -160,6 +160,8 @@ table of contents
     - [lists](#lists-2)
     - [dictionaries](#dictionaries-1)
     - [sets](#sets-1)
+- [exceptions](#exceptions)
+  - [overview](#overview-3)
 
 # course overview
 
@@ -169,7 +171,7 @@ it is not applicable to python version `3.7` to `.10`
 
 # installing and starting python
 
-## intstalling python
+## installing python
 
 use `python3` command on command line to launch python in your CLI
 
@@ -223,7 +225,7 @@ can also use the `_` variable in an expression
 
 this is one of the very few obscure shortcuts in python
 
-note: the `_` variable doesn't have any behavior in python scripsts or program. this functionality is only in the REPL
+note: the `_` variable doesn't have any behavior in python scripts or program. this functionality is only in the REPL
 some commands don't have return values
 
 ```py
@@ -265,7 +267,7 @@ control flow structures
 - while-loops
 - if-statements
 
-are all introducted by statements that are terminated by a **colon**, `:`
+are all introduced by statements that are terminated by a **colon**, `:`
 
 python will change the prompt to three dots `...` requesting that you provide the body of the for-loop.
 
@@ -377,7 +379,7 @@ If the implementation is easy to explain, it may be a good idea.
 Namespaces are one honking great idea -- let's do more of those!
 ```
 
-### moment of zen 1: readbility counts
+### moment of zen 1: readability counts
 
 Readability Counts
 
@@ -389,7 +391,7 @@ Readability Counts
 
 the standard library contains modules
 
-you gain access to standard library modules by uding the `import` keyword
+you gain access to standard library modules by using the `import` keyword
 
 the basic method of importing a module is this syntax: `import module_name`
 
@@ -541,7 +543,7 @@ most programming languages would fail on the above expression for even moderatel
 
 this is because in most programming languages, regular signed integers can only store values less than 2<sup>31</sup> - 1, which equals `2147483647`
 
-however, factorials growso fastthat the largest factorial that you can fit into a 32-bit signed integer is 12 factorial, since 13 factorial is too large.
+however, factorials grow so fast that the largest factorial that you can fit into a 32-bit signed integer is 12 factorial, since 13 factorial is too large.
 
 in most-widely used programming languages, we would need more complex code or more sophisticated mathematics merely to compute how many ways there are to draw 3 fruit from a set of 13 fruits.
 
@@ -574,7 +576,7 @@ we learned
 
 - how to download and install python
 - starting python REPL
-- evaluating simple expressiona and mathematic calculations in REPL
+- evaluating simple expressions and mathematic calculations in REPL
 - the role of underscore in the REPL
   - the value of `_` in REPL is the result of the last evaluated expression
 - how to make basic use of the `print()` function
@@ -685,7 +687,7 @@ floating point numbers are supported in python by the `float` type
 
 python floats are implemented as `IEEE-754 double-precision` with `53-bits of binary precision`
 
-- this is equalivalent to between 15 and 16 significant digits in decimal
+- this is equivalent to between 15 and 16 significant digits in decimal
 
 any literal number containing a decimal is interpreted by python as a `float`
 
@@ -713,7 +715,7 @@ for small numbers, like Planck's constant, 1.616 times 10<sup>-35</sup>
 
 notice how it switched the display representation, that is, the format it prints to the REPL, to the most readable form.
 
-as with integers, convert to floats from other numeric or string stypes using the float constructor function
+as with integers, convert to floats from other numeric or string types using the float constructor function
 
 we can pass int values to the float constructor:
 
@@ -785,7 +787,7 @@ True
 
 the `bool` type represents boolean logical values (`True` and `False`) and plays an important role in several of python's control flow structures
 
-there are two `bool` values, `True` and `False`, both spelled with the first letter capitialized
+there are two `bool` values, `True` and `False`, both spelled with the first letter capitalized
 
 ```py
 >>> True
@@ -820,7 +822,7 @@ True
 >>>
 ```
 
-whenc converting from collections, such as strings or lists, only empty values are considered `falsy`
+when converting from collections, such as strings or lists, only empty values are considered `falsy`
 
 for lists, the empty list is falsy
 
@@ -1120,7 +1122,7 @@ we..
 - looked at **augmented assignment operators** like `-=` and `+=` for modifying iterator/counter variables in-place
 - requesting text input from the user with the `input()` function
 
-# introducing strings, collectons, and iteration
+# introducing strings, collections, and iteration
 
 ## `str`
 
@@ -1343,7 +1345,7 @@ if we have access to Norwegian characters, we can store them in a string literal
 >>>
 ```
 
-we can even write the hexadecimal representations of Unicode code poinst as an escape sequence prefixed by `/u`, such as:
+we can even write the hexadecimal representations of Unicode code points as an escape sequence prefixed by `/u`, such as:
 
 ```py
 >>> "Vi er s\u00e5 glad for \u00e5 h\xf8re og l\u00e6re om Python!"
@@ -1841,7 +1843,7 @@ see how the calls of the function evaluate value of the returned expression
 
 ### naming special functions
 
-in python, many language feaatures are implemented or controlled using specially named objects or functions.
+in python, many language features are implemented or controlled using specially named objects or functions.
 
 these special names generally have two leading and two trailing underscores
 
@@ -1917,7 +1919,7 @@ only
 >>>
 ```
 
-but what happens if we try to run the moduile directly from our OS terminal/shell prompt?
+but what happens if we try to run the module directly from our OS terminal/shell prompt?
 
 ```shell
 $ python words.py
@@ -1926,7 +1928,7 @@ $
 
 no words are printed, which is because all the module does now is define a function and then exit -- the function is never called. we would prefer if the module printed something when we executed it.
 
-to make a module from w hich we can usefully import functions into the REPL and which can be run as a script, we need to learn a new python idiom
+to make a module from which we can usefully import functions into the REPL and which can be run as a script, we need to learn a new python idiom
 
 `__name__` (dunder name)
 
@@ -1965,7 +1967,7 @@ now, the special dunder name (`__name__`) variable is equal to the string dunder
 
 why? python sets the value of dunder name differently depending on how our module is being used.
 
-the **key idea** being introduced here is that our module can use this behvaior **to decide how it should behave**
+the **key idea** being introduced here is that our module can use this behavior **to decide how it should behave**
 
 if we replace the print function call with an if-check that checks if the dunder name variable is == to dunder main, we will call the fetch_words function
 
@@ -2002,7 +2004,7 @@ $
 
 `def` is a statement, which when executed in sequence with the other top-level model scope code, causes the code within the function to be bound to the name of the function
 
-whem modules are imported or run, **all** of the top-level statements are run, and this is by the means which the function within the module namespace are defined
+when modules are imported or run, **all** of the top-level statements are run, and this is by the means which the function within the module namespace are defined
 
 ### module, script, or program?
 
@@ -2021,13 +2023,13 @@ whem modules are imported or run, **all** of the top-level statements are run, a
 
 strongly recommended to even making simple scripts importable because it eases development and testing so much if you can access your code from within the REPL
 
-likewise, even modules which are only evermeant to be imported in production settings benefit from having executable test code.
+likewise, even modules which are only ever meant to be imported in production settings benefit from having executable test code.
 
 for this reason, nearly all modules we create have this form of defining one or more importable functions with a postscript to facilitate execution
 
 ## command line arguments
 
-we will modify our words.py file to moduilarize more of the program
+we will modify our words.py file to modularize more of the program
 
 we
 
@@ -2134,7 +2136,7 @@ g
 >>>
 ```
 
-it's a good idea to rename it to something more generic like `print_items`, and changing the variable names in the functino to suit the change we made
+it's a good idea to rename it to something more generic like `print_items`, and changing the variable names in the function to suit the change we made
 
 here is our code now:
 
@@ -2223,7 +2225,7 @@ only
 $ corepy %
 ```
 
-this looks fine until we realize that we can't usefully test `main` any longer from the REPL since it referes to `argv[1]` which is unlikely to have any useful value in the REPL environment
+this looks fine until we realize that we can't usefully test `main` any longer from the REPL since it refers to `argv[1]` which is unlikely to have any useful value in the REPL environment
 
 the solution is to allow the argument list to be passed as a formal argument to the main function using `sys.argv` as the actual parameter if the dunder name equals dunder main block.
 
@@ -2263,7 +2265,7 @@ our top-level functions have two lines between them -- this is conventional for 
 > That is the number of lines
 > PEP8 recommends
 
-according to the PEP8 style guide, it is customary to use two balnk lines between module-level functions
+according to the PEP8 style guide, it is customary to use two blank lines between module-level functions
 
 we use single blank lines for logical breaks within functions
 
@@ -2512,7 +2514,7 @@ only
 $ corepy %
 ```
 
-since python 3.3, python also supports the use of the shebang to make python scripts directly executable with the correct version of the python interpreter, even to t he extent that shebands look like they should only work on UNIX-like system will work as expected on Windows
+since python 3.3, python also supports the use of the shebang to make python scripts directly executable with the correct version of the python interpreter, even to the extent that shebangs look like they should only work on UNIX-like system will work as expected on Windows
 
 this works because Windows python distribution now uses a program called `Pylauncher`. Pylauncher, the executable for which is simply called `py.exe` will parse the shebang and locate the appropriate version of python
 
@@ -2560,7 +2562,7 @@ we learned..
 
 ## overview
 
-pyton object model
+python object model
 names references to objects
 value vs identity equality
 passing arguments and returning values
@@ -2720,7 +2722,7 @@ the steps:
 
 value-equality and identity equality are very different.
 
-- comparison by **value** can be controlled **programatically**
+- comparison by **value** can be controlled **programmatically**
 - comparison by **identity** is **unalterably** defined by the language and this behavior cannot be changed
 
 ## passing arguments and returning values
@@ -3070,7 +3072,7 @@ read more about **type coercion** vs **type conversion** in javascript [here](ht
 
 when we bind a name to an object, where is that binding stored?
 
-name reesolution to objects is managed by **scopes** and **scoping rules**
+name resolution to objects is managed by **scopes** and **scoping rules**
 
 there are **four** types of scope in python arranged in an hierarchy. each scope is a context in which names are stored and can be looked-up/are accessible.
 
@@ -3303,7 +3305,7 @@ dunder doc (`__doc__`) is the doc string we provided for the function
 - you can access the name of a function or module with dunder name, (`__name__`)
 - doc strings can be accessed thru `__doc__`
 - we can use len() to measure the length of a string
-- if we multiply a string by an integer, we get a new string with multiple copies of the operand string. aka the repititon operation, repeats a string an integral number of times
+- if we multiply a string by an integer, we get a new string with multiple copies of the operand string. aka the repetition operation, repeats a string an integral number of times
 
 # built-in collections
 
@@ -3359,7 +3361,7 @@ Norway
 >>>
 ```
 
-we can concatentate tuples using the plus operator and repeat using the multiplication operator
+we can concatenate tuples using the plus operator and repeat using the multiplication operator
 
 ```py
 >>> t + (338186.0, 265e9)
@@ -3606,7 +3608,7 @@ something from nothing
 partition divides a string into three sections
 
 1. the part before the separator
-2. the separator itseelf
+2. the separator itself
 3. the part after the separator
 
 ```py
@@ -4124,7 +4126,7 @@ we can demonstrate this by mutating that object thru the `a` list
 >>>
 ```
 
-we can see this change reflected nowin the `b` list
+we can see this change reflected now in the `b` list
 
 and the final state of both lists, `a` and `b`
 
@@ -4160,7 +4162,7 @@ it's most often used for initializing a list of a certain size known in advance 
 >>>
 ```
 
-**WARNING:** whenusing mutable objectsa selements, the same principle applies: repetition in this case will repeat the **REFERENCE** without copying the value
+**WARNING:** when using mutable objects as elements, the same principle applies: repetition in this case will repeat the **REFERENCE** without copying the value
 
 this is demonstrated using nested lists:
 
@@ -4400,7 +4402,7 @@ where I illegibly know doctors'.split()
 
 #### reversing and sorting into copies
 
-sometimes, an in-place sortor reversal is not required. for example, it might cause a function argument to be modified
+sometimes, an in-place sort or reversal is not required. for example, it might cause a function argument to be modified
 
 `reversed()` and `sorted()` are out-of-place equivalents to `list.reverse()` and `list.sort()`
 
@@ -4470,7 +4472,7 @@ internally, dictionaries maintains pairs of references to the key objects and th
 
 ![dictionary internals](media/dictionaryInternals.png)
 
-the key objects **MUST BE IMMUTABLE**, therefore strings, numbers, and tupes are fine to use as keys, but lists are not
+the key objects **MUST BE IMMUTABLE**, therefore strings, numbers, and tuples are fine to use as keys, but lists are not
 
 the value objects can be mutable and in practice, often are
 
@@ -4784,7 +4786,7 @@ recall that curly braces create an empty dictionary
 >>>
 ```
 
-to makean empty set, we can't use the `{}` syntax. we must use the `set()` constructor
+to make an empty set, we can't use the `{}` syntax. we must use the `set()` constructor
 
 ```py
 >>> e = set()
@@ -5078,7 +5080,7 @@ True
 
 this checks that all of the elements of the second set are present in the first set
 
-to check whether all of the people who can taste phenylthiocarbamide and calso taste hydrogen cyanide, we can use the `issuperset()` method
+to check whether all of the people who can taste phenylthiocarbamide and also taste hydrogen cyanide, we can use the `issuperset()` method
 
 ```py
 >>> taste_ptc.issuperset(smell_hcn)
@@ -5148,7 +5150,7 @@ support from a protocol demands specific behavior from a type
 
 ### string
 
-- use `str.join()` for efficient string concatentation
+- use `str.join()` for efficient string concatenation
 - use `str.partition()` for certain simple string parsing operations
 - `str.format()` is a powerful string interpolation technique
 - `f-strings`, new from python 3.6, are a kind of string literal for performing interpolation
@@ -5167,7 +5169,7 @@ support from a protocol demands specific behavior from a type
 - use `list.index()` and `list.count()` to look for elements in a list
 - use the `del` keyword to remove elements from a list
 - sort and reverse lists **in-place** with `list.sort()` and `list.reverse()`
-- `sorted()` and `reverse()` sortand reverse any iterable
+- `sorted()` and `reverse()` sort and reverse any iterable
 - list copies are shallow, **only copying the references**
 
 ### dictionaries
@@ -5176,7 +5178,7 @@ support from a protocol demands specific behavior from a type
 - iteration and membership in dictionaries are done with respect to their keys
 - do not assume any order when iterating dictionary keys
 - `dict.keys()`, `dict.values()`, and `dict.items()` are iterable views into dictionaries
-- copy dictionariesw with `dict.copy() or the `dict` constructor
+- copy dictionaries with `dict.copy() or the `dict` constructor
 - use `dict.update()` to extend one dictionary with another
 
 ### sets
@@ -5186,3 +5188,7 @@ support from a protocol demands specific behavior from a type
 - built-in collections can be organized by protocols
 - underscore often represents unused values used for dummy or superfluous variables
 - the `pprint` module supports pretty printing of compound data structures
+
+# exceptions
+
+## overview
