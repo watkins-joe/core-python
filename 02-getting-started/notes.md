@@ -162,6 +162,9 @@ table of contents
     - [sets](#sets-1)
 - [exceptions](#exceptions)
   - [overview](#overview-3)
+    - [exception handling](#exception-handling)
+  - [exceptions and control flow](#exceptions-and-control-flow)
+    - [exception propagation](#exception-propagation)
 
 # course overview
 
@@ -5192,3 +5195,69 @@ support from a protocol demands specific behavior from a type
 # exceptions
 
 ## overview
+
+throwing exceptions is common for errors in program execution. if we tried to read a non-existent file, an exception would be raised
+
+we will learn
+
+- what exceptions are
+- raising exceptions
+- control flow
+- catching exceptions
+- unhandled exceptions
+- use in Python
+- built-in exceptions
+- programmer vs. user errors
+- resource cleanup
+
+### exception handling
+
+mechanism for interrupting normal program flow and continuing in surrounding context
+
+1. **raising** an exception
+2. **handling** an exception
+   1. control flow is transferred to the exception handler
+3. **unhandled** exceptions
+   1. if an exception propagates up the call stack to the start of the program, then an unhandled exception will cause the program to terminate
+4. exception **objects**
+   1. exception object containing information about where and why an exceptional event occured is transported from the point at which the exception was raise to the exception handler so that the handler can interrogate the exception object and take appropriate action
+
+python exceptions are similar to exceptions in languages like C++ and Java
+
+## exceptions and control flow
+
+we will be using a python module to contain our code for these concepts
+
+see file in `02-getting-started/exceptions` directory called `exceptional.py` for this module.
+
+we execute `python3` in our terminal in the root of where our `exceptional.py` file lives to give us the ability to import our `convert` function from our `exceptional` module
+
+```py
+>>> from exceptional import convert
+>>> convert("one three three seven".split())
+1337
+>>>
+```
+
+this works, but if we call our function with an object that **can't** be converted to an integer, we get a traceback from the dictionary lookup
+
+```py
+>>> convert("around two grillion".split())
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+  File "/Users/jw02583/Documents/repos/core-python/02-getting-started/exceptions/exceptional.py", line 17, in convert
+    number += DIGIT_MAP[token]
+KeyError: 'around'
+>>>
+>>>
+```
+
+what happened is that the DIGIT_MAP raised a key error when we tried to look up the string key `around` in it. it threw the KeyError because the DIGIT_MAP doesn't have an entry for `around`, we didn't have a handler in place, so the exception was caught by the REPL and the stack trace was displayed
+
+the `KeyError` in the stack trace is the type of the exception object, the string `around`, is part of the payload of the exception object that has been retrieved and printed at the REPL.
+
+### exception propagation
+
+![exception propagation](media/exceptionPropagation.png)
+
+notice that the exception propagates thru several levels in the call stack
