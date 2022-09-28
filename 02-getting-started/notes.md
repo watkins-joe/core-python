@@ -167,6 +167,9 @@ table of contents
     - [exception propagation](#exception-propagation)
   - [handling exceptions](#handling-exceptions)
     - [try, except statements/blocks](#try-except-statementsblocks)
+  - [exceptions and programmer errors](#exceptions-and-programmer-errors)
+    - [`pass` keyword](#pass-keyword)
+    - [accessing exception objects](#accessing-exception-objects)
 
 # course overview
 
@@ -5437,6 +5440,156 @@ Conversion failed!
 -1
 >>> convert(451)
 Conversion failed!
+-1
+>>>
+```
+
+## exceptions and programmer errors
+
+now that we are more comfortable with the control flow for exception behavior, we can remove our print statements from `exceptional.py`
+
+now our code looks like:
+
+```py
+def convert(s):
+  """Convert a string to an integer."""
+  x = -1
+  try:
+    number = ''
+    for token in s:
+      number += DIGIT_MAP[token]
+    x = int(number)
+  except (KeyError, TypeError):
+  return x
+```
+
+but when we try to import it, we get yet another type of exception:
+
+```py
+>>> from exceptional import convert
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+  File "/Users/jw02583/Documents/repos/core-python/02-getting-started/exceptions/exceptional.py", line 23
+    return x
+    ^
+IndentationError: expected an indented block
+>>>
+```
+
+this is because our except block is now empty
+
+```py
+...
+  except (KeyError, TypeError):
+  return x
+...
+```
+
+and empty except blocks are not allowed in python programs.
+
+this is NOT an exceptions that it is ever useful to catch with an except block
+
+almost anything that goes wrong with a python program results in an exception.
+
+but some, like:
+
+- `IndentationError`
+- `SyntaxError`
+- `NameError`
+
+are the result of programmer errors which should be identified and corrected during development rather than handled at runtime
+
+the fact that these things ARE exceptions is mostly useful if you're creating a python development tool, such as a python IDE, embedding python itself in a larger system to support application scripting, or designing a plugin system which dynamically loads code
+
+--
+
+### `pass` keyword
+
+what do we do with our empty except block, now that we've removed our print statements?
+
+our solution is the `pass` keyword
+
+`pass` is a special statement that does precisely nothing
+
+now our code looks like:
+
+```py
+def convert(s):
+  """Convert a string to an integer."""
+  x = -1
+  try:
+    number = ''
+    for token in s:
+      number += DIGIT_MAP[token]
+    x = int(number)
+  except (KeyError, TypeError):
+    pass
+  return x
+```
+
+it's s `no-op` and its only purpose is allow us to construct **syntactically** permissible blocks that are **semantically** empty
+
+though, in this case, it would be better to simplify further and use multiple return statements and get rid of the `x` variable completely
+
+now our code looks like:
+
+```py
+def convert(s):
+  """Convert a string to an integer."""
+  x = -1
+  try:
+    number = ''
+    for token in s:
+      number += DIGIT_MAP[token]
+    return int(number)
+  except (KeyError, TypeError):
+    return -1
+```
+
+### accessing exception objects
+
+sometimes, we want to get a hold of the exception object and interrogate it to get more details as to what went wrong
+
+we can get a namedreferenceto the exception object by adding an `as` clause onto the end of the except statement
+
+now our code looks like:
+
+```py
+import sys
+
+# ... DIGIT_MAP here
+
+def convert(s):
+  """Convert a string to an integer."""
+  x = -1
+  try:
+    number = ''
+    for token in s:
+      number += DIGIT_MAP[token]
+    return int(number)
+  except (KeyError, TypeError) as e:
+    print(f"Conversion error: {e!r}", file=sys.stderr)
+    return -1
+```
+
+we modified our function to print a message with exception details to the **standard error stream** before returning
+
+to print a standard error, we need to get a reference to the stream from the `sys` module, so we needed to import `sys` at the top of our module
+
+we then passed `sys.stderr` as a keyword argument called `file` to `print`
+
+here, we use a feature of `f` strings we haven't used before.
+
+if you put an `!r` after the expression, the `repr` representation of the value will be inserted into your string
+
+in the case of exceptions, this gives us more detailed information about the type of the exception
+
+testing it on the REPL:
+
+```py
+>>> from exceptional import convert
+>>> convert("fail".split())
+Conversion error: KeyError('fail')
 -1
 >>>
 ```
