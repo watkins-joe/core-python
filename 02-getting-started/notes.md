@@ -173,6 +173,9 @@ table of contents
   - [re-raising exceptions](#re-raising-exceptions)
     - [exceptions cannot be ignored](#exceptions-cannot-be-ignored)
     - [just `raise` an exception](#just-raise-an-exception)
+  - [exceptions are part of the API](#exceptions-are-part-of-the-api)
+    - [use standard exception types](#use-standard-exception-types)
+  - [exceptions and protocols](#exceptions-and-protocols)
 
 # course overview
 
@@ -5736,3 +5739,272 @@ TypeError: 'int' object is not iterable
 ```
 
 we see that the original exception type is re-raised whether it's a `KeyError` or a `TypeError`, but our conversion error message is printed to standard error along the way
+
+## exceptions are part of the API
+
+exceptions are an important part of a function's API
+
+callers need to know which exceptions to expect under various conditions so they can ensure appropriate exception handlers are in place
+
+we will use the square root function as our example, courtesy of Heron of Alexandria's algorithm for calculating square roots
+
+created a new file called `roots.py`
+
+```py
+def sqrt(x):
+    """Compute square roots using the method of Heron of Alexandria.
+
+    Args:
+        x: The number for which the square root is to be    computed.
+
+    Returns:
+        The square root of x.
+    """
+
+    guess = x
+    i = 0
+    while guess * guess != x and i < 20:
+        guess = (guess + x / guess) / 2.0
+        i += 1
+    return guess
+
+def main():
+    print(sqrt(9))
+    print(sqrt(2))
+    print(sqrt(-1))
+
+if __name__ == '__main__':
+    main()
+```
+
+after running our program, we see that Heron was onto something
+
+```py
+joe exceptions % python3 roots.py
+3.0
+1.414213562373095
+```
+
+if we try to get the square root of `-1` we get another exception:
+
+```py
+joe exceptions % python3 roots.py
+3.0
+1.414213562373095
+Traceback (most recent call last):
+  File "/Users/jw02583/Documents/repos/core-python/02-getting-started/exceptions/roots.py", line 24, in <module>
+    main()
+  File "/Users/jw02583/Documents/repos/core-python/02-getting-started/exceptions/roots.py", line 21, in main
+    print(sqrt(-1))
+  File "/Users/jw02583/Documents/repos/core-python/02-getting-started/exceptions/roots.py", line 14, in sqrt
+    guess = (guess + x / guess) / 2.0
+ZeroDivisionError: float division by zero
+joe exceptions %
+```
+
+python intercepted a division by 0 and raised an exception
+
+let's modify our function to catch the exception before it propagates up the to the top of the call stack, making our program stop.
+
+like we did before, we can use the `try except` blocks
+
+now our code looks like this:
+
+```py
+def sqrt(x):
+  # ...
+
+def main():
+    print(sqrt(9))
+    print(sqrt(2))
+    try:
+        print(sqrt(-1))
+    except ZeroDivisionError:
+        print("Cannot compute square root of a negative number.")
+
+    print("Program execution continues normally here.")
+
+if __name__ == '__main__':
+    main()
+```
+
+now, when we run our script, we see that we are handling the exception properly and cleanly.
+
+```py
+joe exceptions % python3 roots.py
+3.0
+1.414213562373095
+Cannot compute square root of a negative number.
+Program execution continues normally here.
+joe exceptions %
+```
+
+we need to be careful to avoid the beginners mistake of having too-tight scopes for exception handling blocks. we can easily use one `try except` block for all of our calls to `sqrt`
+
+upon adding a third print statement to show how code execution of the enclosed block is terminated
+
+```py
+def main():
+    try:
+        print(sqrt(9))
+        print(sqrt(2))
+        print(sqrt(-1))
+        print("This is never printed.")
+    except ZeroDivisionError:
+        print("Cannot compute square root of a negative number.")
+
+    print("Program execution continues normally here.")
+
+if __name__ == '__main__':
+    main()
+```
+
+proof:
+
+```py
+joe exceptions % python3 roots.py
+3.0
+1.414213562373095
+Cannot compute square root of a negative number.
+Program execution continues normally here.
+```
+
+### use standard exception types
+
+this is an improvement over what we started with but most likely, users of a `sqrt` function don't expect it to throw a `ZeroDivisonError`. python provides us with several standard exception types to signal common errors
+
+1. standard types
+   - python provides standard exceptions for signalling common errors
+2. invalid argument values
+
+- use `ValueError` for arguments of the right type but with an invalid value
+
+3. exception constructors
+
+- use `raise ValueError()` to raise a new `ValueError`
+
+there are two places in our `roots.py` module where we could handle the division by `0`
+
+1. we could wrap the root-finding while loop in a `try except` `ZeroDivisionError` construct and then raise a new ValueError from inside of the exception handler:
+
+```py
+def sqrt(x):
+    """Compute square roots using the method of Heron of Alexandria.
+
+    Args:
+        x: The number for which the square root is to be    computed.
+
+    Returns:
+        The square root of x.
+    """
+
+    guess = x
+    i = 0
+    try:
+        while guess * guess != x and i < 20:
+            guess = (guess + x / guess) / 2.0
+            i += 1
+    except ZeroDivisionError:
+        raise ValueError()
+    return guess
+```
+
+this would be wasteful though. we know this routine will fail with negative numbers so our second solution is that..
+
+2. we can detect this negative number precondition early on with a guard clause and raise an exception at that point
+
+```py
+def sqrt(x):
+    """Compute square roots using the method of Heron of Alexandria.
+
+    Args:
+        x: The number for which the square root is to be    computed.
+
+    Returns:
+        The square root of x.
+
+    Raises:
+        ValueError: If x  is negative.
+    """
+    if x < 0:
+        raise ValueError(
+            f"Cannot compute square root of negative number {x}"
+        )
+
+    guess = x
+    i = 0
+    while guess * guess != x and i < 20:
+        guess = (guess + x / guess) / 2.0
+        i += 1
+    return guess
+```
+
+instead, this approach is a simply if-check and a call to raise, passing the new exception object. the `ValueError` constructor accepts an error message.
+
+we also added a `Raises` section in our docstring telling the user what exception(s) will be raised in certain conditions of `x`.
+
+```py
+"""
+Raises:
+    ValueError: If x is negative.
+"""
+```
+
+but, look what happens when we run our program:
+
+```py
+joe exceptions % python3 roots.py
+3.0
+1.414213562373095
+Traceback (most recent call last):
+  File "/Users/jw02583/Documents/repos/core-python/02-getting-started/exceptions/roots.py", line 37, in <module>
+    main()
+  File "/Users/jw02583/Documents/repos/core-python/02-getting-started/exceptions/roots.py", line 29, in main
+    print(sqrt(-1))
+  File "/Users/jw02583/Documents/repos/core-python/02-getting-started/exceptions/roots.py", line 14, in sqrt
+    raise ValueError(
+ValueError: Cannot compute square root of negative number -1
+joe exceptions %
+```
+
+we are still getting a traceback and an ungraceful program exit. this is because we forgot to modify our exception handler catch `ValueError` rather than `ZeroDivisionError`
+
+let's modify our calling code to catch the right exception class and also assign the caught exception object to a named variable so that we can interrogate it after it has been caught
+
+in this case, our interrogation is to simply print the exception object, which knows how to display itself as the message to standard error
+
+now our code looks like:
+
+```py
+# roots.py
+
+# ...
+
+def main():
+    try:
+        print(sqrt(9))
+        print(sqrt(2))
+        print(sqrt(-1))
+        print("This is never printed.")
+    except ValueError as e:
+        print(e, file=sys.stderr)
+
+    print("Program execution continues normally here.")
+
+# ...
+```
+
+running the program again:
+
+```py
+joe exceptions % python3 roots.py
+3.0
+1.414213562373095
+Cannot compute square root of negative number -1
+Program execution continues normally here.
+joe exceptions %
+```
+
+we can see that our exception is now being gracefully handled
+
+## exceptions and protocols
