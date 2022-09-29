@@ -176,6 +176,12 @@ table of contents
   - [exceptions are part of the API](#exceptions-are-part-of-the-api)
     - [use standard exception types](#use-standard-exception-types)
   - [exceptions and protocols](#exceptions-and-protocols)
+    - [follow existing patterns](#follow-existing-patterns)
+      - [lookup failure in mappings](#lookup-failure-in-mappings)
+    - [common exception types](#common-exception-types)
+      - [`IndexError`](#indexerror)
+      - [`ValueError`](#valueerror)
+      - [`KeyError`](#keyerror)
 
 # course overview
 
@@ -6008,3 +6014,83 @@ joe exceptions %
 we can see that our exception is now being gracefully handled
 
 ## exceptions and protocols
+
+exceptions are part of a function's API and more broadly, are part of certain protocols
+
+example:
+
+- objects which implement the sequence protocol should raise an `IndexError` for out-of-bounds indexing
+
+**the exceptions that are raised are as much a part of a function's specification as the arguments it accepts**
+
+as such, they must be implemented and documented appropriately
+
+existing built-in exceptions are often the right ones to use
+
+rarely will you ever have to define a new exception type
+
+### follow existing patterns
+
+the more your code follows established patterns, the easier it will be for others to use, integrate, and understand
+
+#### lookup failure in mappings
+
+suppose you were writing a key-value database
+
+```py
+def lookup(key):
+  if not find_key(key):
+    raise KeyError()
+  return value(key)
+```
+
+it would be natural to use `KeyError` to indicate a request for a non-existent key because this is how `dict` works -- that is, mapping in python follows certain patterns, and exceptions are part of that pattern
+
+### common exception types
+
+#### `IndexError`
+
+- `IndexError`
+  - An integer index is out of range
+
+this is thrown when you index past the end of the list:
+
+```py
+>>> z = [1, 4, 2]
+>>> z[3]
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+IndexError: list index out of range
+>>>
+```
+
+#### `ValueError`
+
+- `ValueError`
+  - An object is of the correct type but has an innappropriate value
+
+an example of this is trying to construct an int from a non-numeric string
+
+```py
+>>> int("jim")
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+ValueError: invalid literal for int() with base 10: 'jim'
+>>>
+```
+
+#### `KeyError`
+
+- `KeyError`
+  - A lookup in a mapping failed
+
+an example of this is when we look up a non-existent key in a dict
+
+```py
+>>> codes = dict(gb=44, us=1, no=47, fr=33, es=34)
+>>> codes['de']
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+KeyError: 'de'
+>>>
+```
