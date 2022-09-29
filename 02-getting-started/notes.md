@@ -170,6 +170,9 @@ table of contents
   - [exceptions and programmer errors](#exceptions-and-programmer-errors)
     - [`pass` keyword](#pass-keyword)
     - [accessing exception objects](#accessing-exception-objects)
+  - [re-raising exceptions](#re-raising-exceptions)
+    - [exceptions cannot be ignored](#exceptions-cannot-be-ignored)
+    - [just `raise` an exception](#just-raise-an-exception)
 
 # course overview
 
@@ -5593,3 +5596,143 @@ Conversion error: KeyError('fail')
 -1
 >>>
 ```
+
+## re-raising exceptions
+
+add a second function `string_log` to our module which calls our convert function and computes the natural log of the result
+
+our code looks like this now:
+
+```py
+from math import log
+import sys
+
+DIGIT_MAP = {
+  'zero': '0',
+  'one': '1',
+  'two': '2',
+  'three': '3',
+  'four': '4',
+  'five': '5',
+  'six': '6',
+  'seven': '7',
+  'eight': '8',
+  'nine': '9',
+}
+
+def convert(s):
+  """Convert a string to an integer."""
+  x = -1
+  try:
+    number = ''
+    for token in s:
+      number += DIGIT_MAP[token]
+    x = int(number)
+  except (KeyError, TypeError) as e:
+    print(f"Conversion error: {e!r}", file=sys.stderr)
+    pass
+  return x
+
+def string_log(s):
+  v = convert(s)
+  return log(v)
+```
+
+we wrote this piece of code to demonstrate how foolish it is to return error codes
+
+### exceptions cannot be ignored
+
+- that they can be easily ignored by the caller, wreaking havoc on unsuspecting code later in the program
+- a better program might test the value of `v` before proceeding to the `log` call
+  - without such a check, `log` will fail when passed the negative error code value
+
+```py
+>>> from exceptional import string_log
+>>> string_log("ouch!".split())
+Conversion error: KeyError('ouch!')
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+  File "/Users/jw02583/Documents/repos/core-python/02-getting-started/exceptions/exceptional.py", line 32, in string_log
+    return log(v)
+ValueError: math domain error
+>>>
+```
+
+the log failure causes the raising of another exception
+
+### just `raise` an exception
+
+a much better and altogether more pythonic solution is to forget about error return codes and go back to raising an exception from `convert`
+
+instead of returning an unpythonic error code, we can simply omit our error message and RE-RAISE the exception object we're currently handling
+
+this is done by replacing the `return -1` with `raise` at the end of exception handling block
+
+before:
+
+```py
+# exceptional.py
+
+def convert(s):
+  """Convert a string to an integer."""
+  x = -1
+  try:
+    number = ''
+    for token in s:
+      number += DIGIT_MAP[token]
+    x = int(number)
+  except (KeyError, TypeError) as e:
+    print(f"Conversion error: {e!r}", file=sys.stderr)
+    pass
+  return x
+```
+
+after:
+
+```py
+# exceptional.py
+
+def convert(s):
+  """Convert a string to an integer."""
+  try:
+    number = ''
+    for token in s:
+      number += DIGIT_MAP[token]
+    return int(number)
+  except (KeyError, TypeError) as e:
+    print(f"Conversion error: {e!r}", file=sys.stderr)
+    raise
+```
+
+- removed the `x` variable declaration
+- returning `int(number)` instead of assigning it to `x`
+- replaced `pass` and `return x` with just `raise`
+
+without a parameter, `raise` simply re-raises the exception that is currently being handled
+
+testing this in the REPL:
+
+```py
+>>> from exceptional import string_log
+>>> string_log("cat dog".split())
+Conversion error: KeyError('cat')
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+  File "/Users/jw02583/Documents/repos/core-python/02-getting-started/exceptions/exceptional.py", line 29, in string_log
+    v = convert(s)
+  File "/Users/jw02583/Documents/repos/core-python/02-getting-started/exceptions/exceptional.py", line 22, in convert
+    number += DIGIT_MAP[token]
+KeyError: 'cat'
+>>> string_log(8675309)
+Conversion error: TypeError("'int' object is not iterable")
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+  File "/Users/jw02583/Documents/repos/core-python/02-getting-started/exceptions/exceptional.py", line 29, in string_log
+    v = convert(s)
+  File "/Users/jw02583/Documents/repos/core-python/02-getting-started/exceptions/exceptional.py", line 21, in convert
+    for token in s:
+TypeError: 'int' object is not iterable
+>>>
+```
+
+we see that the original exception type is re-raised whether it's a `KeyError` or a `TypeError`, but our conversion error message is printed to standard error along the way
