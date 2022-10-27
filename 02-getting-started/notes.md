@@ -182,6 +182,18 @@ table of contents
       - [`IndexError`](#indexerror)
       - [`ValueError`](#valueerror)
       - [`KeyError`](#keyerror)
+  - [avoid explicit type checks](#avoid-explicit-type-checks)
+  - [it's easier to ask forgiveness than permission](#its-easier-to-ask-forgiveness-than-permission)
+    - [LBYL vs. EAFP](#lbyl-vs-eafp)
+      - [LBYL version of example:](#lbyl-version-of-example)
+      - [EAFP version of example:](#eafp-version-of-example)
+    - [EAFP plus Exceptions](#eafp-plus-exceptions)
+  - [cleanup actions](#cleanup-actions)
+    - [try...finally](#tryfinally)
+  - [moment of zen: errors should never pass silently, unless explicitly silenced](#moment-of-zen-errors-should-never-pass-silently-unless-explicitly-silenced)
+  - [platform-specific code](#platform-specific-code)
+    - [detecting a single keypress](#detecting-a-single-keypress)
+  - [summary](#summary-6)
 
 # course overview
 
@@ -6094,3 +6106,231 @@ Traceback (most recent call last):
 KeyError: 'de'
 >>>
 ```
+
+## avoid explicit type checks
+
+- generally, avoid catching `TypeErrors` in python
+
+- let TypeErrors arise on their own
+
+## it's easier to ask forgiveness than permission
+
+### LBYL vs. EAFP
+
+two philosophies in python culture:
+
+1. LBYL - Look before you leap
+2. Easier to ask forgiveness than permission
+
+- Python STRONGLY prefers EAFP
+  - the code's "happy path" is emphasized rather than being interspersed with error handling
+
+example: file processing
+
+- processing details are not important
+- `process_file()` opens a file and reads it
+
+#### LBYL version of example:
+
+```py
+import os
+
+p = '/path/to/datafile.dat'
+
+if os.path.exists(p):
+  process_file(p)
+else:
+  print(f'No such file as {p}')
+```
+
+in the LBYL example we:
+
+1. before attempting to call `process_file()`, we check that the file exists
+   1. if it doesn't, we print a helpful message instead
+
+there are several problems with this approach:
+
+1. we only perform an existence check
+   1. what if the file exists but contains garbage?
+   2. what if the path refers to a directory instead of a file?
+
+according to LBYL, we should add preemptive tests for these, too.
+
+a more subtle problem is that there is a race condition -- it's possible for the file to be deleted by another process between the existence check and the `process_file()` call. there is no good way to deal with this.
+
+#### EAFP version of example:
+
+```py
+p = '/path/to/datafile.dat'
+
+try:
+  process_file(f)
+except OSError as e:
+  print(f'Error: {e}')
+```
+
+this is the more pythonic EAFP approach
+
+in the EAFP example, we:
+
+1. simply attempt the operation without checks in advance
+2. we have an exception handler in place to deal with any problems
+   1. we don't even need to note in a lot of detail exactly what might go wrong
+3. we catch an OSError, which covers all manner of conditions such as FileNotFound.
+
+### EAFP plus Exceptions
+
+1. Exceptions are not easily ignored
+2. Error coodes are silent by default
+3. Exceptions plus EAFP makes it hard for problems to be silently ignored
+
+## cleanup actions
+
+sometimes you need to perform a cleanup action regardless if an operation succeeds
+
+### try...finally
+
+```py
+try:
+  # try-block
+finally:
+  # executed no matter how the
+  # try-block terminates
+```
+
+example of using try-finally:
+
+error-prone code:
+
+```py
+import os
+
+def make_at(path, dir_name):
+  original_path = os.getcwd()
+  os.chdir(path)
+  os.mkdir(dir_name)
+  os.chdir(original_path)
+```
+
+should the call to `os.mkdir()` fail for some reason, the current working directory of the python process won't be restored to it's original value
+
+to fix this, we would like the function to restore the original current working directory under all circumstances - this can be done with a `try...finally` block
+
+new code:
+
+```py
+import os
+import sys
+
+def make_at(path, dir_name):
+  original_path = os.getcwd()
+  os.chdir(path)
+  try:
+    os.mkdir(dir_name)
+  finally:
+    os.chdir(original_path)
+```
+
+this code:
+
+1. executes the code in the finally block regardless if the code in the try-block was successful or raised an expection
+
+we can combine this with except blocks to handle this exception:
+
+```py
+import os
+import sys
+
+def make_at(path, dir_name):
+  original_path = os.getcwd()
+  os.chdir(path)
+  try:
+    os.mkdir(dir_name)
+  except OSError as e:
+    print(e, file=sys.stderr)
+    raise
+  finally:
+    os.chdir(original_path)
+```
+
+this code:
+
+1. adds a simple failure logging operation
+   1. now, if `os.mkdir` raises an OSError, the OSError handler will be run and the exception will be re-raised.
+2. since the finally block is ALWAYS executed no matter how the try block ends, we can be sure that the final directory change will take place under all circumstances
+
+## moment of zen: errors should never pass silently, unless explicitly silenced
+
+error are like bells
+and if we make them silent
+they are of no use
+
+## platform-specific code
+
+detecting a single keypress from Python such as the 'press any key to continue' functionality at the console, requires use of operating system-specifc modules
+
+we can't use the built-in `input()` function because that waits for the user to press <kbd>Return</kbd> before giving us a string
+
+to implement this:
+
+| OS          | Module                     |
+| ----------- | -------------------------- |
+| Windows     | `msvcrt`                   |
+| Linux/MacOS | `tty`, `termios` and `sys` |
+
+example:
+
+### detecting a single keypress
+
+```py
+"""keypress - A module for detecting a single keypress."""
+
+try:
+  import msvcrt
+
+  def getkey():
+    """Wait for a keypress and return a single character string."""
+    return msvcrt.getch()
+
+except ImportError:
+  """this is an example of an error being silenced explicitly because we are going to attempt an alternative course of action in this exception handler""""
+
+  import sys
+  import tty
+  import termios
+
+  def getkey():
+        """Wait for a keypress and return a single character string."""
+    fd = sys.stdin.fileno()
+    original_attributes = termios.tcgetattr(fd)
+    try:
+      tty.setraw(sys.stdin.fileno())
+      ch = sys.stdin.read(1)
+    finally:
+      termios.tcsetattr(fd, termios.TCSADRAIN, original_attributes)
+    return ch
+
+  # If either of the Unix-specific tty or termios are not found, we allow the ImportError to propagate from here
+```
+
+## summary
+
+- raising an exception interrupts program flow
+- handle exceptions with try...except
+- exceptions can be detected within try...except
+- except-blocks define handlers for exceptions
+- python uses exceptions pervasively
+- except-blocks can capture the exception
+- avoid catching programmer errors
+- signal exceptional conditions with `raise`
+- `raise` without an argument re-raises the current exception
+- generally, don't catch `TypeError`
+- use `str()` to convert exceptions to strings
+- exceptions are part of an API and should be appropriately documented
+- prefer built-in exception types when possible
+- use `try...finally` for cleanup actions
+- `print()` can be redirected to `stderr` using the optional `file` argument
+- `!r` forces `repr` representations in f-strings
+- python supports local `and` and `or` operators for boolean expressions
+- return codes are too easily ignored
+- implement platform-specific actions with `ImportError` and EAFP (easier to ask for forgiveness than permission)
