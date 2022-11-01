@@ -201,6 +201,10 @@ table of contents
       - [list comprehension syntax](#list-comprehension-syntax)
         - [equivalent syntax](#equivalent-syntax)
     - [set comprehensions](#set-comprehensions)
+  - [dict comprehensions](#dict-comprehensions)
+    - [syntax](#syntax)
+    - [example:](#example-1)
+      - [example of complicated dict comprehension](#example-of-complicated-dict-comprehension)
 
 # course overview
 
@@ -6438,3 +6442,81 @@ our list of the number of decimal digits in the factorial numbers contains dupli
 ```
 
 note that the resulting new set's values are not stored in any meaningful order since sets are unordered containers
+
+## dict comprehensions
+
+- also uses curly braces
+- is distinguished from the set comprehension by the fact we now provide two colon-separated expressions for the key and the value which will be evaluated in tandem for each new item
+- a good use case for a dict comprehension is to invert a dictionary so we can perform efficient look-ups in the opposite direction
+- they **do not** work directly on `dict` sources (they can, but iterating over a dictionary yields only the **keys**)
+  - use `dict.items()` to get keys **and** values from `dict` sources
+
+### syntax
+
+```py
+{
+    key_expr(item): value_expr(item)
+    for item in iterable
+}
+```
+
+### example:
+
+a dictionary that maps countries to capital cities
+
+```py
+>>> country_to_capital = {'United Kingdom': 'London', 'Brazil': 'Brasilia', 'Morocco': 'Rabat', 'Sweden': 'Stockholm'}
+>>> country_to_capital
+{'United Kingdom': 'London', 'Brazil': 'Brasilia', 'Morocco': 'Rabat', 'Sweden': 'Stockholm'}
+>>> from pprint import pprint as pp
+>>> pp(country_to_capital)
+{'Brazil': 'Brasilia',
+ 'Morocco': 'Rabat',
+ 'Sweden': 'Stockholm',
+ 'United Kingdom': 'London'}
+>>>
+```
+
+again, a good use case of a dict comprehension is to **invert** a dictionary so we can perform efficient look-ups in the opposite direction
+
+```py
+>>> capital_to_country = {capital: country for country, capital in country_to_capital.items()}
+>>> from pprint import pprint as pp
+>>> pp(capital_to_country)
+{'Brasilia': 'Brazil',
+ 'London': 'United Kingdom',
+ 'Rabat': 'Morocco',
+ 'Stockholm': 'Sweden'}
+>>>
+```
+
+should your dict comprehension product some identical keys, later keys will overwrite earlier keys
+
+in this example, we start with a list of words and map the first letter of words to the words themselves, but only the last `h` word is kept.
+
+```py
+>>> words = ["hi", "hello", "foxtrot", "hotel"]
+>>> { x[0]: x for x in words }
+{'h': 'hotel', 'f': 'foxtrot'}
+>>>
+```
+
+comprehension expressions can be arbitrarily complex and there is no limit to the complexity of the expression you can use in any of the comprehensions
+
+- avoid excessive complexity
+- extract complex expressions into separate functions to preserve readability
+
+#### example of complicated dict comprehension
+
+here, we are using a dict comprehension to map the real paths of files to their sizes.
+
+```py
+>>> import os
+>>> import glob
+>>> file_sizes = {os.path.realpath(p): os.stat(p).st_size for p in glob.glob('*.*')}
+>>> pp(file_sizes)
+{'/Users/<username>/Documents/repos/core-python/README.md': 187}
+>>>
+```
+
+this example is close to the limit of being reasonable for a dict comprenehsion
