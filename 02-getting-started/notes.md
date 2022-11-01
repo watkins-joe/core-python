@@ -194,6 +194,13 @@ table of contents
   - [platform-specific code](#platform-specific-code)
     - [detecting a single keypress](#detecting-a-single-keypress)
   - [summary](#summary-6)
+- [iteration and iterables](#iteration-and-iterables)
+  - [overview](#overview-4)
+  - [list and set comprehensions](#list-and-set-comprehensions)
+    - [list comprehensions](#list-comprehensions)
+      - [list comprehension syntax](#list-comprehension-syntax)
+        - [equivalent syntax](#equivalent-syntax)
+    - [set comprehensions](#set-comprehensions)
 
 # course overview
 
@@ -6334,3 +6341,100 @@ except ImportError:
 - python supports local `and` and `or` operators for boolean expressions
 - return codes are too easily ignored
 - implement platform-specific actions with `ImportError` and EAFP (easier to ask for forgiveness than permission)
+
+# iteration and iterables
+
+## overview
+
+## list and set comprehensions
+
+comprehensions
+
+- concise syntax for describing lists, sets, and dictionaries.
+
+they are readable and expressive and are close to natural language
+
+### list comprehensions
+
+1. we create a list of words by splitting a string
+
+```py
+>>> words = "Why sometimes I have believed as many as six impossible things before breakfast".split()
+>>> words
+['Why', 'sometimes', 'I', 'have', 'believed', 'as', 'many', 'as', 'six', 'impossible', 'things', 'before', 'breakfast']
+>>>
+```
+
+2. enter the list comprehension
+
+the comprehension is enclosed in square brackets, just like a literal list.
+
+instead of literal elements being written inside the list, it contains a fragment of declarative code which describes how to construct the elements in the list, which we do by using `for word in words`
+
+```py
+>>> [len(word) for word in words]
+[3, 9, 1, 4, 8, 2, 4, 2, 3, 10, 6, 6, 9]
+>>>
+```
+
+3. the new list is formed by binding `word` to each value in `words` in turn, and evaluating `len(word)` to create a new value. each of these new values becomes an element in the newly-constructed list
+
+#### list comprehension syntax
+
+```py
+[expr(item) for item in iterable]
+```
+
+_for each item in the iterable on the right, we evaluate the expression on the left, and use that as the next element of the new list being constructed_
+
+##### equivalent syntax
+
+```py
+>>> lengths = []
+>>> for word in words:
+...     lengths.append(len(word))
+...
+>>> lengths
+[3, 9, 1, 4, 8, 2, 4, 2, 3, 10, 6, 6, 9]
+>>>
+```
+
+the expression producing the new list's elements can be any Python expression
+
+another example:
+
+- finding the number of decimal digits in each of the first 20 factorials using `range` to generate the source of sequence
+
+```py
+>>> from math import factorial
+>>> f = [len(str(factorial(x))) for x in range(20)]
+>>> f
+[1, 1, 1, 1, 2, 3, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 15, 16, 18]
+>>>
+```
+
+and note that the type of object produced by list comprehensions is regular list
+
+```py
+>>> type(f)
+<class 'list'>
+>>>
+```
+
+### set comprehensions
+
+supports a similar comprehension syntax using curly braces
+
+our list of the number of decimal digits in the factorial numbers contains duplicates. we can use a set instead to eliminate duplicates.
+
+```py
+>>> from math import factorial
+>>> s = {len(str(factorial(x))) for x in range (20)}
+>>> type(s)
+<class 'set'>
+>>> print(s)
+{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 15, 16, 18}
+>>>
+```
+
+note that the resulting new set's values are not stored in any meaningful area since sets are unordered containers
