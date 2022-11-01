@@ -6437,4 +6437,4 @@ our list of the number of decimal digits in the factorial numbers contains dupli
 >>>
 ```
 
-note that the resulting new set's values are not stored in any meaningful area since sets are unordered containers
+note that the resulting new set's values are not stored in any meaningful order since sets are unordered containers
