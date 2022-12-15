@@ -205,6 +205,14 @@ table of contents
     - [syntax](#syntax)
     - [example:](#example-1)
       - [example of complicated dict comprehension](#example-of-complicated-dict-comprehension)
+  - [filtering comprehensions](#filtering-comprehensions)
+    - [combining a filtering predicate with a transforming expression](#combining-a-filtering-predicate-with-a-transforming-expression)
+  - [moment of zen: simple is better than complex](#moment-of-zen-simple-is-better-than-complex)
+  - [iteration protocols](#iteration-protocols)
+    - [iterable vs iterator](#iterable-vs-iterator)
+  - [generator functions](#generator-functions)
+    - [`yield`](#yield)
+    - [examples of generator functions](#examples-of-generator-functions)
 
 # course overview
 
@@ -6490,6 +6498,10 @@ again, a good use case of a dict comprehension is to **invert** a dictionary so 
 >>>
 ```
 
+dictionary comprehensions don't work directly on `dict` sources`
+
+use `dict.items()` to get keys and values from `dict` sources
+
 should your dict comprehension product some identical keys, later keys will overwrite earlier keys
 
 in this example, we start with a list of words and map the first letter of words to the words themselves, but only the last `h` word is kept.
@@ -6520,3 +6532,208 @@ here, we are using a dict comprehension to map the real paths of files to their 
 ```
 
 this example is close to the limit of being reasonable for a dict comprenehsion
+
+## filtering comprehensions
+
+all three types of collection comprehensions support a filtering clause. it allows us to choose which items of the source are evaluated by the expression on the left
+
+example:
+
+a primality testing predicate function
+
+```py
+from math import sqrt
+def is_prime(x):
+    if x < 2:
+        return False
+    for i in range (2, int(sqrt(x)) + 1):
+        if x % i == 0:
+            return False
+    return True
+```
+
+we can now use `is_prime` as the filtering clause of a list comprehension to produce all primes less than 100.
+
+example:
+
+```py
+>>> [x for x in range(101) if is_prime(x)]
+[2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97]
+>>>
+```
+
+there is an odd `x for x` construct here because we aren't applying any transformations to the filtered values. the expression in terms ofo x is simply x itself.
+
+### combining a filtering predicate with a transforming expression
+
+dictionary comprehension which maps numbers with exactly three divisors to a tuple of those divisors
+
+```py
+>>> from pprint import pprint as pp
+>>> prime_square_divisors = {x*x: (1, x, x*x) for x in range(20) if is_prime(x)}
+>>> pp(prime_square_divisors)
+{4: (1, 2, 4),
+ 9: (1, 3, 9),
+ 25: (1, 5, 25),
+ 49: (1, 7, 49),
+ 121: (1, 11, 121),
+ 169: (1, 13, 169),
+ 289: (1, 17, 289),
+ 361: (1, 19, 361)}
+>>>
+```
+
+## moment of zen: simple is better than complex
+
+code is written once
+but read over and over
+fewer is clearer
+
+comprehensinons should be PURELY functional and normally have NO SIDE-EFFECTS
+
+if you need to print to the console during iteration, use another construct, like a for loop instead.
+
+## iteration protocols
+
+### iterable vs iterator
+
+| iterable                                           | iterator                                                        |
+| -------------------------------------------------- | --------------------------------------------------------------- |
+| Can be passed to `iter()` to produce an _iterator_ | Can be passed to `next()` to get the next value in the sequence |
+
+```py
+>>> iterable = ['Spring', 'Summer', 'Autumn', 'Winter']
+>>> iterator = iter(iterable)
+>>> next(iterator)
+'Spring'
+>>> next(iterator)
+'Summer'
+>>> next(iterator)
+'Autumn'
+>>> next(iterator)
+'Winter'
+>>> next(iterator)
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+StopIteration
+>>>
+```
+
+python raises an exception at the end of the list.
+
+```py
+def first(iterable):
+  iterator = iter(iterable)
+  try:
+      return next(iterator)
+  except StopIteration:
+      raise ValueError("iterable is empty")
+```
+
+```py
+>>> first(["1st", "2nd", "3rd"])
+'1st'
+>>> first({"1st", "2nd", "3rd"})
+'2nd'
+>>> first(set())
+Traceback (most recent call last):
+  File "<stdin>", line 4, in first
+StopIteration
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+  File "<stdin>", line 6, in first
+ValueError: iterable is empty
+>>>
+```
+
+## generator functions
+
+generator functions are
+
+- iterables defined by functions
+- sequences are evaluated lazily
+  - meaning they only compute the next value on demand
+- can model INFINITE sequences of values with no definite end
+  - example include streams of data from a sensor or active log files
+- by carefully designing our generator function, we can make generic stream processing elements which can be composed into sophisticated pipelines
+
+### `yield`
+
+generators are defined by any python function which uses the `yield` keyword at least once in its definition
+
+they may also contain `return` statements. there is an implicit return at the end of the definition
+
+### examples of generator functions
+
+they are introduced by `def`, just like a regular python function
+
+```py
+>>> def gen123():
+...     yield 1
+...     yield 2
+...     yield 3
+...
+>>> g = gen123()
+>>> g
+<generator object gen123 at 0x10ad6add0>
+>>>
+```
+
+`gen123` is called just like any other python function
+
+it returns a `generator` object. generators are python iterators
+
+we can use the iterator protocol to retrieve, or `yield` successive values from the series
+
+```py
+>>> next(g)
+1
+>>> next(g)
+2
+>>> next(g)
+3
+>>> next(g)
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+StopIteration
+>>>
+```
+
+subsequent calls to `next` will raise a `StopIteration exception` just like any other python iterator
+
+because generators are iterators and because iterators must also be iterable, they can also be used in all of the usual python constructs which expect iterable object, such as for loops.
+
+```py
+>>> for v in gen123():
+...     print(v)
+...
+1
+2
+3
+>>>
+```
+
+be aware that each call to the generator function returns a new generator object.
+
+```py
+>>> h
+<generator object gen123 at 0x10ae00f20>
+>>> i
+<generator object gen123 at 0x10ae2e350>
+>>>
+```
+
+they are different objects, and each generator object can be advanced **independently**
+
+```py
+>>> next(h)
+1
+>>> next(h)
+2
+>>> next(i)
+1
+>>>
+```
