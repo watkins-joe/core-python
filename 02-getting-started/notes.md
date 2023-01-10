@@ -213,6 +213,17 @@ table of contents
   - [generator functions](#generator-functions)
     - [`yield`](#yield)
     - [examples of generator functions](#examples-of-generator-functions)
+  - [maintaining state in generators](#maintaining-state-in-generators)
+  - [laziness and the infinite](#laziness-and-the-infinite)
+  - [generator expressions](#generator-expressions)
+  - [iteration tools](#iteration-tools)
+    - [itertools](#itertools)
+      - [using `islice` and `count`](#using-islice-and-count)
+    - [boolean aggregation](#boolean-aggregation)
+      - [`any()`](#any)
+      - [`all()`](#all)
+      - [`zip()`](#zip)
+  - [summary](#summary-7)
 
 # course overview
 
@@ -6737,3 +6748,350 @@ they are different objects, and each generator object can be advanced **independ
 1
 >>>
 ```
+
+## maintaining state in generators
+
+they can maintain state in local variables
+
+a function defines a generator because it contains a `yield` statement
+
+`continue` keyword finishes the current loop iteration and begins the next iteration immediately, can also be used with while loops.
+
+lazy approach to computation can result in complex flow control. forced evaluation can simplify things during development
+
+```py
+def take(count, iterable):
+  counter = 0
+  for item in iterable:
+    if counter == count:
+      return
+    counter += 1
+    yield item
+
+def distinct(iterable):
+  seen = set()
+  for item in iterable
+    if item in seen
+      continue
+    yield item
+    seen.add(item)
+
+def run_pipeline():
+  items = [3, 6, 6, 2, 1, 1]
+  for item in take(3, distinct(items)):
+    print(item)
+```
+
+often useful during development to force evaluation of all of the generated values.
+
+this is most easily achieved by inserting a call to the list constructor.
+
+```py
+# ...
+def run_pipeline():
+  items = [3, 6, 6, 2, 1, 1]
+  for item in take(3, list(distinct(items))):
+    print(item)
+```
+
+the interspersed call to list causes the distinct generator to exhaustively process its source items before `take` does its work.
+
+## laziness and the infinite
+
+- generators are lazy, meaning the computation only happens just in time when the next result is requested.
+- they only do enough work to produce requested data
+- this allows generators to model infinite (or just very large) sequences
+- since values are only produced as requested by the caller and since no data structure needs to be build to contain the elements of the sequence, generators can be safely used to produced never-ending or just very large sequences like
+  - sensor readings
+  - mathematical sequences
+  - contents of multi-terabyte files
+
+example of `lucas` series
+
+```py
+def lucas():
+  yield 2
+  a = 2
+  b = 1
+  while True:
+    yield b
+    a, b = b, a + b
+```
+
+## generator expressions
+
+- a cross between comprehensions and generator functions
+- use a similar syntax as comprehensions, but they result in the creation of a generator object which produces the specified sequence lazily
+
+syntax
+
+```py
+(expr(item) for item in iterable)
+```
+
+- are useful for situations where you want the lazy evaluation of generators with the declarative concision of comprehensions
+
+example:
+
+```py
+million_squares = (x*x for x in range(1, 1000001))
+>>> million_squares = (x*x for x in range(1, 1000001))
+>>> million_squares
+<generator object <genexpr> at 0x1094c7ac0>
+# no squares created yet, we only have captured the specification of the sequence into a generator object
+# we can force evaluation of the generator by using it to create a long list
+>>> list(million_squares)[-10:]
+[999982000081, 999984000064, 999986000049, 999988000036, 999990000025, 999992000016, 999994000009, 999996000004, 999998000001, 1000000000000]
+>>>
+```
+
+the list obviously consumes a significant chunk of memory. in this case, about 40 MB for the list object and the integer objects contained therein.
+
+also, notice that a generator object is just an iterator, and once run exhaustively in this way, will yield no more items. repeating the previous statement returns an empty list.
+
+```py
+>>> list(million_squares)[-10:]
+[]
+>>>
+```
+
+each time we call a generator function, we create a new generator object.
+
+generators are **SINGLE-USE OBJECTS**
+
+to re-create a generator from a generator expression, you must execute the expression **AGAIN**
+
+example:
+
+computing the sum of the first 10 million squares using the built-in sum function, which accepts an iterable series of numbers.
+
+if this were a list comprehension, we could expect this to consume around 400 MB of memory.
+
+using a GENERATOR expression, memory usage will be insignificant.
+
+this produces a result in a second or so and uses almost no memory.
+
+```py
+>>> sum(x*x for x in range(1, 10000001))
+333333383333335000000
+>>>
+```
+
+looking carefully, we can see in this case that we didn't supply separate enclosing parenthesis for the generator expression in addition to those needed for the `sum` function call
+
+this elegant ability to have the parenthesis used for the function call also serve for the generator expression aides readability
+
+[optional parenthesis]('./../media/optionalParenthesis.png')
+
+as with comprehensions, you can include an `IF` clause in the end of the generator expression
+
+re-using is_prime predicate, we can determine the sum of those integers for the first 1,000 prime numbers.
+
+```py
+>>> sum(x for x in range(1001) if is_prime(x))
+76127
+>>>
+```
+
+## iteration tools
+
+batteries included
+
+- python provides a powerful vocabulary for working with iterators
+- these include familiar `enumerate()` and `sum()`
+  - enumerate - for producing integer indices
+  - sum - for computing summation of numbers
+- the `itertools` module prodices many more
+
+### itertools
+
+`itertools.islice()`
+perform lazy slicing of any iterator, similar to the built-in list slicing functionality
+
+```py
+>>> from itertools import islice
+>>> islice(all_primes, 1000)
+```
+
+but how do we generate `all_primes`?
+
+`itertools.count()`
+an unbounded arithmetic sequence of integers
+
+#### using `islice` and `count`
+
+```py
+>>> thousand_primes = islice((x for x in count() if is_prime(x)), 1000)
+>>> thousand_primes
+<itertools.islice object at 0x1094f0a40>
+>>>
+```
+
+this returns a special `islice` object which is iterable
+
+we can convert it to a slice using the list constructor
+
+```py
+>>> list(thousand_primes)[-10:]
+[7841, 7853, 7867, 7873, 7877, 7879, 7883, 7901, 7907, 7919]
+>>>
+```
+
+we simply pass the islice we just defined to the sum function to find the sum of the first 1,000 primes
+
+```py
+>>> sum(islice((x for x in count() if is_prime(x)), 1000))
+3682913
+>>>
+```
+
+### boolean aggregation
+
+#### `any()`
+
+`any()`
+determines if **any** elements in a series are true
+
+example:
+
+```py
+>>> any([False, False, True])
+True
+>>>
+```
+
+using `any` with a generator expressino to answer the question of whether there are any prime numbers in the range 1328 to 1360, inclusive.
+
+```py
+>>> any(is_prime(x) for x in range(1328, 1361))
+False
+>>>
+```
+
+#### `all()`
+
+`all()`
+determines if **all** elements in a series are true
+
+```py
+>>> all([False, False, True])
+False
+>>>
+```
+
+using `all` to check if all of these city names are proper nouns with initial upper case letters
+
+```py
+>>> all(name == name.title() for name in ['London', 'Paris', 'Tokyo', 'New York', 'Sydney', 'Kuala Lumpur'])
+True
+>>>
+```
+
+#### `zip()`
+
+`zip()`
+synchronize iteration across two or more iterables
+
+```py
+>>> sunday = [12, 14, 15, 15, 17, 21, 22, 22, 23, 22, 20, 18]
+>>> monday = [13, 14, 14, 14, 16, 20, 21, 22, 22, 21, 19, 17]
+>>>
+```
+
+if we zip these together, we can see that zip yields tuples when iterated.
+
+```py
+>>> for item in zip(sunday, monday):
+...     print(item)
+...
+(12, 13)
+(14, 14)
+(15, 14)
+(15, 14)
+(17, 16)
+(21, 20)
+(22, 21)
+(22, 22)
+(23, 22)
+(22, 21)
+(20, 19)
+(18, 17)
+>>>
+```
+
+this in turn means we can use it with tuple unpacking in the for loop.
+
+```py
+>>> for sun, mon, in zip(sunday, monday):
+...     print("average = ", (sun + mon) / 2)
+...
+average =  12.5
+average =  14.0
+average =  14.5
+average =  14.5
+average =  16.5
+average =  20.5
+average =  21.5
+average =  22.0
+average =  22.5
+average =  21.5
+average =  19.5
+average =  17.5
+>>>
+```
+
+zip can accept any number of iterable arguments and we can create some more statistics, too
+
+```py
+>>> tuesday = [2, 2, 3, 7, 9, 10, 11, 12, 10, 9, 8, 8]
+>>> for temps in zip(sunday, monday, tuesday):
+...     print(f"min = {min(temps):4.1f}, max={max(temps):4.1f}, average={sum(temps) / len(temps):4.1f}")
+...
+min =  2.0, max=13.0, average= 9.0
+min =  2.0, max=14.0, average=10.0
+min =  3.0, max=15.0, average=10.7
+min =  7.0, max=15.0, average=12.0
+min =  9.0, max=17.0, average=14.0
+min = 10.0, max=21.0, average=17.0
+min = 11.0, max=22.0, average=18.0
+min = 12.0, max=22.0, average=18.7
+min = 10.0, max=23.0, average=18.3
+min =  9.0, max=22.0, average=17.3
+min =  8.0, max=20.0, average=15.7
+min =  8.0, max=18.0, average=14.3
+>>>
+```
+
+we can lazily concatenate ierables using itertools.chain. this is different from simple concatentation three lists into a new list.
+
+we can now check if all of those temperatures are above freezing point without the memory impact of data duplication.
+
+```py
+>>> from itertools import chain
+>>> temperatures = chain(sunday, monday, tuesday)
+>>> all(t > 0 for t in temperatures)
+True
+>>>
+```
+
+## summary
+
+in this module, we learned that:
+
+- comprehensions are a consise syntax for describing lists, sets, and dictionaries
+- comprehensions use an input iterable and an optional predicate
+- iterable objects can be iterated item by item
+- use `iter()` to get an iterator from an iterable object
+- use `next() to get the next item from an iterable
+- iterators raise `StopIteration` when they're exhausted
+- generator functions describe sequences imperatively
+- generator functions contain at LEAST ONE `yield` keyword
+- generators are iterators
+  - when the iterator is advanced with next, the generator starts or resumes execution up to and including the next yield
+- each call to a generator function produces a new generator object
+- generators can maintain explicit internal state
+- generators yield values lazily and so can model an infinite series of data
+- generator expressions are a type of comprehension that creates generators
+- python includes a rich set of tools for dealing with iterable series
+  - in the form of built-in functions such as `sum()`, `any()`, and `zip()`
+  - in the `itertools` module as well, which includes other tools for iteration
