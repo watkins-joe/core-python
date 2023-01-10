@@ -229,6 +229,8 @@ table of contents
   - [types and classes](#types-and-classes)
     - [classes](#classes-1)
     - [object-oriented programming](#object-oriented-programming)
+  - [defining classes](#defining-classes)
+    - [defining a class](#defining-a-class)
 
 # course overview
 
@@ -7156,3 +7158,55 @@ for example, on a `string` object, the methods we can use on that object such as
 - can also make simple problems unnecessarily complex
 - python lets you strike the right balance between functions and classes
   - this sets the language apart from Java and C#
+
+## defining classes
+
+### defining a class
+
+classes definitions are introduced by the `class` keyword, followed by the class name
+
+```py
+class MyClassName:
+  # by convention, class names use CamelCase, sometimes known as PascalCase
+  # a capital letter for each and every component word
+  # ...
+```
+
+example of a simple class definition:
+
+```py
+"""Model for aircraft flights"""
+
+class Flight:
+
+```
+
+the class statement introduces a new block, so we indent on the next line. empty blocks aren't allowed, so the simplest possible class needs at least a do-nothing `pass` statement to be syntactically acceptable.
+
+just as `def` for defining function, `class` is a statement that can occur anywhere in a program and which binds a class definition to a class name.
+
+when the top-level code in the `airtravel` module is executed, the class will be defined.
+
+we can now import our new class into the REPL and try it out.
+
+```py
+# from airtravel.py
+>>> from airtravel import Flight
+# we just imported the class object
+>>> Flight
+<class 'airtravel.Flight'>
+>>>
+```
+
+to use this class to mint a new object, we will call it's constructor
+
+```py
+>>> f = Flight()
+>>> f
+<airtravel.Flight object at 0x107fe4cd0>
+>>> type(f)
+<class 'airtravel.Flight'>
+>>>
+```
+
+the type of `f` is literally the class
