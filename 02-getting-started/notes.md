@@ -224,6 +224,11 @@ table of contents
       - [`all()`](#all)
       - [`zip()`](#zip)
   - [summary](#summary-7)
+- [classes](#classes)
+  - [overview](#overview-5)
+  - [types and classes](#types-and-classes)
+    - [classes](#classes-1)
+    - [object-oriented programming](#object-oriented-programming)
 
 # course overview
 
@@ -7095,3 +7100,59 @@ in this module, we learned that:
 - python includes a rich set of tools for dealing with iterable series
   - in the form of built-in functions such as `sum()`, `any()`, and `zip()`
   - in the `itertools` module as well, which includes other tools for iteration
+
+# classes
+
+## overview
+
+we will:
+
+- define a `class`
+- how class relates to type
+- define new classes
+- instance methods
+  - adding to classes
+  - the `self` argument
+- initializers
+  - compare and constrast with constructors
+  - establish and enforce invariants
+- collaborating classes
+- decomposing problems
+- separating interface and implementation
+- combine programming paradigms to painlessly mix OOP and designs based around functions
+  - _everything_ is an object
+- nominal typing and duck typing
+- class inheritance
+
+## types and classes
+
+all objects in python have a type
+
+```py
+>>> type(5)
+<class 'int'>
+>>> type("python")
+<class 'str'>
+>>> type([1, 2, 3])
+<class 'list'>
+>>> type(x*x for x in [2, 4, 6])
+<class 'generator'>
+>>>
+```
+
+### classes
+
+classes
+
+- define the structure and behavior of objects at the time we create the object
+- act as a template for creating new objects
+- classes control an object's initial state, attributes, and methods
+
+for example, on a `string` object, the methods we can use on that object such as `split` are defined in the `str` class
+
+### object-oriented programming
+
+- classes can make complex problems tractable
+- can also make simple problems unnecessarily complex
+- python lets you strike the right balance between functions and classes
+  - this sets the language apart from Java and C#
