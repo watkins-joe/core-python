@@ -231,6 +231,10 @@ table of contents
     - [object-oriented programming](#object-oriented-programming)
   - [defining classes](#defining-classes)
     - [defining a class](#defining-a-class)
+  - [instance methods](#instance-methods)
+  - [instance initializers](#instance-initializers)
+    - [why `_number`?](#why-_number)
+    - [class invariants](#class-invariants)
 
 # course overview
 
@@ -7210,3 +7214,285 @@ to use this class to mint a new object, we will call it's constructor
 ```
 
 the type of `f` is literally the class
+
+## instance methods
+
+methods are functions defined within a class
+
+instance methods are functions which can be called on objects, or instances of our class, such as `f`
+
+instance methods **MUST** accept a reference to the actual instance on which the method was called as the **FIRST** argument.
+
+by convertion, this argument is always called `self`
+
+now, our code looks like:
+
+```py
+"""Model for aircraft flights."""
+
+class Flight:
+
+    def number(self):
+        return "SN060"
+```
+
+from a fresh REPL, we can reimport airtravel and call `number()` on our `f` Flight object
+
+```py
+>>> from airtravel import Flight
+>>> f = Flight()
+>>> f.number()
+'SN060'
+>>>
+```
+
+note that when we call `number`, we do not provide the instance `f` for the actual argument `self` in the argument list
+
+this is because the standard method invocation form with a dot (`f.number`) is simply syntactic sugar for `Flight.number(f)`.
+
+if you try the latter, it works as expected.
+
+```py
+>>> Flight.number(f)
+'SN060'
+>>>
+```
+
+..although you really never see this form used.
+
+## instance initializers
+
+`__init__()`
+
+- instance method for initializing new objects
+- if provided, is called as part of the process of creating a new object when we call the constructor
+- the initializer method must be called "dunder init", delimited by the double underscores for Python runtime machinery
+
+`__init__()` is an initializer, not a constructor.
+
+the purpose of dunder init is to configure an object that already exists by the time dunder init is called.
+
+the `self` argument is similar to `this` in Java, C#, C++, and JavaScript.
+
+the actual constructor is provided by the Python runtime system and one of the things it does is check for the existence of an instance initializer and call it when present.
+
+within the initializer, we assign to an attribute of the newly created instance called `_number`.
+
+assigning to an object attribute that doesn't yet exist is sufficient to being it inito being.
+
+the initializer should NOT return anything; it simply modified the object referred to by `self`
+
+```py
+"""Model for aircraft flights."""
+
+class Flight:
+
+    def __init__(self, number):
+        self._number = number
+
+    def number(self):
+        return "SN060"
+```
+
+### why `_number`?
+
+we choose to `_number` with a leading underscore for two reasons:
+
+1. avoids a name clash with the method of the same name (`number()`)
+   1. methods are function, functions are objects, and theese functions are bound to attributes of the object. therefore, we already have an attribute called number and we don't want to replace it.
+   2. by convention, the implementation details start of an object that are NOT INTENDED for consumption or manipulation by clients of the object, should be prefixed with an underscore `_`
+
+we now also modify our number method to access the `_number` attriibute and return it.
+
+```py
+"""Model for aircraft flights."""
+
+class Flight:
+
+    def __init__(self, number):
+        self._number = number
+
+    def number(self):
+        return self._number
+```
+
+now, we can create a new flight with a custom number of our choosing in the constructor
+
+```py
+>>> from airtravel import Flight
+>>> f = Flight(2)
+>>> f.number()
+2
+>>>
+```
+
+any arguments passed to the flight constructor will be forwarded to the initializer.
+
+we can also pass in our original string from before!
+
+```py
+>>> from airtravel import Flight
+>>> f = Flight("SN060")
+>>> f.number()
+'SN060'
+>>>
+```
+
+we can also directly access the implementation details
+
+```py
+>>> f._number
+'SN060'
+>>>
+```
+
+..although this is not recommended for production code, it is very handy for debugging.
+
+if coming from a bondage and discipline language such as Java or C# with public, private, and protected access modifiers, Python's everything-is-public approach can seem excessively open-minded
+
+in practice, the leading underscore conventiioni has proven sufficient protection even in large and complex python systems. people know to not use these attributes directly.
+
+### class invariants
+
+truths about and object that endure for its lifetime
+
+one such invariant for flights is that the flight number always begins with an uppercase two-letter airline code followed by a three or four digit route number.
+
+in Python, we can establish class invariants in the dunder init method and raise exceptions if they can't be attained.
+
+we first use string slicing in str.isalpha() to verify that the first two characters of the flight number are alphabetic, raising a ValueError if not.
+
+```py
+"""Model for aircraft flights."""
+
+class Flight:
+
+    def __init__(self, number):
+        if not number[:2].isalpha():
+            raise ValueError(f"No airline code in '{number}'")
+        self._number = number
+
+  # ...
+```
+
+then we check if the same slice is uppercase by `str.isupper()` raising a ValueError if not
+
+```py
+"""Model for aircraft flights."""
+
+class Flight:
+
+    def __init__(self, number):
+        if not number[:2].isalpha():
+            raise ValueError(f"No airline code in '{number}'")
+
+        if not number[:2].isupper():
+            raise ValueError(f"Invalid airline code '{number}'")
+
+        self._number = number
+  # ...
+```
+
+finally, we use slicing, `str.isdigit()` and the `int` constructor to verify that the rest of `number` comprises only digits and that it represents a value between `0` and `9999`, raising a ValueError if not
+
+```py
+if not (number[:2].isdigit() and int(number[2:]) <= 9999):
+            raise ValueError(f"Invalid route number '{number}'")
+```
+
+```py
+"""Model for aircraft flights."""
+
+class Flight:
+
+    def __init__(self, number):
+        if not number[:2].isalpha():
+            raise ValueError(f"No airline code in '{number}'")
+
+        if not number[:2].isupper():
+            raise ValueError(f"Invalid airline code '{number}'")
+
+        if not (number[2:].isdigit() and int(number[2:]) <= 9999):
+            raise ValueError(f"Invalid route number '{number}'")
+
+        self._number = number
+  # ...
+```
+
+for the first time in the course, we see the logical negation operator `not`
+
+Ad-hoc testing in the REPL is a very effective technique during development
+
+we can create our custom flight numbers now, and raise errors when they are not formatted properly.
+
+no errors, proper flight name:
+
+```py
+>>> from airtravel import Flight
+>>> f = Flight("SN060")
+>>> f.number()
+'SN060'
+>>>
+```
+
+if no leading alpha chars:
+
+```py
+>>> g = Flight("060")
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+  File "/Users/jw02583/Documents/repos/core-python/02-getting-started/classes/airtravel.py", line 8, in __init__
+    raise ValueError(f"No airline code in '{number}'")
+ValueError: No airline code in '060'
+>>>
+```
+
+if not uppercase:
+
+```py
+>>> g = Flight("sn060")
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+  File "/Users/jw02583/Documents/repos/core-python/02-getting-started/classes/airtravel.py", line 11, in __init__
+    raise ValueError(f"Invalid airline code '{number}'")
+ValueError: Invalid airline code 'sn060'
+>>>
+```
+
+too many digits
+
+```py
+>>> g = Flight("SN12345")
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+  File "/Users/jw02583/Documents/repos/core-python/02-getting-started/classes/airtravel.py", line 14, in __init__
+    raise ValueError(f"Invalid route number '{number}'")
+ValueError: Invalid route number 'SN12345'
+>>>
+```
+
+and now that we can be sure that the flight objects will have a valid flight number, we can add a second method to return just the airline code
+
+```py
+"""Model for aircraft flights."""
+
+class Flight:
+
+    def __init__(self, number):
+        if not number[:2].isalpha():
+            raise ValueError(f"No airline code in '{number}'")
+
+        if not number[:2].isupper():
+            raise ValueError(f"Invalid airline code '{number}'")
+
+        if not (number[2:].isdigit() and int(number[2:]) <= 9999):
+            raise ValueError(f"Invalid route number '{number}'")
+
+        self._number = number
+
+    def number(self):
+        return self._number
+
+    def airline(self):
+        return self._number[:2]
+```
