@@ -241,6 +241,7 @@ table of contents
   - [moment of zen: complex is better than complicated](#moment-of-zen-complex-is-better-than-complicated)
   - [booking seats](#booking-seats)
     - [seat booking data structure](#seat-booking-data-structure)
+      - [`allocate_seat`](#allocate_seat)
 
 # course overview
 
@@ -7691,3 +7692,343 @@ for each flight, we simply need to keep track of who is sitting in each seat
 ### seat booking data structure
 
 ![seat booking data structure](media/seatBookingDataStructure.png)
+
+seat allocations will be represented usig a list of dictionaries.
+
+the list will contain one entry for each row of seats, and each entry will be a dictionary mapping seat letter ro occupant name (`seat_letter : occupant_name`)
+
+it the seat is unoccupied, it will contain `None`
+
+we initialize the seating plan in the flight initializer using this fragment utilizing tuple unpacking
+
+```py
+rows, seats = self._aircraft.seating_plan()
+```
+
+which in our code looks like:
+
+```py
+class Flight:
+    """A flight with a particular passenger aircraft."""
+
+    def __init__(self, number, aircraft):
+        if not number[:2].isalpha():
+            raise ValueError(f"No airline code in '{number}'")
+
+        if not number[:2].isupper():
+            raise ValueError(f"Invalid airline code '{number}'")
+
+        if not (number[2:].isdigit() and int(number[2:]) <= 9999):
+            raise ValueError(f"Invalid route number '{number}'")
+
+        self._number = number
+        self._aircraft = aircraft
+        rows, seats = self._aircraft.seating_plan() # added
+
+    def aircraft_model(self):
+        return self._aircraft.model()
+
+    def number(self):
+        return self._number
+
+    def airline(self):
+        return self._number[:2]
+```
+
+in the second line, we create a list for the seat allocations
+
+which looks like:
+
+```py
+class Flight:
+    """A flight with a particular passenger aircraft."""
+
+    def __init__(self, number, aircraft):
+        if not number[:2].isalpha():
+            raise ValueError(f"No airline code in '{number}'")
+
+        if not number[:2].isupper():
+            raise ValueError(f"Invalid airline code '{number}'")
+
+        if not (number[2:].isdigit() and int(number[2:]) <= 9999):
+            raise ValueError(f"Invalid route number '{number}'")
+
+        self._number = number
+        self._aircraft = aircraft
+        rows, seats = self._aircraft.seating_plan()
+        self._seating = [None] + [{letter: None for letter in seats} for _ in rows] # added
+
+    def aircraft_model(self):
+        return self._aircraft.model()
+
+    def number(self):
+        return self._number
+
+    def airline(self):
+        return self._number[:2]
+```
+
+rather than continually deal with the fact that our airplane row indices are one-based, whereas lists are zero-based, we choose to waste one entry at the beginning of the list to avoid confusion.
+
+this first wasted entry is the single element list containing `None`
+
+to this single-element list, we can concatenate another list containing one entry for each real row in the aircraft
+
+this list is constructed by a list comprehension which iterates over the rows objects, which is the range of row numbers retrieved from the `_aircraft` on the previous line.
+
+we're not actually interested in the row number, since we know it will match with the list index in the final list, so we discard it by using the dummy underscore variable.
+
+the item expression part of the list expression is **itself** a comprehension, specifically a dictionary comprehension.
+
+this iterates over each letter for the row and creaetes a mapping from the single letter string to None to indicate an empty seat.
+
+we use a list comprehension rather than list replication with the multiplication operate because we want a distinct dictionary object to be created for each row.
+
+before continuing, lets test our code in the REPL.
+
+since our implementation details are public, we can access them and check their values in development more-easily.
+
+here is our seating arrangement for our example:
+
+```py
+>>> from airtravel import *
+>>> f = Flight("BA758", Aircraft("G-EUPT", "Airbus A319", num_rows=22, num_seats_per_row=6))
+>>> f._seating
+[None, {'A': None, 'B': None, 'C': None, 'D': None, 'E': None, 'F': None}, {'A': None, 'B': None, 'C': None, 'D': None, 'E': None, 'F': None}, {'A': None, 'B': None, 'C': None, 'D': None, 'E': None, 'F': None}, {'A': None, 'B': None, 'C': None, 'D': None, 'E': None, 'F': None}, {'A': None, 'B': None, 'C': None, 'D': None, 'E': None, 'F': None}, {'A': None, 'B': None, 'C': None, 'D': None, 'E': None, 'F': None}, {'A': None, 'B': None, 'C': None, 'D': None, 'E': None, 'F': None}, {'A': None, 'B': None, 'C': None, 'D': None, 'E': None, 'F': None}, {'A': None, 'B': None, 'C': None, 'D': None, 'E': None, 'F': None}, {'A': None, 'B': None, 'C': None, 'D': None, 'E': None, 'F': None}, {'A': None, 'B': None, 'C': None, 'D': None, 'E': None, 'F': None}, {'A': None, 'B': None, 'C': None, 'D': None, 'E': None, 'F': None}, {'A': None, 'B': None, 'C': None, 'D': None, 'E': None, 'F': None}, {'A': None, 'B': None, 'C': None, 'D': None, 'E': None, 'F': None}, {'A': None, 'B': None, 'C': None, 'D': None, 'E': None, 'F': None}, {'A': None, 'B': None, 'C': None, 'D': None, 'E': None, 'F': None}, {'A': None, 'B': None, 'C': None, 'D': None, 'E': None, 'F': None}, {'A': None, 'B': None, 'C': None, 'D': None, 'E': None, 'F': None}, {'A': None, 'B': None, 'C': None, 'D': None, 'E': None, 'F': None}, {'A': None, 'B': None, 'C': None, 'D': None, 'E': None, 'F': None}, {'A': None, 'B': None, 'C': None, 'D': None, 'E': None, 'F': None}, {'A': None, 'B': None, 'C': None, 'D': None, 'E': None, 'F': None}]
+>>>
+```
+
+this is accurate, but not particularly nice to look at.
+
+we can try this again usinig prettyprint
+
+```py
+>>> from pprint import pprint as pp
+>>> pp(f._seating)
+[None,
+ {'A': None, 'B': None, 'C': None, 'D': None, 'E': None, 'F': None},
+ {'A': None, 'B': None, 'C': None, 'D': None, 'E': None, 'F': None},
+ {'A': None, 'B': None, 'C': None, 'D': None, 'E': None, 'F': None},
+ {'A': None, 'B': None, 'C': None, 'D': None, 'E': None, 'F': None},
+ {'A': None, 'B': None, 'C': None, 'D': None, 'E': None, 'F': None},
+ {'A': None, 'B': None, 'C': None, 'D': None, 'E': None, 'F': None},
+ {'A': None, 'B': None, 'C': None, 'D': None, 'E': None, 'F': None},
+ {'A': None, 'B': None, 'C': None, 'D': None, 'E': None, 'F': None},
+ {'A': None, 'B': None, 'C': None, 'D': None, 'E': None, 'F': None},
+ {'A': None, 'B': None, 'C': None, 'D': None, 'E': None, 'F': None},
+ {'A': None, 'B': None, 'C': None, 'D': None, 'E': None, 'F': None},
+ {'A': None, 'B': None, 'C': None, 'D': None, 'E': None, 'F': None},
+ {'A': None, 'B': None, 'C': None, 'D': None, 'E': None, 'F': None},
+ {'A': None, 'B': None, 'C': None, 'D': None, 'E': None, 'F': None},
+ {'A': None, 'B': None, 'C': None, 'D': None, 'E': None, 'F': None},
+ {'A': None, 'B': None, 'C': None, 'D': None, 'E': None, 'F': None},
+ {'A': None, 'B': None, 'C': None, 'D': None, 'E': None, 'F': None},
+ {'A': None, 'B': None, 'C': None, 'D': None, 'E': None, 'F': None},
+ {'A': None, 'B': None, 'C': None, 'D': None, 'E': None, 'F': None},
+ {'A': None, 'B': None, 'C': None, 'D': None, 'E': None, 'F': None},
+ {'A': None, 'B': None, 'C': None, 'D': None, 'E': None, 'F': None},
+ {'A': None, 'B': None, 'C': None, 'D': None, 'E': None, 'F': None}]
+>>>
+```
+
+this is much better and easier to look at.
+
+#### `allocate_seat`
+
+now, we will add behavior to Flight to allocate seats to passengers.
+
+to keep it simple, a passenger will simply be a string name.
+
+our code looks like:
+
+```py
+    def allocate_seat(seat, passenger):
+        """Allocate a seat to a passenger. # 1
+
+        Args:
+            seat: A seat designator such as '12C' or '21F'.
+            passenger: The passenger name.
+
+        Raises:
+            ValueError: If the seat is unavailable.
+        """
+
+        rows, seat_letters = self._aircraft.seating_plan()
+
+        letter = seat[-1] # 2
+        if letter not in seat_letters: # 3
+            raise ValueError(f"Invalid seat letter {letter}")
+
+        row_text = seat[:-1] # 4
+        try:
+            row = int(row_text) # 5
+        except ValueError:
+            raise ValueError(f"Invalid seat row {row_text}") # 6
+
+        if row not in rows: # 7
+            raise ValueError(f"Invalid row number {row}")
+
+        if self._seating[row][letter] is not None: # 8
+            raise ValueError(f"Seat {seat} already occupied") # 8.1
+
+        self._seating[row][letter] = passenger # 9
+```
+
+most of the code is validation of the seat designator
+
+`allocate-seat` broken down, step by step:
+
+1. methods or functions are just as deserving of docstrings as modules
+2. we get the seat letter by using negative indexing into seat string
+3. we test that the seat letter is valid by checking for membership of seat letters using the `in` membership testing operator
+4. we extract the row number using string slicing to take all but the last character
+5. we try to convert the row number substring to an integer using the `int` constructor
+6. if this fails, we catch the value error and in the handler, raise a new ValueError with a more appropriate message payload
+7. we conveniently validate the row number by using the `in` operator against the rows object which is a range. we can do this because range supports the container protocol
+8. we check that the requested seat is unoccupied usinig an identity test with None
+   1. if occupied, we raise the ValueError
+9. if we get this far, everything's in good shape and we can assign the seat
+
+it also **contains a bug** that we will discover later.
+
+now, lets try the code.
+
+1. construct our new flight
+
+```py
+>>> from airtravel import *
+>>> f = Flight("BA758", Aircraft("G-EUPT", "Airbus A319", num_rows=22, num_seats_per_row=6))
+>>>
+```
+
+2. we put python's BDFL Guido van Rossum in seat 12A
+
+```py
+>>> f.allocate_seat("12A", "Guido van Rossum")
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+TypeError: allocate_seat() takes 2 positional arguments but 3 were given
+>>>
+```
+
+this occurred because we forgot to include the `self` argument in the definition of the `allocate_seat` method
+
+once we fix that, we can try again.
+
+```py
+>>> from airtravel import *
+>>> f = Flight("BA758", Aircraft("G-EUPT", "Airbus A319", num_rows=22, num_seats_per_row=6))
+>>> f.allocate_seat("12A", "Guido van Rossum")
+>>>
+```
+
+this runs now with no errors.
+
+3. attempt to allocate seat 12A to Rasmus Lerford
+
+```py
+>>> f.allocate_seat("12A", "Rasmus Lerforf")
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+  File "/Users/jw02583/Documents/repos/core-python/02-getting-started/classes/airtravel.py", line 57, in allocate_seat
+    raise ValueError(f"Seat {seat} already occupied")
+ValueError: Seat 12A already occupied
+>>>
+```
+
+and discover that it raises a ValueError to prevent us from assigning two people to the same seat.
+
+4. let's assign Byrane Stroustrup and Anders Hejlsberg next to each other in row 15.
+
+```py
+>>> f.allocate_seat("15F", "Bjarne Stroustrup")
+>>> f.allocate_seat("15E", "Ander Hejlsberg")
+>>>
+```
+
+5. when we try to put Yukihiro Matsumoto in E27, we get a ValueError, telling us we used an invalid seat letter
+
+```py
+>>> f.allocate_seat("E27", "Yukihiro Matsumoto")
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+  File "/Users/jw02583/Documents/repos/core-python/02-getting-started/classes/airtravel.py", line 45, in allocate_seat
+    raise ValueError(f"Invalid seat letter {letter}")
+ValueError: Invalid seat letter 7
+>>>
+```
+
+6. assign John McCarthy and Richard Hickey to seats 1C and 1D respectively
+
+```py
+>>> f.allocate_seat("1C", "John McCarthy")
+>>> f.allocate_seat("1D", "Richard Hickey")
+>>>
+```
+
+7. when we try to seat Larry Wall in seat 'DD', we get another ValueError
+
+```py
+>>> f.allocate_seat("DD", "Larry Wall")
+Traceback (most recent call last):
+  File "/Users/jw02583/Documents/repos/core-python/02-getting-started/classes/airtravel.py", line 49, in allocate_seat
+    row = int(row_text)
+ValueError: invalid literal for int() with base 10: 'D'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+  File "/Users/jw02583/Documents/repos/core-python/02-getting-started/classes/airtravel.py", line 51, in allocate_seat
+    raise ValueError(f"Invalid seat row {row_text}")
+ValueError: Invalid seat row D
+>>>
+```
+
+8. now, we can see our seating chart using the pprint function
+
+```py
+>>> from pprint import pprint as pp
+>>> pp(f._seating)
+[None,
+ {'A': None,
+  'B': None,
+  'C': 'John McCarthy',
+  'D': 'Richard Hickey',
+  'E': None,
+  'F': None},
+ {'A': None, 'B': None, 'C': None, 'D': None, 'E': None, 'F': None},
+ {'A': None, 'B': None, 'C': None, 'D': None, 'E': None, 'F': None},
+ {'A': None, 'B': None, 'C': None, 'D': None, 'E': None, 'F': None},
+ {'A': None, 'B': None, 'C': None, 'D': None, 'E': None, 'F': None},
+ {'A': None, 'B': None, 'C': None, 'D': None, 'E': None, 'F': None},
+ {'A': None, 'B': None, 'C': None, 'D': None, 'E': None, 'F': None},
+ {'A': None, 'B': None, 'C': None, 'D': None, 'E': None, 'F': None},
+ {'A': None, 'B': None, 'C': None, 'D': None, 'E': None, 'F': None},
+ {'A': None, 'B': None, 'C': None, 'D': None, 'E': None, 'F': None},
+ {'A': None, 'B': None, 'C': None, 'D': None, 'E': None, 'F': None},
+ {'A': 'Guido van Rossum',
+  'B': None,
+  'C': None,
+  'D': None,
+  'E': None,
+  'F': None},
+ {'A': None, 'B': None, 'C': None, 'D': None, 'E': None, 'F': None},
+ {'A': None, 'B': None, 'C': None, 'D': None, 'E': None, 'F': None},
+ {'A': None,
+  'B': None,
+  'C': None,
+  'D': None,
+  'E': 'Ander Hejlsberg',
+  'F': 'Bjarne Stroustrup'},
+ {'A': None, 'B': None, 'C': None, 'D': None, 'E': None, 'F': None},
+ {'A': None, 'B': None, 'C': None, 'D': None, 'E': None, 'F': None},
+ {'A': None, 'B': None, 'C': None, 'D': None, 'E': None, 'F': None},
+ {'A': None, 'B': None, 'C': None, 'D': None, 'E': None, 'F': None},
+ {'A': None, 'B': None, 'C': None, 'D': None, 'E': None, 'F': None},
+ {'A': None, 'B': None, 'C': None, 'D': None, 'E': None, 'F': None},
+ {'A': None, 'B': None, 'C': None, 'D': None, 'E': None, 'F': None}]
+>>>
+```
+
+the dutchman is lonely on row 12, so we'd like to move him back to row 15 with the danes. to do so, we'll need a `relocate_passenger` method.
