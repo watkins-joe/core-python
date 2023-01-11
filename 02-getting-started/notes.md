@@ -235,6 +235,12 @@ table of contents
   - [instance initializers](#instance-initializers)
     - [why `_number`?](#why-_number)
     - [class invariants](#class-invariants)
+  - [a second class](#a-second-class)
+  - [collaborating classes](#collaborating-classes)
+    - [the law of demeter](#the-law-of-demeter)
+  - [moment of zen: complex is better than complicated](#moment-of-zen-complex-is-better-than-complicated)
+  - [booking seats](#booking-seats)
+    - [seat booking data structure](#seat-booking-data-structure)
 
 # course overview
 
@@ -7496,3 +7502,192 @@ class Flight:
     def airline(self):
         return self._number[:2]
 ```
+
+## a second class
+
+one of the things we'd like to do with our flight is to accept seat bookings
+
+to do that, we need to know the seating layout.
+
+and to know the seating layout, we need to know the type of aircraft.
+
+let's make another class to model the different kinds of aircraft
+
+```py
+class Aircraft:
+
+    def __init__(self, registration, model, num_rows, num_seats_per_row):
+        self._registration = registration
+        self._model = model
+        self._num_rows = num_rows
+        self._num_seats_per_row = num_seats_per_row
+
+    def registration(self):
+        return self._registration
+
+    def model(self):
+        return self._model
+
+    def seating_plan(self):
+        return (range(1, self._num_rows + 1), "ABCDEFGHJK"[:self._num_seats_per_row])
+```
+
+in production code, we could validate this code to make sure that the number of rows was not negative, for example.
+
+the registration method returns the registration.
+
+```py
+    def registration(self):
+        return self._registration
+```
+
+the model method returns the aircraft's model.
+
+```py
+    def model(self):
+        return self._model
+```
+
+for the seating plan, we'd like something more in line with our booking system
+
+rows in aircraft are numbered from 1, and the seats with eacch row are designated with letters from an alphabet which omits the letter `I` to avoid confusion with `1`.
+
+we will add a seating plan method which returns the allow rows and seats as a tuple containing a range objecct and a string of seat letters.
+
+```py
+    def seating_plan(self):
+        return (range(1, self._num_rows + 1), "ABCDEFGHJK"[:self._num_seats_per_row])
+```
+
+the range call produced an interable sequence of row numbers, up to the number of rows in the plane. the string and its slice method return a string with one character per seat. these two objects, the range and the string, are bundled up into a tuple
+
+doing this, we can create a new Aircraft object
+
+```py
+>>> from airtravel import *
+>>> a = Aircraft("G-EUPT", "Airbus A319", num_rows=22, num_seats_per_row=6)
+>>> a
+<airtravel.Aircraft object at 0x10bab7fd0>
+>>>
+```
+
+and we can access the registration, model, and seating_plan through their respective methods
+
+```py
+>>> a.registration()
+'G-EUPT'
+>>> a.model()
+'Airbus A319'
+>>> a.seating_plan()
+(range(1, 23), 'ABCDEF')
+>>>
+```
+
+see how we used keyword arguments for the rows and seats for documentary purposes.
+
+also recall that the ranges are half-open so 23 is intentionally 1 beyond the end of the range.
+
+## collaborating classes
+
+### the law of demeter
+
+- the principle of least knowledge
+- only talk to your friends
+
+longer definition:
+
+- it's an object-oriented design principle that says you should never call methods on objects you received from other calls
+
+we will modify our Flight class to accept an aircraft object when it is constructed
+
+```py
+class Flight:
+                                  # \/ added
+    def __init__(self, number, aircraft):
+        if not number[:2].isalpha():
+            raise ValueError(f"No airline code in '{number}'")
+
+        if not number[:2].isupper():
+            raise ValueError(f"Invalid airline code '{number}'")
+
+        if not (number[2:].isdigit() and int(number[2:]) <= 9999):
+            raise ValueError(f"Invalid route number '{number}'")
+
+        self._number = number
+        self._aircraft = aircraft # added
+```
+
+we will follow the Law of Demetere by adding a method to report the aircraft model
+
+the method will delegate the aircraft on behalf of the client, rather than allowing the client to reach through the Flight and interrogate the aircraft object directly.
+
+```py
+class Flight:
+
+    def __init__(self, number, aircraft):
+        if not number[:2].isalpha():
+            raise ValueError(f"No airline code in '{number}'")
+
+        if not number[:2].isupper():
+            raise ValueError(f"Invalid airline code '{number}'")
+
+        if not (number[2:].isdigit() and int(number[2:]) <= 9999):
+            raise ValueError(f"Invalid route number '{number}'")
+
+        self._number = number
+        self._aircraft = aircraft
+
+    def aircraft_model(self): # added
+        return self._aircraft.model()
+```
+
+we will also add a docstring to the class. these work just like function and module docstrings.
+
+```py
+class Flight:
+    """A flight with a particular passenger aircraft."""
+
+    # ...
+```
+
+now, let's construct another flight, but this time passing in the aircraft object to the Flight constructor
+
+```py
+>>> from airtravel import *
+>>> f = Flight("BA758", Aircraft("G-EUPT", "Airbus A319", num_rows=22, num_seats_per_row=6))
+>>>
+```
+
+notice that we construct the Aircraft object and directly pass it to the Flight constructor without needing an intermediate named reference to it.
+
+once constructed, we can access the aircraft's model directly from our Flight object
+
+```py
+>>> f.aircraft_model()
+'Airbus A319'
+>>>
+```
+
+## moment of zen: complex is better than complicated
+
+many moving parts
+combined in a clever box
+are now one good tool
+
+the aircraft model method is an example of complex is better than complicated.
+
+the Flight class is more complex, it contains additional code to drill down through the aircraft reference to find the model.
+
+however, all clients of Flight can now be less complicated.
+
+none of them need to know about the aircraft class, dramatically simplifying the system.
+
+## booking seats
+
+implementing a simple booking system
+
+for each flight, we simply need to keep track of who is sitting in each seat
+
+### seat booking data structure
+
+![seat booking data structure](media/seatBookingDataStructure.png)
