@@ -244,6 +244,9 @@ table of contents
       - [`allocate_seat`](#allocate_seat)
   - [methods for implementation details](#methods-for-implementation-details)
     - [`relocate_passenger` method](#relocate_passenger-method)
+  - [object-oriented design with function objects](#object-oriented-design-with-function-objects)
+    - [tell, don't ask](#tell-dont-ask)
+      - [`console_card_printer` method](#console_card_printer-method)
 
 # course overview
 
@@ -8334,5 +8337,121 @@ we can verify this result by multiplying the number of seats per row (6) by the 
 ```py
 >>> 6 * 22 - 5
 127
+>>>
+```
+
+## object-oriented design with function objects
+
+it is possible to write nice OOP code without needing classes
+
+with a new airtravel requirement, we need to be able to print boarding passes.
+
+- they need to be printed in alphabetical order
+- separation of concerns: don't put this on the Flight class
+- remember that functions are objects, too
+
+### tell, don't ask
+
+tell other objects what to do instead of asking them their state and responding to it
+
+rather than have a card printer query all the passenger details from the flight,
+we'll have the Flight tell a simple card printing function what to do
+
+#### `console_card_printer` method
+
+a module-level function
+
+```py
+def console_card_printer(passenger, seat, flight_number, aircraft):
+    output = f"| Name: {passenger}"        \
+             f"  Flight: {flight_number}"  \
+             f"  Seat: {seat}"             \
+             f"  Aircraft: {aircraft}"     \
+             " |"
+    banner = "+" + "-" * (len(output) - 2) + "+"
+    border = "|" + " " * (len(output) - 2) + "|"
+    lines = [banner, border, output, border, banner]
+    card = "\n".join(lines)
+    print(card)
+    print()
+```
+
+we can use a **line continuation backslash characters** that allow us to split a long statement over several lines
+
+this is used together with implicit string concatenation of adjacent strings to produce one long string with no line breaks.
+
+we then measure the length of the output line and put some banners and borders around it.
+
+we then concatenate the lines together calling the join method on a newline `\n` separator before printing the whole card followed by a blank line
+
+note that the card printer ƒunction doesn't know anything about flights or aircraft, it's very loosely coupled
+
+to the Flight class, we add a `make_boarding_cards` method accepts a `card_printer`
+
+```py
+def make_boarding_cards(self, card_printer):
+    for passenger, seat in sorted(self._passenger_seats()):
+        card_printer(passenger, seat, self.number(), self.aircraft_model())
+```
+
+this calls the implementation detail `_passenger_seats` method, sorts the results, and loops over the resulting `passenger_seat` tuples
+
+for each of these, it then calls the `card_printer` that was passed in
+
+the new `_passenger_seats` method is a generator function, which searchs all seats for occupants, yielding the passenger and the seat number as they're found.
+
+```py
+def _passenger_seats(self):
+    """An iterable series of passenger seating locations."""
+    row_numbers, seat_letters = self._aircraft.seating_plan()
+    for row in row_numbers:
+        for letter in seat_letters:
+            passenger = self._seating[row][letter]
+            if passenger is not None:
+                yield (passenger, f"{row}{letter}")
+```
+
+it first determines the number of rows and seat letters in each row.
+
+then, it loops over the row numbers, and for each row, loops over the seat letters.
+
+it finds the passenger in that seat and if the passenger is not None, yields the passenger and seat information
+
+if we now try this in the REPL, we can see it in action
+
+```py
+>>> from airtravel import console_card_printer, make_flight
+>>> f = make_flight()
+>>> f.make_boarding_cards(console_card_printer)
++------------------------------------------------------------------------+
+|                                                                        |
+| Name: Ander Hejlsberg  Flight: BA758  Seat: 15E  Aircraft: Airbus A319 |
+|                                                                        |
++------------------------------------------------------------------------+
+
++--------------------------------------------------------------------------+
+|                                                                          |
+| Name: Bjarne Stroustrup  Flight: BA758  Seat: 15F  Aircraft: Airbus A319 |
+|                                                                          |
++--------------------------------------------------------------------------+
+
++-------------------------------------------------------------------------+
+|                                                                         |
+| Name: Guido van Rossum  Flight: BA758  Seat: 12A  Aircraft: Airbus A319 |
+|                                                                         |
++-------------------------------------------------------------------------+
+
++---------------------------------------------------------------------+
+|                                                                     |
+| Name: John McCarthy  Flight: BA758  Seat: 1C  Aircraft: Airbus A319 |
+|                                                                     |
++---------------------------------------------------------------------+
+
++----------------------------------------------------------------------+
+|                                                                      |
+| Name: Richard Hickey  Flight: BA758  Seat: 1D  Aircraft: Airbus A319 |
+|                                                                      |
++----------------------------------------------------------------------+
+
 >>>
 ```
