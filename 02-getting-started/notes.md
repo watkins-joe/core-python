@@ -242,6 +242,8 @@ table of contents
   - [booking seats](#booking-seats)
     - [seat booking data structure](#seat-booking-data-structure)
       - [`allocate_seat`](#allocate_seat)
+  - [methods for implementation details](#methods-for-implementation-details)
+    - [`relocate_passenger` method](#relocate_passenger-method)
 
 # course overview
 
@@ -8032,3 +8034,305 @@ ValueError: Invalid seat row D
 ```
 
 the dutchman is lonely on row 12, so we'd like to move him back to row 15 with the danes. to do so, we'll need a `relocate_passenger` method.
+
+## methods for implementation details
+
+we can clean up our code a bit and extract the deat designator parsing and validation logic into its own method, `_parse_seat`
+
+we use a leading underscore because this method is an implementation detail
+
+now our code looks like:
+
+```py
+    # ...
+    def allocate_seat(self, seat, passenger):
+        """Allocate a seat to a passenger.
+
+        Args:
+            seat: A seat designator such as '12C' or '21F'.
+            passenger: The passenger name.
+
+        Raises:
+            ValueError: If the seat is unavailable.
+        """
+
+        row, letter = self._parse_seat(seat) # new method usage
+
+        if self._seating[row][letter] is not None:
+            raise ValueError(f"Seat {seat} already occupied")
+
+        self._seating[row][letter] = passenger
+
+    def _parse_seat(self, seat):
+        rows, seat_letters = self._aircraft.seating_plan()
+
+        letter = seat[-1]
+        if letter not in seat_letters:
+            raise ValueError(f"Invalid seat letter {letter}")
+
+        row_text = seat[:-1]
+        try:
+            row = int(row_text)
+        except ValueError:
+            raise ValueError(f"Invalid seat row {row_text}")
+
+        if row not in rows:
+            raise ValueError(f"Invalid row number {row}")
+
+        return row, letter
+```
+
+the new `_parse_seat` method returns a tuple with an integer row number and a seat letter string.
+
+notice that method calls within the same object, such as this call:
+
+```py
+        row, letter = self._parse_seat(seat) # new method usage
+```
+
+also require explicit qualification with `self.` prefix
+
+### `relocate_passenger` method
+
+new method:
+
+```py
+    def relocate_passenger(self, from_seat, to_seat):
+        """Relocate a passenger to a different seat.
+
+        Args:
+            from_seat: The existing seat designator for the passenger to be moved.
+
+            to_seat: The new seat designator.
+        """
+        from_row, from_letter = self._parse_seat(from_seat)
+        if self._seating[from_row][from_letter] is None:
+            raise ValueError(f"No passenger to relocate in seat {from_seat}")
+
+        to_row, to_letter = self._parse_seat(to_seat)
+        if self._seating[to_row][to_letter] is not None:
+            raise ValueError(f"Seat {to_seat} already occupied")
+
+        self._seating[to_row][to_letter] = self._seating[from_row][from_letter]
+        self._seating[from_row][from_letter] = None
+```
+
+it's also getting tiresome creating a new Flight object every time we want to test, so we will add a module-level convenience function for that.
+
+we will call it `make_flight`
+
+this makes creation of our test Flight object much faster. here it is in our airtravel module now:
+
+```py
+"""Model for aircraft flights."""
+
+class Flight:
+    """A flight with a particular passenger aircraft."""
+
+    def __init__(self, number, aircraft):
+        if not number[:2].isalpha():
+            raise ValueError(f"No airline code in '{number}'")
+
+        if not number[:2].isupper():
+            raise ValueError(f"Invalid airline code '{number}'")
+
+        if not (number[2:].isdigit() and int(number[2:]) <= 9999):
+            raise ValueError(f"Invalid route number '{number}'")
+
+        self._number = number
+        self._aircraft = aircraft
+        rows, seats = self._aircraft.seating_plan()
+        self._seating = [None] + [{letter: None for letter in seats} for _ in rows]
+
+    def aircraft_model(self):
+        return self._aircraft.model()
+
+    def number(self):
+        return self._number
+
+    def airline(self):
+        return self._number[:2]
+
+    def allocate_seat(self, seat, passenger):
+        """Allocate a seat to a passenger.
+
+        Args:
+            seat: A seat designator such as '12C' or '21F'.
+            passenger: The passenger name.
+
+        Raises:
+            ValueError: If the seat is unavailable.
+        """
+
+        row, letter = self._parse_seat(seat)
+
+        if self._seating[row][letter] is not None:
+            raise ValueError(f"Seat {seat} already occupied")
+
+        self._seating[row][letter] = passenger
+
+    def _parse_seat(self, seat):
+        rows, seat_letters = self._aircraft.seating_plan()
+
+        letter = seat[-1]
+        if letter not in seat_letters:
+            raise ValueError(f"Invalid seat letter {letter}")
+
+        row_text = seat[:-1]
+        try:
+            row = int(row_text)
+        except ValueError:
+            raise ValueError(f"Invalid seat row {row_text}")
+
+        if row not in rows:
+            raise ValueError(f"Invalid row number {row}")
+
+        return row, letter
+
+    def relocate_passenger(self, from_seat, to_seat):
+        """Relocate a passenger to a different seat.
+
+        Args:
+            from_seat: The existing seat designator for the passenger to be moved.
+
+            to_seat: The new seat designator.
+        """
+        from_row, from_letter = self._parse_seat(from_seat)
+        if self._seating[from_row][from_letter] is None:
+            raise ValueError(f"No passenger to relocate in seat {from_seat}")
+
+        to_row, to_letter = self._parse_seat(to_seat)
+        if self._seating[to_row][to_letter] is not None:
+            raise ValueError(f"Seat {to_seat} already occupied")
+
+        self._seating[to_row][to_letter] = self._seating[from_row][from_letter]
+        self._seating[from_row][from_letter] = None
+
+class Aircraft:
+
+    def __init__(self, registration, model, num_rows, num_seats_per_row):
+        self._registration = registration
+        self._model = model
+        self._num_rows = num_rows
+        self._num_seats_per_row = num_seats_per_row
+
+    def registration(self):
+        return self._registration
+
+    def model(self):
+        return self._model
+
+    def seating_plan(self):
+        return (range(1, self._num_rows + 1), "ABCDEFGHJK"[:self._num_seats_per_row])
+
+def make_flight(): # new function
+    f = Flight("BA758", Aircraft("G-EUPT", "Airbus A319", num_rows=22, num_seats_per_row=6))
+    f.allocate_seat("12A", "Guido van Rossum")
+    f.allocate_seat("15F", "Bjarne Stroustrup")
+    f.allocate_seat("15E", "Ander Hejlsberg")
+    f.allocate_seat("1C", "John McCarthy")
+    f.allocate_seat("1D", "Richard Hickey")
+    return f
+
+```
+
+its normal to mix related functions and classes in the same module like this.
+
+now, we can try this from the REPL.
+
+```py
+>>> from airtravel import make_flight
+>>> f = make_flight()
+>>> f
+<airtravel.Flight object at 0x10809f7f0>
+>>>
+```
+
+Python's dynamic type system allows us to have access to a Flight object without having to import everything in the module (such as the Flight class.ect). this is some very loose coupling between code.
+
+we can then move Guido's seat using our new method
+
+```py
+>>> f.relocate_passenger("12A", "15D")
+>>>
+```
+
+and if we print the seating chart, we should now see that he is in the right place.
+
+```py
+>>> from pprint import pprint as pp
+>>> pp(f._seating)
+[None,
+ {'A': None,
+  'B': None,
+  'C': 'John McCarthy',
+  'D': 'Richard Hickey',
+  'E': None,
+  'F': None},
+ {'A': None, 'B': None, 'C': None, 'D': None, 'E': None, 'F': None},
+ {'A': None, 'B': None, 'C': None, 'D': None, 'E': None, 'F': None},
+ {'A': None, 'B': None, 'C': None, 'D': None, 'E': None, 'F': None},
+ {'A': None, 'B': None, 'C': None, 'D': None, 'E': None, 'F': None},
+ {'A': None, 'B': None, 'C': None, 'D': None, 'E': None, 'F': None},
+ {'A': None, 'B': None, 'C': None, 'D': None, 'E': None, 'F': None},
+ {'A': None, 'B': None, 'C': None, 'D': None, 'E': None, 'F': None},
+ {'A': None, 'B': None, 'C': None, 'D': None, 'E': None, 'F': None},
+ {'A': None, 'B': None, 'C': None, 'D': None, 'E': None, 'F': None},
+ {'A': None, 'B': None, 'C': None, 'D': None, 'E': None, 'F': None},
+ {'A': None, 'B': None, 'C': None, 'D': None, 'E': None, 'F': None},
+ {'A': None, 'B': None, 'C': None, 'D': None, 'E': None, 'F': None},
+ {'A': None, 'B': None, 'C': None, 'D': None, 'E': None, 'F': None},
+ {'A': None,
+  'B': None,
+  'C': None,
+  'D': 'Guido van Rossum',
+  'E': 'Ander Hejlsberg',
+  'F': 'Bjarne Stroustrup'},
+ {'A': None, 'B': None, 'C': None, 'D': None, 'E': None, 'F': None},
+ {'A': None, 'B': None, 'C': None, 'D': None, 'E': None, 'F': None},
+ {'A': None, 'B': None, 'C': None, 'D': None, 'E': None, 'F': None},
+ {'A': None, 'B': None, 'C': None, 'D': None, 'E': None, 'F': None},
+ {'A': None, 'B': None, 'C': None, 'D': None, 'E': None, 'F': None},
+ {'A': None, 'B': None, 'C': None, 'D': None, 'E': None, 'F': None},
+ {'A': None, 'B': None, 'C': None, 'D': None, 'E': None, 'F': None}]
+>>>
+```
+
+it's important during booking to know how many seats are available.
+
+to handle this, we will write a method to display the number of seats available called `num_available_seats`
+
+this is achieved using two nested generator functions
+
+the outer expression filters for all rows, which are `not None`. this excludes our dummy first row.
+
+the value of each item in the outer expression is the sum of the number of `None` values in each row.
+
+we split this outer expression over three rows to improve readability.
+
+this inner expression iterates over values of the dictionary and adds one for each `None` found
+
+```py
+    def num_available_seats(self):
+        return sum(sum(1 for s in row.values() if s is None)
+                    for row in self._seating
+                    if row is not None)
+```
+
+we can make a flight and ask how many seats it has available
+
+```py
+>>> from airtravel import make_flight
+>>> f = make_flight()
+>>> f.num_available_seats()
+127
+>>>
+```
+
+we can verify this result by multiplying the number of seats per row (6) by the number of rows on the plane (22), and subtracting the number of occupied seats (5), resulting in 127.
+
+```py
+>>> 6 * 22 - 5
+127
+>>>
+```
