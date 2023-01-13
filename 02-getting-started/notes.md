@@ -247,6 +247,9 @@ table of contents
   - [object-oriented design with function objects](#object-oriented-design-with-function-objects)
     - [tell, don't ask](#tell-dont-ask)
       - [`console_card_printer` method](#console_card_printer-method)
+  - [polymorphism and duck typing](#polymorphism-and-duck-typing)
+    - [polymorphism](#polymorphism)
+    - [duck typing](#duck-typing)
 
 # course overview
 
@@ -8452,6 +8455,148 @@ if we now try this in the REPL, we can see it in action
 | Name: Richard Hickey  Flight: BA758  Seat: 1D  Aircraft: Airbus A319 |
 |                                                                      |
 +----------------------------------------------------------------------+
+
+>>>
+```
+
+## polymorphism and duck typing
+
+### polymorphism
+
+using objects of different types through a uniform interface.
+
+it applies to both functiionis as well as more complex types.
+
+we just saw an example of polymorphism with the card printer example.
+
+- the `make_boarding_card()` method did not rely on any concrete types, only the abstract details of its interface (essentially, just the order of its arguments)
+- any other object that fit the interface would work in place of `console_card_printer()`
+
+### duck typing
+
+polymorphism in python is achieved thru duck typing
+
+named after the duck test.
+
+"When I see a bird that walks like a duck and swims like a duck and quacks like a duck, I call that bird a duck."
+
+- James Whitecomb Riley
+
+- an object's fitness for a particular use is only determined at runtime, a cornerstone of Python's object system
+- this is in contrast to statically typed, compiled languages where a compiler determeines if an object can be used
+- this means that an object's suitability is not based on inheritance hierarchies, case classes, or anything except the attributes an object has at the time of use
+  - this is in contrast to languages such as Java which depend on nominal subtyping through inheritance from base classes and interfaces
+
+when we review our Aircraft class again, we find that the class in somewhat flawed in that objects instantiated using it depend on being supplied with the seating config that matches the aircraft model, which for the purposes of this exercise, is fixed per model
+
+what would be better and simpler is to get rid of the Aircraft class entirely and make separate classes for each specific model of aircraft with a fixed seating configuration.
+
+the Airbus:
+
+```py
+class AirbusA319:
+
+    def __init__(self, registration):
+        self._registration = registration
+
+    def registration(self):
+        return self._registration
+
+    def model(self):
+        return "Airbus A319"
+
+    def seating_plan(self):
+        return range(1, 23), "ABCDEF"
+```
+
+the Boeing 777:
+
+```py
+class Boeing777:
+
+    def __init__(self, registration):
+        self._registration = registration
+
+    def registration(self):
+        return self._registration
+
+    def model(self):
+        return "Boeing 777"
+
+    def seating_plan(self):
+        # For simplicity's sake, we ignore complex
+        # seating arrangement for first-class
+        return range(1, 56), "ABCDEGHJK
+```
+
+these two classes have no explicit relationship to each other or to our original Aircraft class beyonnd having identical interefaces to each other, with the exception of the initializer, which now takes fewer arguments.
+
+as such, we can now use these new types in place of each other.
+
+change our `make_flight` method into `make_flights` to use them
+
+after updating, our code looks like:
+
+```py
+def make_flights():
+    f = Flight("BA758", AirbusA319("G-EUPT"))
+    f.allocate_seat("12A", "Guido van Rossum")
+    f.allocate_seat("15F", "Bjarne Stroustrup")
+    f.allocate_seat("15E", "Ander Hejlsberg")
+    f.allocate_seat("1C", "John McCarthy")
+    f.allocate_seat("1D", "Richard Hickey")
+
+    g = Flight("BA758", Boeing777("F-GSPS"))
+    g.allocate_seat("55K", "Larry Wall")
+    g.allocate_seat("33G", "Yukihirio Matsumoto")
+    g.allocate_seat("4B", "Brian Kernighan")
+    g.allocate_seat("4A", "Dennis Ritchie")
+
+    return f, g
+```
+
+where our function now returns both flights as a tuple
+
+the different types of aircraft both work fine when used with Flight because they both quack like ducks
+
+lets try it in the REPL:
+
+```py
+>>> from airtravel import *
+>>> f, g = make_flights()
+>>> f.aircraft_model()
+'Airbus A319'
+>>> g.aircraft_model()
+'Boeing 777'
+>>> f.num_available_seats()
+127
+>>> g.num_available_seats()
+491
+>>> g.relocate_passenger("55K", "13G")
+>>> g.make_boarding_cards(console_card_printer)
++----------------------------------------------------------------------+
+|                                                                      |
+| Name: Brian Kernighan  Flight: BA758  Seat: 4B  Aircraft: Boeing 777 |
+|                                                                      |
++----------------------------------------------------------------------+
+
++---------------------------------------------------------------------+
+|                                                                     |
+| Name: Dennis Ritchie  Flight: BA758  Seat: 4A  Aircraft: Boeing 777 |
+|                                                                     |
++---------------------------------------------------------------------+
+
++------------------------------------------------------------------+
+|                                                                  |
+| Name: Larry Wall  Flight: BA758  Seat: 13G  Aircraft: Boeing 777 |
+|                                                                  |
++------------------------------------------------------------------+
+
++---------------------------------------------------------------------------+
+|                                                                           |
+| Name: Yukihirio Matsumoto  Flight: BA758  Seat: 33G  Aircraft: Boeing 777 |
+|                                                                           |
++---------------------------------------------------------------------------+
 
 >>>
 ```
