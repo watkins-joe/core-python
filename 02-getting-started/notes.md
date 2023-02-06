@@ -250,6 +250,10 @@ table of contents
   - [polymorphism and duck typing](#polymorphism-and-duck-typing)
     - [polymorphism](#polymorphism)
     - [duck typing](#duck-typing)
+  - [inheritance and implementation sharing](#inheritance-and-implementation-sharing)
+    - [late binding](#late-binding)
+    - [derived classes](#derived-classes)
+  - [summary](#summary-8)
 
 # course overview
 
@@ -8600,3 +8604,196 @@ lets try it in the REPL:
 
 >>>
 ```
+
+## inheritance and implementation sharing
+
+inheritance is a mechanism whereby one class, the sub class, can be derived from another class, the base class, allowing us to make behavior more specific in the sub class
+
+### late binding
+
+1. in nominally-typed languages such as Java, class-based inheritance is the means by which runtime polymorphism is achieved
+2. not so python, as python uses **late-binding**. the fact that no python method calls or attribute lookups are bound to actual objects until the point at which they're called, a quality known as **late-binding**, means that..
+3. we can attempt polymorphism with any object and it will succeed if the object fits
+
+inheritance in python is primarily useful for sharing implementation between classes
+
+example:
+
+we would like our aircraft classes `AirbusA319` and `Boeing777` to provide a way of returning the total number of seats.
+
+we will add a method called `num_seats` to both classes to do this
+
+```py
+    def num_seats(self):
+        rows, row_seats = self.seating_plan();
+        return len(rows) * len(row_seats)
+```
+
+but, now we have duplicate code across two classes. the solution is to extract the common elements of `AirbusA319` and `Boeing777` into a base class from which both aircraft types will derive.
+
+we will re-create the class `Aircraft` with the goal of it being a `base class`
+
+```py
+class Aircraft:
+
+    def num_seats(self):
+        rows, row_seats = self.seating_plan()
+        return len(rows) * len(row_seats)
+
+```
+
+it contains just the method we want to inherit into the derived class, `num_seats`
+
+this class isn't useable on its own because it depends on a method called `seating_plan` which isn't available in `Aircraft`
+
+```py
+>>> from airtravel import *
+>>> base = Aircraft()
+>>> base.num_seats()
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+  File "/Users/jw02583/Documents/repos/core-python/02-getting-started/classes/airtravel.py", line 107, in num_seats
+    rows, row_seats = self.seating_plan()
+AttributeError: 'Aircraft' object has no attribute 'seating_plan'
+>>>
+```
+
+how do we use it meaningfully?
+
+### derived classes
+
+we specify inheritance in Python using parenthesis containing the base class name immediately after the class name in the class statement
+
+example:
+
+```py
+class Aircraft:
+
+    def num_seats(self):
+        rows, row_seats = self.seating_plan()
+        return len(rows) * len(row_seats)
+
+class AirbusA319(Aircraft):
+
+    def __init__(self, registration):
+        self._registration = registration
+
+    def registration(self):
+        return self._registration
+
+    def model(self):
+        return "Airbus A319"
+
+    def seating_plan(self):
+        return range(1, 23), "ABCDEF"
+
+class Boeing777(Aircraft):
+
+    def __init__(self, registration):
+        self._registration = registration
+
+    def registration(self):
+        return self._registration
+
+    def model(self):
+        return "Boeing 777"
+
+    def seating_plan(self):
+        # For simplicity's sake, we ignore complex
+        # seating arrangement for first-class
+        return range(1, 56), "ABCDEGHJK"
+```
+
+now, both subclasses have access to that `num_seats` method from the `Aircraft` class
+
+```py
+>>> from airtravel import *
+>>> a = AirbusA319("G-EZBT")
+>>> a.num_seats()
+132
+>>> b = Boeing777("N717AN")
+>>> b.num_seats()
+495
+>>>
+```
+
+it works because the `num_seats` method's call to `seating_plan`, which is defined on both subclasses, is successfully resolved on the `self` object at **runtime**
+
+now that we have the base `Aircraft` class, we can hoist other common functionality into it
+
+in this case, the `initializer` and `registration` methods are identical between the two subtypes
+
+now, our `Aircraft` class and other classes look like:
+
+```py
+class Aircraft:
+
+    def __init__(self, registration):
+        self._registration = registration
+
+    def registration(self):
+        return self._registration
+
+    def num_seats(self):
+        rows, row_seats = self.seating_plan()
+        return len(rows) * len(row_seats)
+
+class AirbusA319(Aircraft):
+
+    def model(self):
+        return "Airbus A319"
+
+    def seating_plan(self):
+        return range(1, 23), "ABCDEF"
+
+class Boeing777(Aircraft):
+
+    def model(self):
+        return "Boeing 777"
+
+    def seating_plan(self):
+        # For simplicity's sake, we ignore complex
+        # seating arrangement for first-class
+        return range(1, 56), "ABCDEGHJK"
+```
+
+thanks to duck-typing, python uses inheritance less than many other languages
+
+this is generally seen as a good thing because inheritance is a very tight coupling between classes
+
+## summary
+
+- all types in python have a class
+- classes define the structure and behavior of objects
+- an object's class is set when it's created, and it's fixed for the object's lifetime
+- classes are a key part of object-oriented programming in python
+- classes are defined with the `class` keyword
+- instances of a class are created by calling the class like a function
+- instance methods are functions defined within a class and must accept a `self` argument as the first param
+- methods are called using the `instance.method()` syntax, which is syntactic sugar for passing the instance as the formal `self` argument to the method
+- classes may have a `__init__()` method for initializing new instances, which is used to configure the `self` object at creation time
+- if present, a class's contructor will call `__init__()`
+- `__init()__` is not, strictly speaking, a constructor. the object has been contructed by the time the initializer is called
+- arguments passed to the constructor are forwarded to `__init()__`
+- instance attributes are created simply by assigning to them
+- implementation details are conventionally prefixed with an underscore
+- there are no public, protected, or private access modifiers in Python
+- access to implementation details outside a class can be useful during development
+- class invariants should be established within `__init()__`. if invariants can't be established, raise exception to signal failure
+- methods can have docstrings
+- classes can have docstrings
+- method calls on `self` within a method must be preceded with `self`
+- a module can contain as many classes and functions as you wish
+- polymorphism is achieved in Python through duck-typing, where attributes and methods are only resolved at point of use, **late-binding**
+- polymorphism in python doesn't rely on shared base classes or interfaces
+- class inheritance in Python is primarily useful for sharing information
+- all methods are inherited, including special methods like the initializer
+- strings support slicing because they implement the sequence protocol
+- following the Law of Demeter can reduce coupling
+- we can nest comprehensions
+- it can be useful to discard the current item in a comprehension, and this is conventionally does using the underscore `_`
+- you can discard a collection element to simplify handling one-based indexing
+- don't feel compelled to use classes if functions suffice
+- you can spread comprehensions over multiple lines
+- statements can be split over multiple lines with backslash `\`; use this primarily to improve readability
+- the `tell, don't ask!` approach to OOP can reduce coupling
